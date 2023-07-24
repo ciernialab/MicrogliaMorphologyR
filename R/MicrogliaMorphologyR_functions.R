@@ -8,8 +8,8 @@ fraclac_tidying <- function(dir){
   setwd(dir)
   FracLac1 <- read.csv("Hull and Circle Results.txt", sep='\t')
   y <- FracLac1 %>%
-    separate(1, into=c("Name","trash"), sep="_thresholded.tif_") %>%
-    separate(trash, into=c("ID","trash1"), sep=".tif") %>%
+    separate(1, into=c("Name","trash"), sep="tif_thresholdedtif_") %>%
+    separate(trash, into=c("ID","trash1"), sep="tif") %>%
     select(-trash1)
   y
 }
@@ -35,7 +35,7 @@ skeleton_tidying <- function(dir){
   finaldf2 <- do.call(rbind,good)
 
   y <- finaldf2 %>%
-    separate(Name, into=c("Name","trash"), sep="_thresholded.tif_") %>%
+    separate(Name, into=c("Name","trash"), sep=".tif_thresholded.tif_") %>%
     separate(trash, into=c("ID","junk2"), sep=".tif_results") %>% select(-junk2) %>%
     unite("UniqueID",c("Name","ID"),sep="_",remove=FALSE)
   y
@@ -103,7 +103,7 @@ merge_data <- function(fraclac, skeleton){
 #' @param sep is the character, "_" or "-", that separates your metadata
 #' @export
 metadata_columns <- function(data, metadata, sep){
-  final <- data %>% separate(Name, into=metadata, sep=z)
+  final <- data %>% separate(Name, into=metadata, sep=sep)
   final
 }
 
@@ -281,8 +281,8 @@ featurecorrelations <- function(data,start,end,rthresh,pthresh,title){
   mat2[filter] <- "" # correlation values that are less than 0.5 (weak correlations)
 
   # make heatmap
-  pheatmap(hi$r, display_numbers = mat2, fontsize_number=26,
-           fontsize=20, fontsize_row=18, fontsize_col=18,
+  pheatmap(hi$r, display_numbers = mat2,
+           #fontsize_number=26, fontsize=20, fontsize_row=18, fontsize_col=18,
            main=title)
 }
 
@@ -420,11 +420,11 @@ clusterplots <- function(data, pc.xaxis, pc.yaxis){
   pc.xaxis <- sym(pc.xaxis)
   pc.yaxis <- sym(pc.yaxis)
   data %>% ggplot(aes(x = !!pc.xaxis, y = !!pc.yaxis, color = as.character(`k2$cluster`))) +
-  geom_point() +
-  stat_ellipse() +
-  ggtitle("K-means clusters") +
-  labs(color="Cluster") +
-  theme_minimal(base_size=16)
+    geom_point() +
+    stat_ellipse() +
+    ggtitle("K-means clusters") +
+    labs(color="Cluster") +
+    theme_minimal(base_size=16)
 }
 
 #' Cluster-specific average morphology measures
