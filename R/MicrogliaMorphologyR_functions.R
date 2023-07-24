@@ -3,7 +3,7 @@
 #' 'fraclac_tidying' loads in your FracLac output and cleans up names of cells
 #'
 #' @param dir is your directory containing the 'Hull and Circles Results.txt' file from FracLac output
-
+#' @export
 fraclac_tidying <- function(dir){
   setwd(dir)
   FracLac1 <- read.csv("Hull and Circle Results.txt", sep='\t')
@@ -19,7 +19,7 @@ fraclac_tidying <- function(dir){
 #' 'skeleton_tidying' loads in all of your AnalyzeSkeleton output and clean up IDs to match FracLac data for downstream merging of data at cell level.
 #'
 #' @param dir is your directory containing all of your individual AnalyzeSkeleton .csv result files output from MicrogliaMorphology
-
+#' @export
 skeleton_tidying <- function(dir){
   setwd(dir)
   files <- list.files()
@@ -48,7 +48,7 @@ skeleton_tidying <- function(dir){
 #'
 #' @param fraclac is your tidied fraclac output
 #' @param skeleton is your tidied skeleton output
-
+#' @export
 merge_data <- function(fraclac, skeleton){
   data <- inner_join(fraclac, skeleton, by=c("Name","ID"))
 
@@ -101,7 +101,7 @@ merge_data <- function(fraclac, skeleton){
 #' @param data is your tidied dataframe containing all of your numerical morphology data
 #' @param metadata is your metadata listed out in order that they appear in 'Name' column: e.g., c("Cohort","Sex","MouseID")
 #' @param sep is the character, "_" or "-", that separates your metadata
-
+#' @export
 metadata_columns <- function(data, metadata, sep){
   final <- data %>% separate(Name, into=metadata, sep=z)
   final
@@ -112,7 +112,7 @@ metadata_columns <- function(data, metadata, sep){
 #' 'outliers_boxplots' generates boxplots of morphology features to visualize those with broader ranges which might dominate the analysis downstream.
 #'
 #' @param data is your final dataframe which contains gathered data (measure, value) format
-
+#' @export
 outliers_boxplots <- function(data){
   data %>%
     ggplot(aes(x=measure, y=value)) +
@@ -126,7 +126,7 @@ outliers_boxplots <- function(data){
 #' 'outliers_distributions' generates plots of feature distributions to determine which features have skewed distributions and how to normalize your values for analysis downstream.
 #'
 #' @param data is your final dataframe which contains gathered data (measure, value) format
-
+#' @export
 outliers_distributions <- function(data){
   data %>%
     ggplot(aes(x = value)) +
@@ -140,7 +140,7 @@ outliers_distributions <- function(data){
 #'
 #' @param data is your final dataframe which contains gathered data (measure, value) format
 #' @param x is the constant value you want to add (e.g., 0, 0.1, 1)
-
+#' @export
 normalize_logplots <- function(data,x){
   data %>%
     ggplot(aes(x = log(value+x))) +
@@ -157,7 +157,7 @@ normalize_logplots <- function(data,x){
 #' 'normalize_scaled' allows you to check distributions of features after scaling (e.g., log10(scale(value)))
 #'
 #' @param data is your final dataframe which contains gathered data (measure, value) format
-
+#' @export
 normalize_scaled <- function(data){
   data %>%
     ggplot(aes(x = scale(value))) +
@@ -174,7 +174,7 @@ normalize_scaled <- function(data){
 #' 'normalize_minmax' allows you to check distributions of features after min-max normalizing to get your values for each measure constrained to 0-1 range.
 #'
 #' @param data is your final dataframe which contains gathered data (measure, value) format
-
+#' @export
 normalize_minmax <- function(data){
   data %>%
     ggplot(aes(x = minmax(value))) +
@@ -192,7 +192,7 @@ normalize_minmax <- function(data){
 #'
 #' @param x is your input values
 #' @param y is the constant value you want to add (e.g., 0, 0.1, 1)
-
+#' @export
 logscale <- function(x,y){
   data <- log(x+y)
   data}
@@ -205,7 +205,7 @@ logscale <- function(x,y){
 #' @param x is the constant value you want to add (e.g., 0.1, 1)
 #' @param start is first column number of morphology measures
 #' @param end is last column number of morphology measures
-
+#' @export
 transform_log <- function(data,x,start,end){
   data %>% mutate_at(start:end, funs(logscale(.,x)))
 }
@@ -215,7 +215,7 @@ transform_log <- function(data,x,start,end){
 #' 'minmax' allows you to min-max normalize values
 #'
 #' @param x is your input values
-
+#' @export
 minmax <- function(x){
   data <- (x- min(x)) /(max(x)-min(x))
   data}
@@ -227,7 +227,7 @@ minmax <- function(x){
 #' @param data is your input dataframe
 #' @param start is first column number of morphology measures
 #' @param end is last column number of morphology measures
-
+#' @export
 transform_minmax <- function(data,start,end){
   data %>% mutate_at(start:end, minmax)
 }
@@ -239,7 +239,7 @@ transform_minmax <- function(data,start,end){
 #' @param data is your input dataframe
 #' @param start is first column number of morphology measures
 #' @param end is last column number of morphology measures
-
+#' @export
 transform_scale <- function(data,start,end){
   data %>% mutate_at(start:end, scale)
 }
@@ -250,7 +250,7 @@ transform_scale <- function(data,start,end){
 #'
 #' @param data is your input dataframe
 #' @param ... list out your variables of interest without combining (e.g., Cohort, Sex, Treatment)
-
+#' @export
 samplesize <- function(data,...){
   data %>% group_by(...) %>% summarise(num=n())
 }
@@ -265,7 +265,7 @@ samplesize <- function(data,...){
 #' @param rthresh is cutoff threshold for significant correlation values
 #' @param pthresh is cutoff threshold for significant p-values
 #' @param title is what you want to name your heatmap
-
+#' @export
 featurecorrelations <- function(data,start,end,rthresh,pthresh,title){
   # correlations with p-values
   hi <- rcorr(as.matrix(scale(data[,start:end])), type="spearman")
@@ -293,7 +293,7 @@ featurecorrelations <- function(data,start,end,rthresh,pthresh,title){
 #' @param data is your input data frame
 #' @param start is first column number of morphology measures
 #' @param end is last column number of morphology measures
-
+#' @export
 pcadata_elbow <- function(data, start, end){
   prin_comp <- prcomp(data[,start:end], scale=TRUE)
   fviz_eig(prin_comp, addlabels=TRUE, main="Variance explained by PCs")
@@ -308,7 +308,7 @@ pcadata_elbow <- function(data, start, end){
 #' @param end is last column number of morphology measures
 #' @param pc.start is first PC you want included (e.g., PC1)
 #' @param pc.end is last PC you want included (e.g., PC4)
-
+#' @export
 pcadata <- function(data, start, end, pc.start, pc.end){
   prin_comp <- prcomp(data[,start:end], scale=TRUE)
   components <- prin_comp[["x"]]
@@ -330,7 +330,7 @@ pcadata <- function(data, start, end, pc.start, pc.end){
 #' @param rthresh is cutoff threshold for significant correlation values
 #' @param pthresh is cutoff threshold for significant p-values
 #' @param title is what you want to name your heatmap
-
+#' @export
 pcfeaturecorrelations <- function(pca_data, pc.start, pc.end, feature.start, feature.end, rthresh, pthresh, title){
 
   morphologyfeatures <- colnames(pca_data[,feature.start:feature.end])
@@ -415,7 +415,7 @@ pcfeaturecorrelations <- function(pca_data, pc.start, pc.end, feature.start, fea
 #' @param data is your input data frame
 #' @param pc.xaxis is the pc values you want on x-axis (e.g, PC1)
 #' @param pc.yaxis is the pce values you want on y-axis (e.g., PC2)
-
+#' @export
 clusterplots <- function(data, pc.xaxis, pc.yaxis){
   pc.xaxis <- sym(pc.xaxis)
   pc.yaxis <- sym(pc.yaxis)
@@ -434,7 +434,7 @@ clusterplots <- function(data, pc.xaxis, pc.yaxis){
 #' @param data is your input data frame
 #' @param start is first column number of morphology measures
 #' @param end is last column number of morphology measures
-
+#' @export
 clusterfeatures <- function(data, start, end){
   heatmap <- data %>% group_by(`k2$cluster`) %>% summarise(across(start:end, ~ mean(.x)))
   heatmap$`k2$cluster` <- paste0("Cluster ", heatmap$`k2$cluster`)
@@ -450,7 +450,7 @@ clusterfeatures <- function(data, start, end){
 #'
 #' @param data is your input data frame
 #' @param ... list out your variables of interest without combining (e.g., Cohort, Sex, Treatment)
-
+#' @export
 clusterpercentage <- function(data,...){
   data %>%
     group_by(..., `k2$cluster`) %>%
@@ -465,7 +465,7 @@ clusterpercentage <- function(data,...){
 #'
 #' @param data is your input data frame
 #' @param ... list out your variables of interest without combining (e.g., Cohort, Sex, Treatment)
-
+#' @export
 clusterpercentage_boxplots <- function(data,...){
   y <- unname(sapply(rlang::enexprs(...), as.character))
   z <- paste0(y, collapse="*")
@@ -491,7 +491,7 @@ clusterpercentage_boxplots <- function(data,...){
 #' @param posthoc.sex is your posthoc comparisons when considering sex (e.g., ~Treatment|Sex)
 #' @param posthoc.nosex is your posthoc comparisons when not considering sex (e.g., ~Treatment)
 #' @param adjust is your method of multiple test correction
-
+#' @export
 stats_morphologymeasures <- function(data,model,posthoc.sex,posthoc.nosex,adjust){
 
   y.model <- as.character(model)
@@ -574,7 +574,7 @@ stats_morphologymeasures <- function(data,model,posthoc.sex,posthoc.nosex,adjust
 #'
 #' @param data is your input data frame
 #' @param group is the variable you want to group your data by
-
+#' @export
 cell.level_boxplots <- function(data,group){
   group <- sym(group)
   data %>%
