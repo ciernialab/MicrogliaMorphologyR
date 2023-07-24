@@ -4,11 +4,11 @@
 \alias{outliers_boxplots}
 \title{Exploratory data analysis: outlier detection}
 \usage{
-outliers_boxplots(x)
+outliers_boxplots(data)
 }
 \arguments{
-\item{x}{is your final dataframe which contains gathered data (measure, value) format}
+\item{data}{is your final dataframe which contains gathered data (measure, value) format}
 }
 \description{
-This function allows you to use boxplots of features to look for those with broader ranges which might dominate the data analysis
+'outliers_boxplots' generates boxplots of morphology features to visualize those with broader ranges which might dominate the analysis downstream.
 }

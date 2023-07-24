@@ -2,15 +2,16 @@
 % Please edit documentation in R/MicrogliaMorphologyR_functions.R
 \name{merge_data}
 \alias{merge_data}
-\title{Merge fraclac and skeleton results together}
+\title{Merge FracLac and AnalyzeSkeleton results together into one final cell-level data frame}
 \usage{
-merge_data(x, y)
+merge_data(fraclac, skeleton)
 }
 \arguments{
-\item{x}{is your tidied fraclac output}
+\item{fraclac}{is your tidied fraclac output}
 
-\item{y}{is your tidied skeleton output}
+\item{skeleton}{is your tidied skeleton output}
 }
 \description{
-This function allows you to merge your fraclac and skeleton results by Name and ID, get rid of non-numerical data, and brush up feature names
+'merge_data' merges your FracLac and AnalyzeSkeleton results by Name and ID, gets rid of non-numerical data, and brushes up feature names.
+The final output is a dataframe, where every row is a cell and every column is an identifier or one of 27 unique morphology features.
 }

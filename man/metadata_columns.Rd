@@ -2,17 +2,18 @@
 % Please edit documentation in R/MicrogliaMorphologyR_functions.R
 \name{metadata_columns}
 \alias{metadata_columns}
-\title{Would you like to get some metadata?}
+\title{Tidy up metadata}
 \usage{
-metadata_columns(x, y, z)
+metadata_columns(data, metadata, sep)
 }
 \arguments{
-\item{x}{is your tidied dataframe containing all of your numerical morphology data}
+\item{data}{is your tidied dataframe containing all of your numerical morphology data}
 
-\item{y}{is your metadata listed out in order that they appear in 'Name' column: e.g., c("Cohort","Sex","MouseID")}
+\item{metadata}{is your metadata listed out in order that they appear in 'Name' column: e.g., c("Cohort","Sex","MouseID")}
 
-\item{z}{is the character, "_" or "-", that separates your metadata}
+\item{sep}{is the character, "_" or "-", that separates your metadata}
 }
 \description{
-This function allows you to extract metadata columns from the UniqueID column.
+'metadata_columns' allows you to extract individual metadata columns from the UniqueID column.
+Each piece of metadata should be separated by a common deliminator, 'sep' parameter
 }

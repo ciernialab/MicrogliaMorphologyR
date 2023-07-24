@@ -4,11 +4,13 @@
 \alias{normalize_logplots}
 \title{Exploratory data analysis: normalization methods}
 \usage{
-normalize_logplots(x)
+normalize_logplots(data, x)
 }
 \arguments{
-\item{x}{is your final dataframe which contains gathered data (measure, value) format}
+\item{data}{is your final dataframe which contains gathered data (measure, value) format}
+
+\item{x}{is the constant value you want to add (e.g., 0, 0.1, 1)}
 }
 \description{
-This function allows you to check distributions of features after log normalization (log10(x+1))
+'normalize_logplots' allows you to check distributions of features after log normalization (e.g., log10(value+0.1))
 }

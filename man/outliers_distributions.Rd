@@ -4,11 +4,11 @@
 \alias{outliers_distributions}
 \title{Exploratory data analysis: outlier detection}
 \usage{
-outliers_distributions(x)
+outliers_distributions(data)
 }
 \arguments{
-\item{x}{is your final dataframe which contains gathered data (measure, value) format}
+\item{data}{is your final dataframe which contains gathered data (measure, value) format}
 }
 \description{
-This function allows you to check distributions of features to determine if and how to normalize
+'outliers_distributions' generates plots of feature distributions to determine which features have skewed distributions and how to normalize your values for analysis downstream.
 }

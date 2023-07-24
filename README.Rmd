@@ -32,13 +32,12 @@ skeleton.dir <- "/Volumes/NINC/CierniaLab/Jenn/2022-2023/Paper1_MicrogliaMorphol
 
 fraclac <- fraclac_tidying(fraclac.dir)
 skeleton <- skeleton_tidying(skeleton.dir)
-
 data <- merge_data(fraclac, skeleton)
 
-finaldata <- metadata_columns(data.test, c("Cohort","MouseID","Treatment","Sex","BrainRegion","SubRegion"),"_")
+finaldata <- metadata_columns(data, c("Cohort","MouseID","Treatment","Sex","BrainRegion","SubRegion"),"_")
 ```
 
-### exploratory data visualization
+### exploratory data visualization and data transformation for downstream analyses
 ```{r}
 data2 <- finaldata %>% gather(measure, value, 4:ncol(finaldata))
 
@@ -47,5 +46,88 @@ outliers_boxplots(data2)
 outliers_distributions(data2)
 
 # checking different normalization features
-normalize_logplots(data2)
+normalize_logplots(data2,1)
+normalize_minmax(data2)
+normalize_scaled(data2)
+
+# transform your data in appropriate manner for downstream analyses
+transform_log(data,1,1,3)
+transform_minmax(data,1,3)
+transform_scale(data,1,3)
+
+# get sample size of data based on factors of interest
+samplesize(finaldata, Cohort, MouseID)
+```
+
+### generate heatmap of correlations across features
+```{r}
+featurecorrelations(finaldata,1,3,0.8,0.05,"Correlations across features")
+```
+
+## Dimensionality reduction
+```{r}
+set.seed(1)
+pcadata_elbow(iris,1,3)
+pca_data <- pcadata(iris,1,3,1,3)
+```
+
+### generate heatmap of correlations between PCs and features
+```{r}
+pcfeaturecorrelations(pca_data, 1,3, 4,7, 0.8, 0.05, "Correlation between PCs and features")
+```
+
+## Clustering
+```{r}
+## for k-means clustering: min-max scale PCs 1-4
+pca_data2 <- transform_scale(pca_data,1,3)
+
+# check for optimal number of clusters
+set.seed(2)
+fviz_nbclust(pca_data2[1:3], kmeans, method = 'wss')
+fviz_nbclust(pca_data2[1:3], kmeans, method = 'silhouette')
+fviz_nbclust(pca_data2[1:3], kmeans, method = 'gap_stat')
+
+# cluster and combine with original data
+k2 <- kmeans(pca_data2[1:3], centers=4, nstart=25) 
+test <- cbind(pca_data2, as.data.frame(k2$cluster))
+
+# plot k-means clusters in PC space
+clusterplots(test, "PC1", "PC2")
+
+# customizeable example
+plot <- clusterplots(test)
+plot + scale_colour_viridis_d() # add color scheme of choice
+```
+
+### Cluster characterization
+```{r}
+# cluster-specific measures on average for each morphology feature, relative to other clusters
+clusterfeatures(test,4,7)
+
+# cluster percentages across variables of interest
+# test$hello <- rep(c("A","B","C"), times=4)
+cp <- clusterpercentage(test, hello, Species)
+clusterpercentage_boxplots(cp, hello, Species)
+```
+
+## Statistical analysis
+
+## Individual morphology measures
+```{r}
+DF2 <- test %>% group_by(Species, hello) %>% gather(Measure, Value, 4:7)
+hellohi <- stats_morphologymeasures(DF2, "Value ~ Species*hello + (1|`k2$cluster`)", "~Species|hello", "~Species", "holm")
+hellohi[[1]]
+hellohi[[2]]
+hellohi[[3]]
+do.call("grid.arrange", c(hellohi[[4]], ncol=4))
+hellohi[[5]]
+
+hellohi[[1]] %>% DT::datatable(., options=list(autoWidth=TRUE, scrollX=TRUE, scrollCollapse=TRUE))
+hellohi[[2]] %>% DT::datatable(., options=list(autoWidth=TRUE, scrollX=TRUE, scrollCollapse=TRUE))
+hellohi[[3]] %>% DT::datatable(., options=list(autoWidth=TRUE, scrollX=TRUE, scrollCollapse=TRUE))
+
+cell.level_boxplots(DF2, "Species")
+DF2 %>% 
+  filter(Measure=="Sepal.Length"|Measure=="Petal.Width") %>% 
+  cell.level_boxplots("Species")
 ```

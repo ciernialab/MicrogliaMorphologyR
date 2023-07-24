@@ -2,15 +2,13 @@
 % Please edit documentation in R/MicrogliaMorphologyR_functions.R
 \name{skeleton_tidying}
 \alias{skeleton_tidying}
-\title{Concatenating your individual AnalyzeSkeleton output files into one dataframe}
+\title{Concatenate your individual AnalyzeSkeleton output files into one dataframe}
 \usage{
-skeleton_tidying(x)
+skeleton_tidying(dir)
 }
 \arguments{
-\item{x}{is your directory containing all of your individual AnalyzeSkeleton .csv result files}
-
-\item{y}{is the variable name for your processed output containing your tidied analyzeskeleton data}
+\item{dir}{is your directory containing all of your individual AnalyzeSkeleton .csv result files output from MicrogliaMorphology}
 }
 \description{
-This function allows you to load in all of your AnalyzeSkeleton output and clean up IDs to match FracLac data for downstream merging
+'skeleton_tidying' loads in all of your AnalyzeSkeleton output and clean up IDs to match FracLac data for downstream merging of data at cell level.
 }

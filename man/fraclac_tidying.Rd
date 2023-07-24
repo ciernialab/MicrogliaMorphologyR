@@ -2,15 +2,13 @@
 % Please edit documentation in R/MicrogliaMorphologyR_functions.R
 \name{fraclac_tidying}
 \alias{fraclac_tidying}
-\title{Tidying up your FracLac output}
+\title{Tidy up your FracLac output}
 \usage{
-fraclac_tidying(x)
+fraclac_tidying(dir)
 }
 \arguments{
-\item{x}{is your directory containing the 'Hull and Circles Results.txt' file}
-
-\item{y}{is the variable name for your processed output containing your tidied fraclac data}
+\item{dir}{is your directory containing the 'Hull and Circles Results.txt' file from FracLac output}
 }
 \description{
-This function allows you to load in FracLac output and clean up names of cells
+'fraclac_tidying' loads in your FracLac output and cleans up names of cells
 }
