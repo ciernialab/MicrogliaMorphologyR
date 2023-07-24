@@ -1,29 +1,27 @@
-#' Tidying up your FracLac output
-#' 
-#' This function allows you to load in FracLac output and clean up names of cells
-#' 
-#' @param x is your directory containing the 'Hull and Circles Results.txt' file
-#' @param y is the variable name for your processed output containing your tidied fraclac data 
+#' Tidy up your FracLac output
+#'
+#' 'fraclac_tidying' loads in your FracLac output and cleans up names of cells
+#'
+#' @param dir is your directory containing the 'Hull and Circles Results.txt' file from FracLac output
 
-fraclac_tidying <- function(x){
-  setwd(x)
+fraclac_tidying <- function(dir){
+  setwd(dir)
   FracLac1 <- read.csv("Hull and Circle Results.txt", sep='\t')
   y <- FracLac1 %>%
-  separate(1, into=c("Name","trash"), sep="_thresholded-roitif_") %>%
-  separate(trash, into=c("ID","trash1"), sep="tif") %>%
-  select(-trash1)
+    separate(1, into=c("Name","trash"), sep="_thresholded.tif_") %>%
+    separate(trash, into=c("ID","trash1"), sep=".tif") %>%
+    select(-trash1)
   y
 }
 
-#' Concatenating your individual AnalyzeSkeleton output files into one dataframe
-#' 
-#' This function allows you to load in all of your AnalyzeSkeleton output and clean up IDs to match FracLac data for downstream merging
-#' 
-#' @param x is your directory containing all of your individual AnalyzeSkeleton .csv result files
-#' @param y is the variable name for your processed output containing your tidied analyzeskeleton data 
+#' Concatenate your individual AnalyzeSkeleton output files into one dataframe
+#'
+#' 'skeleton_tidying' loads in all of your AnalyzeSkeleton output and clean up IDs to match FracLac data for downstream merging of data at cell level.
+#'
+#' @param dir is your directory containing all of your individual AnalyzeSkeleton .csv result files output from MicrogliaMorphology
 
-skeleton_tidying <- function(x){
-  setwd(x)
+skeleton_tidying <- function(dir){
+  setwd(dir)
   files <- list.files()
   nf = length(files)
   good = vector("list", nf)
@@ -35,29 +33,30 @@ skeleton_tidying <- function(x){
       good[[i]]=tmp
   }
   finaldf2 <- do.call(rbind,good)
-  
-  y <- finaldf2 %>% 
-    separate(Name, into=c("Name","trash"), sep="_thresholded-roi.tif_") %>%
+
+  y <- finaldf2 %>%
+    separate(Name, into=c("Name","trash"), sep="_thresholded.tif_") %>%
     separate(trash, into=c("ID","junk2"), sep=".tif_results") %>% select(-junk2) %>%
     unite("UniqueID",c("Name","ID"),sep="_",remove=FALSE)
   y
 }
 
-#' Merge fraclac and skeleton results together
-#' 
-#' This function allows you to merge your fraclac and skeleton results by Name and ID, get rid of non-numerical data, and brush up feature names
-#' 
-#' @param x is your tidied fraclac output
-#' @param y is your tidied skeleton output
+#' Merge FracLac and AnalyzeSkeleton results together into one final cell-level data frame
+#'
+#' 'merge_data' merges your FracLac and AnalyzeSkeleton results by Name and ID, gets rid of non-numerical data, and brushes up feature names.
+#' The final output is a dataframe, where every row is a cell and every column is an identifier or one of 27 unique morphology features.
+#'
+#' @param fraclac is your tidied fraclac output
+#' @param skeleton is your tidied skeleton output
 
-merge_data <- function(x,y){
-  data <- inner_join(x, y, by=c("Name","ID"))
-  
+merge_data <- function(fraclac, skeleton){
+  data <- inner_join(fraclac, skeleton, by=c("Name","ID"))
+
   data <- data %>% select(-c(TOTAL.PIXELS,
-                       Hull.s.Centre.of.Mass,
-                       Method.Used.to.Calculate.Circle, 
-                       Hull.s.Centre.of.Mass, 
-                       Circle.s.Centre, X))
+                             Hull.s.Centre.of.Mass,
+                             Method.Used.to.Calculate.Circle,
+                             Hull.s.Centre.of.Mass,
+                             Circle.s.Centre, X))
   data <- data[, c(1:2,30,3:29)]
 
   # brush up feature names
@@ -88,31 +87,34 @@ merge_data <- function(x,y){
                      "# of triple points",
                      "# of quadruple points",
                      "Maximum branch length")
-  
+
   colnames(data)[4:30] <- feature_names
   data
 }
 
 
-#' Would you like to get some metadata?
+#' Tidy up metadata
 #'
-#' This function allows you to extract metadata columns from the UniqueID column.
-#' 
-#' @param x is your tidied dataframe containing all of your numerical morphology data
-#' @param y is your metadata listed out in order that they appear in 'Name' column: e.g., c("Cohort","Sex","MouseID")
-#' @param z is the character, "_" or "-", that separates your metadata
-metadata_columns <- function(x,y,z){
-  final <- x %>% separate(Name, into=y, sep=z)
+#' 'metadata_columns' allows you to extract individual metadata columns from the UniqueID column.
+#' Each piece of metadata should be separated by a common deliminator, 'sep' parameter
+#'
+#' @param data is your tidied dataframe containing all of your numerical morphology data
+#' @param metadata is your metadata listed out in order that they appear in 'Name' column: e.g., c("Cohort","Sex","MouseID")
+#' @param sep is the character, "_" or "-", that separates your metadata
+
+metadata_columns <- function(data, metadata, sep){
+  final <- data %>% separate(Name, into=metadata, sep=z)
   final
 }
 
 #' Exploratory data analysis: outlier detection
 #'
-#' This function allows you to use boxplots of features to look for those with broader ranges which might dominate the data analysis
-#' 
-#' @param x is your final dataframe which contains gathered data (measure, value) format
-outliers_boxplots <- function(x){
-  x %>% 
+#' 'outliers_boxplots' generates boxplots of morphology features to visualize those with broader ranges which might dominate the analysis downstream.
+#'
+#' @param data is your final dataframe which contains gathered data (measure, value) format
+
+outliers_boxplots <- function(data){
+  data %>%
     ggplot(aes(x=measure, y=value)) +
     geom_boxplot() +
     geom_jitter(width=0.15)+
@@ -121,11 +123,12 @@ outliers_boxplots <- function(x){
 
 #' Exploratory data analysis: outlier detection
 #'
-#' This function allows you to check distributions of features to determine if and how to normalize
-#' 
-#' @param x is your final dataframe which contains gathered data (measure, value) format
-outliers_distributions <- function(x){
-  x %>%
+#' 'outliers_distributions' generates plots of feature distributions to determine which features have skewed distributions and how to normalize your values for analysis downstream.
+#'
+#' @param data is your final dataframe which contains gathered data (measure, value) format
+
+outliers_distributions <- function(data){
+  data %>%
     ggplot(aes(x = value)) +
     geom_histogram(bins = 40) +
     facet_wrap(~measure, scales = "free_x", ncol=8)
@@ -133,19 +136,454 @@ outliers_distributions <- function(x){
 
 #' Exploratory data analysis: normalization methods
 #'
-#' This function allows you to check distributions of features after log normalization (log10(x+1))
-#' 
-#' @param x is your final dataframe which contains gathered data (measure, value) format
-normalize_logplots <- function(x){
-  x %>% 
-    ggplot(aes(x = log(value+1))) +
+#' 'normalize_logplots' allows you to check distributions of features after log normalization (e.g., log10(value+0.1))
+#'
+#' @param data is your final dataframe which contains gathered data (measure, value) format
+#' @param x is the constant value you want to add (e.g., 0, 0.1, 1)
+
+normalize_logplots <- function(data,x){
+  data %>%
+    ggplot(aes(x = log(value+x))) +
     geom_histogram(bins = 40) +
     facet_wrap(~measure, scales = "free", ncol=7) +
     theme(strip.text.x = element_text(size=8)) +
     theme(axis.text.x = element_text(angle = 45, hjust = 1, size=8)) +
-    scale_x_continuous(name = "Morphology measure (log(value+1))") +
+    #scale_x_continuous(name = "Morphology measure (log(value+1))") +
     scale_y_continuous(name = "Count")
 }
 
+#' Exploratory data analysis: scaled plots
+#'
+#' 'normalize_scaled' allows you to check distributions of features after scaling (e.g., log10(scale(value)))
+#'
+#' @param data is your final dataframe which contains gathered data (measure, value) format
+
+normalize_scaled <- function(data){
+  data %>%
+    ggplot(aes(x = scale(value))) +
+    geom_histogram(bins = 40) +
+    facet_wrap(~measure, scales = "free", ncol=7) +
+    theme(strip.text.x = element_text(size=8)) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1, size=8)) +
+    scale_x_continuous(name = "Morphology measure (scale(value))") +
+    scale_y_continuous(name = "Count")
+}
+
+#' Exploratory data analysis: min-max scaled plots
+#'
+#' 'normalize_minmax' allows you to check distributions of features after min-max normalizing to get your values for each measure constrained to 0-1 range.
+#'
+#' @param data is your final dataframe which contains gathered data (measure, value) format
+
+normalize_minmax <- function(data){
+  data %>%
+    ggplot(aes(x = minmax(value))) +
+    geom_histogram(bins = 40) +
+    facet_wrap(~measure, scales = "free", ncol=7) +
+    theme(strip.text.x = element_text(size=8)) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1, size=8)) +
+    scale_x_continuous(name = "Morphology measure (minmax(value))") +
+    scale_y_continuous(name = "Count")
+}
+
+#' Log scale
+#'
+#' 'logscale' allows you to log scale values
+#'
+#' @param x is your input values
+#' @param y is the constant value you want to add (e.g., 0, 0.1, 1)
+
+logscale <- function(x,y){
+  data <- log(x+y)
+  data}
+
+#' Transform data: Log scale
+#'
+#' 'transform_log' allows you to log scale your dataframe
+#'
+#' @param data is your input dataframe
+#' @param x is the constant value you want to add (e.g., 0.1, 1)
+#' @param start is first column number of morphology measures
+#' @param end is last column number of morphology measures
+
+transform_log <- function(data,x,start,end){
+  data %>% mutate_at(start:end, funs(logscale(.,x)))
+}
+
+#' Min-max scaling
+#'
+#' 'minmax' allows you to min-max normalize values
+#'
+#' @param x is your input values
+
+minmax <- function(x){
+  data <- (x- min(x)) /(max(x)-min(x))
+  data}
+
+#' Transform data: Min-max scaling
+#'
+#' 'transform_minmax' allows you to min-max scale your dataframe within each morphology measure
+#'
+#' @param data is your input dataframe
+#' @param start is first column number of morphology measures
+#' @param end is last column number of morphology measures
+
+transform_minmax <- function(data,start,end){
+  data %>% mutate_at(start:end, minmax)
+}
+
+#' Transform data: Scaling
+#'
+#' 'transform_scale' allows you to scale your dataframe within each morphology measure
+#'
+#' @param data is your input dataframe
+#' @param start is first column number of morphology measures
+#' @param end is last column number of morphology measures
+
+transform_scale <- function(data,start,end){
+  data %>% mutate_at(start:end, scale)
+}
+
+#' Sample size
+#'
+#' 'samplesize' allows you to obtain sample size of your experimental groups based on variables of interest
+#'
+#' @param data is your input dataframe
+#' @param ... list out your variables of interest without combining (e.g., Cohort, Sex, Treatment)
+
+samplesize <- function(data,...){
+  data %>% group_by(...) %>% summarise(num=n())
+}
+
+#' Correlation heatmap across morphology features
+#'
+#' 'featurecorrelations' allows you to generate a heatmap depicting significant correlations across features
+#'
+#' @param data is your input data frame
+#' @param start is first column number of morphology measures
+#' @param end is last column number of morphology measures
+#' @param rthresh is cutoff threshold for significant correlation values
+#' @param pthresh is cutoff threshold for significant p-values
+#' @param title is what you want to name your heatmap
+
+featurecorrelations <- function(data,start,end,rthresh,pthresh,title){
+  # correlations with p-values
+  hi <- rcorr(as.matrix(scale(data[,start:end])), type="spearman")
+  mat1 <- hi$r
+  filter <- which(abs(mat1)<rthresh)
+
+  mat2 <- hi$P
+  mat2 <- round(mat2,3)
+
+  mat2[mat2 < pthresh] <- "*" # significant p-values
+  mat2[mat2 > pthresh] <- "" # insignificant p-values
+  mat2[is.na(mat2)] <- "" # NAs (should be 27)
+  mat2[filter] <- "" # correlation values that are less than 0.5 (weak correlations)
+
+  # make heatmap
+  pheatmap(hi$r, display_numbers = mat2, fontsize_number=26,
+           fontsize=20, fontsize_row=18, fontsize_col=18,
+           main=title)
+}
+
+#' Dimensionality reduction using PCA and elbow/scree plot to get variance explained
+#'
+#' 'pcadata_elbow' allows you to perform PCA analysis and update your dataframe
+#'
+#' @param data is your input data frame
+#' @param start is first column number of morphology measures
+#' @param end is last column number of morphology measures
+
+pcadata_elbow <- function(data, start, end){
+  prin_comp <- prcomp(data[,start:end], scale=TRUE)
+  fviz_eig(prin_comp, addlabels=TRUE, main="Variance explained by PCs")
+}
+
+#' Dimensionality reduction using PCA
+#'
+#' 'pcadata' allows you to perform PCA analysis and update your dataframe to include PCs of interest
+#'
+#' @param data is your input data frame
+#' @param start is first column number of morphology measures
+#' @param end is last column number of morphology measures
+#' @param pc.start is first PC you want included (e.g., PC1)
+#' @param pc.end is last PC you want included (e.g., PC4)
+
+pcadata <- function(data, start, end, pc.start, pc.end){
+  prin_comp <- prcomp(data[,start:end], scale=TRUE)
+  components <- prin_comp[["x"]]
+  components <- data.frame(components)
+  pca_data <- cbind(prin_comp$x[,pc.start:pc.end], data)
+  pca_data
+}
+
+
+#' What morphology features describe the PCs?
+#'
+#' 'pcfeaturecorrelations' allows you to perform correlations between the top PCs and morphology features to assess which features are driving the variability captured by each of the PCs.
+#'
+#' @param data is your input data frame
+#' @param pc.start is first PC you want included in analysis (e.g., PC1)
+#' @param pc.end is last PC you want included in analysis (e.g., PC4)
+#' @param feature.start is first column number of morphology measures
+#' @param feature.end is last column number of morphology measures
+#' @param rthresh is cutoff threshold for significant correlation values
+#' @param pthresh is cutoff threshold for significant p-values
+#' @param title is what you want to name your heatmap
+
+pcfeaturecorrelations <- function(pca_data, pc.start, pc.end, feature.start, feature.end, rthresh, pthresh, title){
+
+  morphologyfeatures <- colnames(pca_data[,feature.start:feature.end])
+  PCs <- colnames(pca_data[,pc.start:pc.end])
+  master_correlations <- NULL
+  master_pvalues <- NULL
+  for(p in PCs){
+    all_correlations <- NULL
+    all_pvalues <- NULL
+    for(m in morphologyfeatures){
+      # correlations
+      master <- rcorr(as.matrix(pca_data[,c(p, m)]), type="spearman")
+      correlations <- as.data.frame(master$r)
+      correlations <- rownames_to_column(correlations, "PC")
+      correlations <- correlations %>% dplyr::select("PC", m) %>% .[1,]
+      names(correlations)[names(correlations) == m] <- "value"
+      correlations$measure <- paste(m)
+      all_correlations <- rbind(all_correlations, correlations)
+
+      # p-values
+      pvalues <- as.data.frame(master$P)
+      pvalues <- rownames_to_column(pvalues, "PC")
+      pvalues <- pvalues %>% dplyr::select("PC", m) %>% .[1,]
+      names(pvalues)[names(pvalues) == m] <- "value"
+      pvalues$measure <- paste(m)
+      all_pvalues <- rbind(all_pvalues, pvalues)
+    }
+    master_correlations <- rbind(master_correlations, all_correlations)
+    master_pvalues <- rbind(master_pvalues, all_pvalues)
+  }
+
+  # heatmap of correlations PC vs. measures
+
+  # correlations matrix
+  master_correlations_PC = list()
+  for (p in PCs){
+    master_correlations_PC[[p]] =
+      master_correlations %>% filter(PC==p) %>% dplyr::rename(!!p :=value) %>% select(-PC)
+  }
+
+  testing <- master_correlations_PC %>% reduce(inner_join, by="measure", keep=FALSE)
+
+  heatmap_PC_correlations <- testing[,c(2,1,3:ncol(testing))]
+  heatmap_PC_correlations <- heatmap_PC_correlations %>% column_to_rownames(var="measure")
+
+  rownames(heatmap_PC_correlations) <- morphologyfeatures
+
+  # pvalues matrix
+  master_pvalues_PC = list()
+  for (p in PCs){
+    master_pvalues_PC[[p]] =
+      master_pvalues %>% filter(PC==p) %>% dplyr::rename(!!p :=value) %>% select(-PC)
+  }
+
+  testing <- master_pvalues_PC %>% reduce(inner_join, by="measure", keep=FALSE)
+
+  heatmap_PC_pvalues <- testing[,c(2,1,3:ncol(testing))]
+  heatmap_PC_pvalues <- heatmap_PC_pvalues %>% column_to_rownames(var="measure")
+
+  rownames(heatmap_PC_pvalues) <- morphologyfeatures
+
+  # re-formatting for heatmap to only show significant values
+  bat1 <- as.matrix(heatmap_PC_correlations[,pc.start:pc.end])
+  filter <- which(abs(bat1)<rthresh)
+
+  bat2 <- as.matrix(heatmap_PC_pvalues[,pc.start:pc.end])
+  bat2 <- round(bat2,3)
+
+  bat2[bat2 < pthresh] <- "*" # significant p-values
+  bat2[bat2 > pthresh] <- "" # insignificant p-values
+  bat2[is.na(bat2)] <- "" # NAs (should be 27)
+  bat2[filter] <- ""
+
+  pheatmap(bat1, display_numbers = bat2, fontsize_number=20, border_color=NA,
+           fontsize=12, fontsize_row=12, fontsize_col=12, angle_col=0, main=title)
+}
+
+#' Plot to show morphology clusters in PC space
+#'
+#' 'clusterplots' visualizes k-means morphology clusters in PC space
+#'
+#' @param data is your input data frame
+#' @param pc.xaxis is the pc values you want on x-axis (e.g, PC1)
+#' @param pc.yaxis is the pce values you want on y-axis (e.g., PC2)
+
+clusterplots <- function(data, pc.xaxis, pc.yaxis){
+  pc.xaxis <- sym(pc.xaxis)
+  pc.yaxis <- sym(pc.yaxis)
+  data %>% ggplot(aes(x = !!pc.xaxis, y = !!pc.yaxis, color = as.character(`k2$cluster`))) +
+  geom_point() +
+  stat_ellipse() +
+  ggtitle("K-means clusters") +
+  labs(color="Cluster") +
+  theme_minimal(base_size=16)
+}
+
+#' Cluster-specific average morphology measures
+#'
+#' 'clusterfeatures' generates heatmap visualization of average cluster-specific morphology measures relative to other clusters
+#'
+#' @param data is your input data frame
+#' @param start is first column number of morphology measures
+#' @param end is last column number of morphology measures
+
+clusterfeatures <- function(data, start, end){
+  heatmap <- data %>% group_by(`k2$cluster`) %>% summarise(across(start:end, ~ mean(.x)))
+  heatmap$`k2$cluster` <- paste0("Cluster ", heatmap$`k2$cluster`)
+
+  heatmap <- column_to_rownames(heatmap, var="k2$cluster")
+  pheatmap(t(heatmap), scale="row", cluster_cols=FALSE, cluster_rows=TRUE,
+           border_color=NA, fontsize=12, fontsize_row=12, fontsize_col=12, angle_col=45)
+}
+
+#' What are your morphology cluster percentages across variables of interest?
+#'
+#' 'clusterpercentage' groups your data by variables of interest then calculates percentage of each morphology cluster within those groups.
+#'
+#' @param data is your input data frame
+#' @param ... list out your variables of interest without combining (e.g., Cohort, Sex, Treatment)
+
+clusterpercentage <- function(data,...){
+  data %>%
+    group_by(..., `k2$cluster`) %>%
+    count() %>%
+    group_by(...) %>%
+    mutate(percentage = n/sum(n))
+}
+
+#' How do morphology cluster percentages vary across variables of interest?
+#'
+#' 'clusterpercentage_boxplots' generates boxplots that depict cluster shifts with experimental variables of interest
+#'
+#' @param data is your input data frame
+#' @param ... list out your variables of interest without combining (e.g., Cohort, Sex, Treatment)
+
+clusterpercentage_boxplots <- function(data,...){
+  y <- unname(sapply(rlang::enexprs(...), as.character))
+  z <- paste0(y, collapse="*")
+  data %>%
+    ggplot(aes(x=`k2$cluster`, y=percentage*100, fill=as.character(`k2$cluster`))) +
+    facet_wrap(as.formula(paste("~",z))) +
+    geom_bar(position="dodge", stat="identity") +
+    ggtitle("K-means cluster percentages") +
+    labs(fill="Cluster") +
+    theme_minimal(base_size=16) +
+    xlab("Cluster") +
+    ylab("Percentage") +
+    geom_text(aes(label = round(percentage*100,1)), vjust = 1.5)
+}
+
+#' Stats analysis: individual morphology measures
+#'
+#' Linear mixed model to statistically assess how your experimental variables of interest
+#' influence each morphology measure, at the cell level
+#'
+#' @param data is your input data frame
+#' @param model is your linear mixed model (e.g., Value ~ Treatment*Sex + (1|MouseID))
+#' @param posthoc.sex is your posthoc comparisons when considering sex (e.g., ~Treatment|Sex)
+#' @param posthoc.nosex is your posthoc comparisons when not considering sex (e.g., ~Treatment)
+#' @param adjust is your method of multiple test correction
+
+stats_morphologymeasures <- function(data,model,posthoc.sex,posthoc.nosex,adjust){
+
+  y.model <- as.character(model)
+  z.model <- as.character(posthoc.sex)
+  a.model <- as.character(posthoc.nosex)
+  #y <- unname(sapply(rlang::enexprs(...), as.character))
+
+  library(lmerTest)
+  measure <- unique(as.character(x$Measure))
+  log_ggqqplots = list()
+  final.output = list()
+
+  # for writing out results to
+  anova.out <- NULL
+  posthoc.out <- NULL
+  posthoc.out2 <- NULL
+
+  for(m in measure){
+
+    tmp <- x %>% filter(Measure == m)
+    tmp <- as.data.frame(tmp)
+
+    print(m)
+
+    # linear mixed effects model
+    # summary(model) gives you
+    options(contrasts=c("contr.sum","contr.poly"))
+    model <- lmerTest::lmer(as.formula(paste(y.model)), data=tmp)
+
+    ### Test ANOVA assumptions
+    # visual check of distribution
+    log_ggqqplots[[m]] =
+      ggqqplot(residuals(model)) +
+      labs(title=m)
+
+    # anova
+    #anova = anova(model, test="F", type="III")
+    anova = anova(model)
+    anova$measure <- paste(m)
+
+    #posthocs test 1 (if there are sex differences)
+    refgrid <- ref.grid(model)
+    ph <- emmeans(refgrid, as.formula(paste(z.model)))
+    ph2 <- summary(contrast(ph, method="pairwise", adjust=adjust), infer=TRUE)
+    #holm good for unequal sample sizes, adjusts at p-value level
+    outsum <- as.data.frame(ph2)
+    outsum$measure <- paste(m)
+
+    #posthocs test 2 (if there aren't sex differences) #make a second output file
+    refgrid <- ref.grid(model)
+    ph <- emmeans(refgrid, as.formula(paste(a.model)))
+    ph2 <- summary(contrast(ph, method="pairwise", adjust=adjust), infer=TRUE)
+    outsum2 <- as.data.frame(ph2)
+    outsum2$measure <- paste(m)
+
+    # save everything before looping to next subregion
+    anova.out <- rbind(anova.out,anova)
+    posthoc.out <- rbind(posthoc.out,outsum)
+    posthoc.out2 <- rbind(posthoc.out2,outsum2)
+  }
+
+  anova.out$Significant <- ifelse(anova.out$`Pr(>F)` < 0.05, "significant", "ns")
+  posthoc.out$Significant <- ifelse(posthoc.out$`p.value` < 0.05, "significant", "ns")
+  posthoc.out2$Significant <- ifelse(posthoc.out2$`p.value` < 0.05, "significant", "ns")
+
+  final.output[[1]] = anova.out
+  final.output[[2]] = posthoc.out
+  final.output[[3]] = posthoc.out2
+  #final.output[[4]] = do.call("grid.arrange", c(log_ggqqplots, ncol=8))
+  final.output[[4]] = log_ggqqplots
+  final.output[[5]] = print(model)
+
+  final.output
+}
+
+#' Data visualization: individual morphology measures
+#'
+#' Linear mixed model to statistically assess how your experimental variables of interest
+#' influence each morphology measure, at the cell level
+#'
+#' @param data is your input data frame
+#' @param group is the variable you want to group your data by
+
+cell.level_boxplots <- function(data,group){
+  group <- sym(group)
+  data %>%
+    ggplot(aes(x=Measure, y=Value, fill=!!group)) +
+    facet_wrap(~Measure, scales="free") +
+    geom_violin(draw_quantiles = c(0.25, 0.5, 0.75), trim=FALSE) +
+    xlab("Morphology Measure") +
+    ylab("Value") +
+    ggtitle("Individual morphology measure changes at cell level")
+}
 
 
