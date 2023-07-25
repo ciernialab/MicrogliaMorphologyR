@@ -4,7 +4,7 @@ output: github_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(eval = FALSE)
+knitr::opts_chunk$set(cache=TRUE)
 ```
 
 
@@ -20,100 +20,150 @@ MicrogliaMorphologyR is an R package for microglia morphology analysis, that is 
 ## Instructions on how to use MicrogliaMorphologyR
 
 ### install and load package
-```{r}
+```{r, eval=FALSE}
 BiocManager::install('ciernialab/MicrogliaMorphologyR')
 library(MicrogliaMorphologyR)
 ```
 
-### load in your fraclac and skeleton data, tidy, and merge into final data frame
+### load other packages used in this tutorial -- UPDATE TO INCLUDE AS DEPENDENCIES
 ```{r}
-fraclac.dir <- "/Volumes/NINC/CierniaLab/Jenn/2022-2023/Paper1_MicrogliaMorphology/Collaborations/Jun_SzeleLab/Microglia_FracLac/20230313121607/"
-skeleton.dir <- "/Volumes/NINC/CierniaLab/Jenn/2022-2023/Paper1_MicrogliaMorphology/Collaborations/Jun_SzeleLab/Microglia_SkeletonResults/"
+library(MicrogliaMorphologyR)
+library(tidyverse)
+library(Hmisc)
+library(pheatmap)
+library(factoextra)
+```
+
+We will start by loading in your MicrogliaMorphology output (FracLac and SkeletonAnalysis files) and formatting the data so that you have a final dataframe which contains your cell-level data, with every row as a single cell and every column as either a metadata descriptor or morphology measure.
+
+### load in your fraclac and skeleton data, tidy, and merge into final data frame
+```{r, eval=FALSE}
+fraclac.dir <- "insert path to fraclac directory"
+skeleton.dir <- "insert path to skeleton analysis directory"
 
 fraclac <- fraclac_tidying(fraclac.dir)
 skeleton <- skeleton_tidying(skeleton.dir)
-data <- merge_data(fraclac, skeleton)
 
-finaldata <- metadata_columns(data, c("Cohort","MouseID","Treatment","Sex","BrainRegion","SubRegion"),"_")
+data <- merge_data(fraclac, skeleton)
+finaldata <- metadata_columns(data, c("Antibody","Paper","Cohort","MouseID","Sex","Treatment","BrainRegion","Subregion"),"_")
 ```
+
+For demonstration purposes, MicrogliaMorphologyR comes with a dataset called 'data_2xLPS', which is one of the datasets described in the manuscript. Female or male 8 week-old Cx3cr1-eGFP mice were given 2 i.p. injections of either PBS vehicle solution or 0.5mg/kg lipopolysaccharides (LPS), spaced 24 hours apart. Brains were collected 24 hours after the final injection, and brain sections were immunofluorescently stained and imaged for 3 different, commonly used microglia markers: Cx3cr1, P2ry12, and Iba1.
+
+### load in example dataset
+```{r}
+data_2xLPS <- MicrogliaMorphologyR::data_2xLPS
+str(data_2xLPS)
+```
+
+MicrogliaMorphologyR comes with a number of functions which allow you to explore which features have extreme outliers and how normalizing in various ways changes your feature distributions. This allows you to explore and transform your data in a dataset-appropriate manner for downstream analyses. 
 
 ### exploratory data visualization and data transformation for downstream analyses
 ```{r}
-data2 <- finaldata %>% gather(measure, value, 4:ncol(finaldata))
+data_2xLPS_gathered <- data_2xLPS %>% gather(measure, value, 9:ncol(data_2xLPS))
 
 # check for outliers
-outliers_boxplots(data2)
-outliers_distributions(data2)
+outliers_boxplots(data_2xLPS_gathered)
+outliers_distributions(data_2xLPS_gathered)
 
 # checking different normalization features
-normalize_logplots(data2,1)
-normalize_minmax(data2)
-normalize_scaled(data2)
+normalize_logplots(data_2xLPS_gathered,1)
+normalize_minmax(data_2xLPS_gathered)
+normalize_scaled(data_2xLPS_gathered)
 
 # transform your data in appropriate manner for downstream analyses
-transform_log(data,1,1,3)
-transform_minmax(data,1,3)
-transform_scale(data,1,3)
+data_2xLPS_logtransformed <- transform_log(data_2xLPS, 1, start=9, end=35)
+data_2xLPS_minmaxtransformed <- transform_minmax(data_2xLPS, start=9, end=35)
+data_2xLPS_scaled <- transform_scale(data_2xLPS, start=9, end=35)
 
 # get sample size of data based on factors of interest
-samplesize(finaldata, Cohort, MouseID)
+samplesize(data_2xLPS, MouseID, Antibody)
+samplesize(data_2xLPS, Sex, Treatment, Antibody)
 ```
 
 ### generate heatmap of correlations across features
 ```{r}
-featurecorrelations(finaldata,1,3,0.8,0.05,"Correlations across features")
+featurecorrelations(data_2xLPS, start=9, end=35, rthresh=0.8, pthresh=0.05, title="Correlations across features")
 ```
 
-## Dimensionality reduction
+Now, since we have gotten a better feel for our data and how to transform it if needed, we can proceed with PCA for dimensionality reduction and downstream clustering. We can see here that the first 4 PCs describe around ~90% of our data.
+
+## Dimensionality reduction using PCA
 ```{r}
 set.seed(1)
-pcadata_elbow(iris,1,3)
-pca_data <- pcadata(iris,1,3,1,3)
+pcadata_elbow(data_2xLPS_logtransformed, start=9, end=35)
+pca_data <- pcadata(data_2xLPS_logtransformed, start=9, end=35,
+                    pc.start=1, pc.end=10)
+str(pca_data)
 ```
 
 ### generate heatmap of correlations between PCs and features
 ```{r}
-pcfeaturecorrelations(pca_data, 1,3, 4,7, 0.8, 0.05, "Correlation between PCs and features")
+pcfeaturecorrelations(pca_data, pc.start=1, pc.end=5, 
+                      feature.start=19, feature.end=45, 
+                      rthresh=0.75, pthresh=0.05, 
+                      title="Correlation between PCs and features")
 ```
 
-## Clustering
+## Soft clustering using Fuzzy K-means 
+
+### prepare data for clustering
 ```{r}
-## for k-means clustering: min-max scale PCs 1-4
-pca_data2 <- transform_scale(pca_data,1,3)
+## for k-means clustering: scale PCs 1-3, which together describe ~85% of variability
+pca_data_scale <- transform_scale(pca_data, start=1, end=3)
+kmeans_input <- pca_data_scale[1:3]
+```
 
-# check for optimal number of clusters
+### Cluster optimization prior to running fuzzy k-means
+```{r}
+# check for optimal number of clusters using wss and silhouette methods
 set.seed(2)
-fviz_nbclust(pca_data2[1:3], kmeans, method = 'wss')
-fviz_nbclust(pca_data2[1:3], kmeans, method = 'silhouette')
-fviz_nbclust(pca_data2[1:3], kmeans, method = 'gap_stat')
+sampling <- kmeans_input[sample(nrow(kmeans_input), 5000),] #sample 5000 random rows for cluster optimization
 
+fviz_nbclust(sampling, kmeans, method = 'wss', nstart=25, iter.max=50) # 4 clusters
+fviz_nbclust(sampling, kmeans, method = 'silhouette', nstart=25, iter.max=50) # 4 clusters
+```
+
+From using wss, silhouette, and gapstat methods to check the optimal numbers of clusters for our dataset, it appears that our data would be optimally clustered using k=4. There are many more cluster optimization methods that you can try to explore optimal numbers of clusters (insert link). Next, we use the clusterfeatures function within MicrogliaMorphologyR to assess how clustering at k = 4 influences how the clusters are defined by morphology features (and if they make sense according to what we know about microglia morphology). 
+
+```{r}
 # cluster and combine with original data
-k2 <- kmeans(pca_data2[1:3], centers=4, nstart=25) 
-test <- cbind(pca_data2, as.data.frame(k2$cluster))
+k2 <- kmeans(kmeans_input, centers=4)
+pca_kmeans <- cbind(pca_data[1:2], data_2xLPS, as.data.frame(k2$cluster))
+str(pca_kmeans)
+
+# cluster-specific measures on average for each morphology feature, relative to other clusters
+clusterfeatures(pca_kmeans, start=11, end=37)
 
 # plot k-means clusters in PC space
-clusterplots(test, "PC1", "PC2")
+clusterplots(pca_kmeans, "PC1", "PC2")
 
 # customizeable example
-plot <- clusterplots(test)
+plot <- clusterplots(pca_kmeans, "PC1", "PC2")
 plot + scale_colour_viridis_d() # add color scheme of choice
 ```
 
 ### Cluster characterization
 ```{r}
-# cluster-specific measures on average for each morphology feature, relative to other clusters
-clusterfeatures(test,4,7)
-
 # cluster percentages across variables of interest
-# test$hello <- rep(c("A","B","C"), times=4)
-cp <- clusterpercentage(test, hello, Species)
-clusterpercentage_boxplots(cp, hello, Species)
+cp <- clusterpercentage(pca_kmeans, Antibody, Treatment, Sex)
+cp$Treatment <- factor(cp$Treatment, levels=c("PBS","2xLPS"))
+clusterpercentage_boxplots(cp, Antibody, Treatment, Sex)
+```
+
+### Cluster fuzzy k-means
+```{r, eval=FALSE}
+library(ppclust)
+set.seed(3)
+data_fuzzykmeans <- fcm(kmeans_input, centers=4) # start time = 10:36
+data_pca_fuzzykmeans <- cbind(pca_data[1:2], data_2xLPS, as.data.frame(data_fuzzykmeans$u), 
+                              as.data.frame(data_fuzzykmeans$cluster) %>% rename(Cluster=`data_fuzzykmeans$cluster`))
 ```
 
 ## Statistical analysis
 
 ## Individual morphology measures
-```{r}
+```{r, eval=FALSE}
 DF2 <- test %>% group_by(Species, hello) %>% gather(Measure, Value, 4:7)
 hellohi <- stats_morphologymeasures(DF2, "Value ~ Species*hello + (1|`k2$cluster`)", "~Species|hello", "~Species", "holm")
 hellohi[[1]]
@@ -125,9 +175,4 @@ hellohi[[5]]
 hellohi[[1]] %>% DT::datatable(., options=list(autoWidth=TRUE, scrollX=TRUE, scrollCollapse=TRUE))
 hellohi[[2]] %>% DT::datatable(., options=list(autoWidth=TRUE, scrollX=TRUE, scrollCollapse=TRUE))
 hellohi[[3]] %>% DT::datatable(., options=list(autoWidth=TRUE, scrollX=TRUE, scrollCollapse=TRUE))
-
-cell.level_boxplots(DF2, "Species")
-DF2 %>% 
-  filter(Measure=="Sepal.Length"|Measure=="Petal.Width") %>% 
-  cell.level_boxplots("Species")
 ```
