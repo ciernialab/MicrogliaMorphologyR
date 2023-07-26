@@ -409,6 +409,33 @@ pcfeaturecorrelations <- function(pca_data, pc.start, pc.end, feature.start, fea
            angle_col=0, main=title)
 }
 
+#' Explore how experimental variables describe data
+#'
+#' 'plots_expvariable' colors points in pc space by experimental variables
+#'
+#' @param data is your input data frame
+#' @param pc.xaxis is the pc values you want on x-axis (e.g, PC1)
+#' @param pc.yaxis is the pce values you want on y-axis (e.g., PC2)
+#' @export
+plots_expvariable <- function(data, pc.xaxis, pc.yaxis){
+  pc.xaxis <- sym(pc.xaxis)
+  pc.yaxis <- sym(pc.yaxis)
+
+  variables <- unique(as.character(data$variable))
+  plots_variables = list()
+  for(v in variables){
+    plots_variables[[v]] =
+      data %>%
+      filter(variable==v) %>%
+      ggplot(aes(x=!!pc.xaxis, y=!!pc.yaxis, color=value)) +
+      geom_point(alpha=1/10) +
+      labs(title=v)
+  }
+
+  do.call("grid.arrange", c(plots_variables, ncol=4))
+}
+
+
 #' Plot to show morphology clusters in PC space
 #'
 #' 'clusterplots' visualizes k-means morphology clusters in PC space
@@ -416,12 +443,11 @@ pcfeaturecorrelations <- function(pca_data, pc.start, pc.end, feature.start, fea
 #' @param data is your input data frame
 #' @param pc.xaxis is the pc values you want on x-axis (e.g, PC1)
 #' @param pc.yaxis is the pce values you want on y-axis (e.g., PC2)
-#' @param clustercol is the name of column which contains your k-means cluster idenifications
 #' @export
-clusterplots <- function(data, pc.xaxis, pc.yaxis, clustercol){
+clusterplots <- function(data, pc.xaxis, pc.yaxis){
   pc.xaxis <- sym(pc.xaxis)
   pc.yaxis <- sym(pc.yaxis)
-  data %>% ggplot(aes(x = !!pc.xaxis, y = !!pc.yaxis, color = as.character(clustercol))) +
+  data %>% ggplot(aes(x = !!pc.xaxis, y = !!pc.yaxis, color = as.character(Cluster))) +
     geom_point() +
     stat_ellipse() +
     ggtitle("K-means clusters") +
@@ -502,10 +528,8 @@ stats_morphologymeasures <- function(data,model,posthoc.sex,posthoc.nosex,adjust
   y.model <- as.character(model)
   z.model <- as.character(posthoc.sex)
   a.model <- as.character(posthoc.nosex)
-  #y <- unname(sapply(rlang::enexprs(...), as.character))
 
-  library(lmerTest)
-  measure <- unique(as.character(x$Measure))
+  measure <- unique(as.character(data$Measure))
   log_ggqqplots = list()
   final.output = list()
 
@@ -516,7 +540,7 @@ stats_morphologymeasures <- function(data,model,posthoc.sex,posthoc.nosex,adjust
 
   for(m in measure){
 
-    tmp <- x %>% filter(Measure == m)
+    tmp <- data %>% filter(Measure == m)
     tmp <- as.data.frame(tmp)
 
     print(m)
