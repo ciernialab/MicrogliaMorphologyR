@@ -45,7 +45,9 @@ fraclac <- fraclac_tidying(fraclac.dir)
 skeleton <- skeleton_tidying(skeleton.dir)
 
 data <- merge_data(fraclac, skeleton)
-finaldata <- metadata_columns(data, c("Antibody","Paper","Cohort","MouseID","Sex","Treatment","BrainRegion","Subregion"),"_")
+finaldata <- metadata_columns(data,
+                              c("Antibody","Paper","Cohort","MouseID","Sex","Treatment","BrainRegion","Subregion"),
+                              sep="_")
 ```
 
 For demonstration purposes, MicrogliaMorphologyR comes with a dataset called 'data_2xLPS', which is one of the datasets described in the manuscript. Female or male 8 week-old Cx3cr1-eGFP mice were given 2 i.p. injections of either PBS vehicle solution or 0.5mg/kg lipopolysaccharides (LPS), spaced 24 hours apart. Brains were collected 24 hours after the final injection, and brain sections were immunofluorescently stained and imaged for 3 different, commonly used microglia markers: Cx3cr1, P2ry12, and Iba1.
@@ -99,7 +101,7 @@ str(pca_data)
 
 ### generate heatmap of correlations between PCs and features
 ```{r}
-pcfeaturecorrelations(pca_data, pc.start=1, pc.end=5, 
+pcfeaturecorrelations(pca_data, pc.start=1, pc.end=3, 
                       feature.start=19, feature.end=45, 
                       rthresh=0.75, pthresh=0.05, 
                       title="Correlation between PCs and features")
@@ -138,6 +140,15 @@ clusterfeatures(pca_kmeans, start=11, end=37)
 # plot k-means clusters in PC space
 clusterplots(pca_kmeans, "PC1", "PC2")
 
+clusterfeatures <- function(data, start, end){
+  heatmap <- data %>% group_by(Cluster) %>% summarise(across(start:end, ~ mean(.x)))
+  heatmap$Cluster <- paste0("Cluster ", heatmap$Cluster)
+
+  heatmap <- column_to_rownames(heatmap, var="Cluster")
+  pheatmap(t(heatmap), scale="row", cluster_cols=FALSE, cluster_rows=TRUE,
+           border_color=NA, fontsize=12, fontsize_row=12, fontsize_col=12, angle_col=45)
+}
+
 # customizeable example
 plot <- clusterplots(pca_kmeans, "PC1", "PC2")
 plot + scale_colour_viridis_d() # add color scheme of choice
@@ -155,7 +166,7 @@ clusterpercentage_boxplots(cp, Antibody, Treatment, Sex)
 ```{r, eval=FALSE}
 library(ppclust)
 set.seed(3)
-data_fuzzykmeans <- fcm(kmeans_input, centers=4) # start time = 10:36
+data_fuzzykmeans <- fcm(kmeans_input, centers=4, nstart=25) # start time = 5:13
 data_pca_fuzzykmeans <- cbind(pca_data[1:2], data_2xLPS, as.data.frame(data_fuzzykmeans$u), 
                               as.data.frame(data_fuzzykmeans$cluster) %>% rename(Cluster=`data_fuzzykmeans$cluster`))
 ```
