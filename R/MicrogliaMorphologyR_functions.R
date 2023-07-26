@@ -131,7 +131,7 @@ outliers_distributions <- function(data){
   data %>%
     ggplot(aes(x = value)) +
     geom_histogram(bins = 40) +
-    facet_wrap(~measure, scales = "free_x", ncol=8)
+    facet_wrap(~measure, scales = "free_x")
 }
 
 #' Exploratory data analysis: normalization methods
@@ -145,9 +145,9 @@ normalize_logplots <- function(data,x){
   data %>%
     ggplot(aes(x = log(value+x))) +
     geom_histogram(bins = 40) +
-    facet_wrap(~measure, scales = "free", ncol=7) +
-    theme(strip.text.x = element_text(size=8)) +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1, size=8)) +
+    facet_wrap(~measure, scales = "free") +
+    #theme(strip.text.x = element_text(size=8)) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     #scale_x_continuous(name = "Morphology measure (log(value+1))") +
     scale_y_continuous(name = "Count")
 }
@@ -162,9 +162,9 @@ normalize_scaled <- function(data){
   data %>%
     ggplot(aes(x = scale(value))) +
     geom_histogram(bins = 40) +
-    facet_wrap(~measure, scales = "free", ncol=7) +
-    theme(strip.text.x = element_text(size=8)) +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1, size=8)) +
+    facet_wrap(~measure, scales = "free") +
+    #theme(strip.text.x = element_text(size=8)) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     scale_x_continuous(name = "Morphology measure (scale(value))") +
     scale_y_continuous(name = "Count")
 }
@@ -179,9 +179,9 @@ normalize_minmax <- function(data){
   data %>%
     ggplot(aes(x = minmax(value))) +
     geom_histogram(bins = 40) +
-    facet_wrap(~measure, scales = "free", ncol=7) +
-    theme(strip.text.x = element_text(size=8)) +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1, size=8)) +
+    facet_wrap(~measure, scales = "free") +
+    #theme(strip.text.x = element_text(size=8)) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     scale_x_continuous(name = "Morphology measure (minmax(value))") +
     scale_y_continuous(name = "Count")
 }
@@ -404,8 +404,9 @@ pcfeaturecorrelations <- function(pca_data, pc.start, pc.end, feature.start, fea
   bat2[is.na(bat2)] <- "" # NAs (should be 27)
   bat2[filter] <- ""
 
-  pheatmap(bat1, display_numbers = bat2, fontsize_number=20, border_color=NA,
-           fontsize=12, fontsize_row=12, fontsize_col=12, angle_col=0, main=title)
+  pheatmap(bat1, display_numbers = bat2, border_color=NA,
+           #fontsize_number=20, fontsize=12, fontsize_row=12, fontsize_col=12,
+           angle_col=0, main=title)
 }
 
 #' Plot to show morphology clusters in PC space
@@ -415,16 +416,17 @@ pcfeaturecorrelations <- function(pca_data, pc.start, pc.end, feature.start, fea
 #' @param data is your input data frame
 #' @param pc.xaxis is the pc values you want on x-axis (e.g, PC1)
 #' @param pc.yaxis is the pce values you want on y-axis (e.g., PC2)
+#' @param clustercol is the name of column which contains your k-means cluster idenifications
 #' @export
-clusterplots <- function(data, pc.xaxis, pc.yaxis){
+clusterplots <- function(data, pc.xaxis, pc.yaxis, clustercol){
   pc.xaxis <- sym(pc.xaxis)
   pc.yaxis <- sym(pc.yaxis)
-  data %>% ggplot(aes(x = !!pc.xaxis, y = !!pc.yaxis, color = as.character(`k2$cluster`))) +
+  data %>% ggplot(aes(x = !!pc.xaxis, y = !!pc.yaxis, color = as.character(clustercol))) +
     geom_point() +
     stat_ellipse() +
     ggtitle("K-means clusters") +
     labs(color="Cluster") +
-    theme_minimal(base_size=16)
+    theme_minimal()
 }
 
 #' Cluster-specific average morphology measures
@@ -441,7 +443,8 @@ clusterfeatures <- function(data, start, end){
 
   heatmap <- column_to_rownames(heatmap, var="k2$cluster")
   pheatmap(t(heatmap), scale="row", cluster_cols=FALSE, cluster_rows=TRUE,
-           border_color=NA, fontsize=12, fontsize_row=12, fontsize_col=12, angle_col=45)
+           border_color=NA, angle_col=45)
+          #fontsize=12, fontsize_row=12, fontsize_col=12
 }
 
 #' What are your morphology cluster percentages across variables of interest?
@@ -449,11 +452,13 @@ clusterfeatures <- function(data, start, end){
 #' 'clusterpercentage' groups your data by variables of interest then calculates percentage of each morphology cluster within those groups.
 #'
 #' @param data is your input data frame
+#' @param clustercol is the name of your column which contains cluster IDs. Make sure to put this in quotes.
 #' @param ... list out your variables of interest without combining (e.g., Cohort, Sex, Treatment)
 #' @export
-clusterpercentage <- function(data,...){
+clusterpercentage <- function(data, clustercol,...){
+  clustercol <- sym(clustercol)
   data %>%
-    group_by(..., `k2$cluster`) %>%
+    group_by(..., !!clustercol) %>%
     count() %>%
     group_by(...) %>%
     mutate(percentage = n/sum(n))
