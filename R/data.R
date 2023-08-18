@@ -28,7 +28,7 @@
 
 #' Fuzzy k-means dataset from 2xLPS
 #'
-#' @format ## `data_2xLPS_fuzzykmeans`
+#' @format ## `data_fuzzykmeans`
 #' A data frame with 46,104 rows and 35 columns:
 #' \describe{
 #'   \item{Antibody}{Microglia marker used in immunofluorescent image}
@@ -37,4 +37,4 @@
 #'   \item{Subregion}{frontal cortex: infralimbic (IL), prelimbic (PL), anterior cingulate cortex (ACC); hippocampus: CA1, CA2, CA3, dentate gyrus (DG); stratium: caudate putamen (CP), nucleus accumbens (NA)}
 #'   ...
 #' }
-"data_2xLPS_fuzzykmeans"
+"data_fuzzykmeans"
