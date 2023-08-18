@@ -186,6 +186,7 @@ set.seed(3)
 data_fuzzykmeans <- fcm(kmeans_input, centers=4, nstart=25)
 ```
 
+### Data visualization
 ```{r}
 # combine data
 data_pca_fuzzykmeans <- cbind(pca_data[1:5], MicrogliaMorphologyR::data_2xLPS_fuzzykmeans)
@@ -206,7 +207,12 @@ cp %>% filter(Antibody=="Iba1") %>%
   labs(fill="Treatment") +
   theme_bw(base_size=10) +
   theme(axis.text.x=element_text(angle=45, vjust=1, hjust=1))
+```
 
+## Statistical analysis
+
+### Cluster percentage changes at animal level, in response to experimental variables
+```{r}
 # transform data to be appropriate for anova
 cp.stats <- cp %>% mutate(anova.input=ln(percentage/(100-percentage)))
 cp.stats$Cluster <- factor(cp$Cluster)
@@ -228,11 +234,9 @@ testing[[2]] %>% DT::datatable(., options=list(autoWidth=TRUE, scrollX=TRUE, scr
 testing[[3]] %>% DT::datatable(., options=list(autoWidth=TRUE, scrollX=TRUE, scrollCollapse=TRUE))
 ```
 
-## Statistical analysis
-
-## Individual morphology measures
+### Individual morphology measures
 ```{r}
-DF <- data_pca_fuzzykmeans %>% group_by(MouseID, Sex, Treatment) %>% gather(Measure, Value, 11:37)
+DF <- data_pca_fuzzykmeans %>% group_by(MouseID, Sex, Treatment) %>% gather(Measure, Value, 14:40)
 stats <- stats_morphologymeasures(DF, "Value ~ Treatment*Sex + (1|MouseID)", "~Treatment|Sex", "~Treatment", "holm")
 stats[[1]]
 stats[[2]]
