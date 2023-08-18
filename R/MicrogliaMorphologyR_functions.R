@@ -615,34 +615,6 @@ cell.level_boxplots <- function(data,group){
     ggtitle("Individual morphology measure changes at cell level")
 }
 
-#' Data visualization: cluster changes
-#'
-#' Linear mixed model to statistically assess how your experimental variables of interest
-#' influence each morphology measure, at the cell level
-#'
-#' @param data is your input data frame
-#' @param group is the variable you want to group your data by
-#' @export
-cell.level_boxplots <- function(data,group){
-  group <- sym(group)
-  data %>%
-    ggplot(aes(x=Measure, y=Value, fill=!!group)) +
-    facet_wrap(~Measure, scales="free") +
-    geom_violin(draw_quantiles = c(0.25, 0.5, 0.75), trim=FALSE) +
-    xlab("Morphology Measure") +
-    ylab("Value") +
-    ggtitle("Individual morphology measure changes at cell level")
-}
 
-cluster
-  ggplot(aes(x=Cluster, y=percentage, group=interaction(Cluster, Treatment))) +
-  facet_wrap(~BrainRegion) +
-  geom_boxplot(aes(group=interaction(Cluster, Treatment), fill=Treatment)) +
-  scale_fill_manual(values=c("#fde725","#482878")) +
-  geom_point(position=position_dodge(width=0.8), size=0.75, aes(group=interaction(Cluster,Treatment), color=Sex)) +
-  ggtitle("Mouse dataset: K-means clusters") +
-  labs(fill="Treatment") +
-  theme_bw(base_size=10) +
-  theme(axis.text.x=element_text(angle=45, vjust=1, hjust=1))
 
 
