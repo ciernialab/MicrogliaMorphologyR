@@ -187,23 +187,45 @@ data_fuzzykmeans <- fcm(kmeans_input, centers=4, nstart=25)
 ```
 
 ```{r}
-data_fuzzykmeans <- MicrogliaMorphologyR::data_fuzzykmeans
-data_pca_fuzzykmeans <- cbind(pca_data[1:5], data_2xLPS, as.data.frame(data_fuzzykmeans$u), 
-                              as.data.frame(data_fuzzykmeans$cluster) %>%
-                                rename(Cluster=`data_fuzzykmeans$cluster`))
+# combine data
+data_pca_fuzzykmeans <- cbind(pca_data[1:5], MicrogliaMorphologyR::data_2xLPS_fuzzykmeans)
 str(data_pca_fuzzykmeans)
-clusterfeatures(pca_kmeans, start=11, end=37)
 
-data_pca_fuzzykmeans %>% 
-  filter(BrainRegion=="HC") %>%
-  ggplot(aes(x=PC1, y=PC2, color=as.character(Cluster))) +
-  facet_wrap(~Antibody*Sex*Treatment) +
-  geom_point() +
-  scale_color_viridis_d()
-
-cp <- clusterpercentage(data_pca_fuzzykmeans, "Cluster", Antibody, Sex, Treatment, BrainRegion)
+cp <- clusterpercentage(data_pca_fuzzykmeans, "Cluster", MouseID, Antibody, Sex, Treatment, BrainRegion)
 cp$Treatment <- factor(cp$Treatment, levels=c("PBS","2xLPS"))
 clusterpercentage_boxplots(cp %>% filter(BrainRegion=="STR"), Antibody, Sex, Treatment)
+
+# explore data via boxplots
+cp %>% filter(Antibody=="Iba1") %>%
+  ggplot(aes(x=Cluster, y=percentage, group=interaction(Cluster, Treatment))) +
+  facet_wrap(~BrainRegion) +
+  geom_boxplot(aes(group=interaction(Cluster, Treatment), fill=Treatment)) +
+  scale_fill_manual(values=c("#fde725","#482878")) +
+  geom_point(position=position_dodge(width=0.8), size=0.75, aes(group=interaction(Cluster,Treatment), color=Sex)) +
+  ggtitle("Mouse dataset: K-means clusters") +
+  labs(fill="Treatment") +
+  theme_bw(base_size=10) +
+  theme(axis.text.x=element_text(angle=45, vjust=1, hjust=1))
+
+# transform data to be appropriate for anova
+cp.stats <- cp %>% mutate(anova.input=ln(percentage/(100-percentage)))
+cp.stats$Cluster <- factor(cp$Cluster)
+
+# filter transformed dataset for downstream states
+stats.input <- cp.stats %>% filter(BrainRegion=="FC", Antibody=="Iba1")
+
+# run stats analysis for changes in cluster percentages, at the animal level
+testing <- stats_cluster.animal(stats.input, "anova.input ~ Cluster*Treatment*Sex + (1|MouseID)",
+                     "~Cluster*Treatment|Sex", "~Cluster*Treatment", "dunnet")
+testing[[1]]
+testing[[2]]
+testing[[3]]
+testing[[4]]
+testing[[5]]
+
+testing[[1]] %>% DT::datatable(., options=list(autoWidth=TRUE, scrollX=TRUE, scrollCollapse=TRUE))
+testing[[2]] %>% DT::datatable(., options=list(autoWidth=TRUE, scrollX=TRUE, scrollCollapse=TRUE))
+testing[[3]] %>% DT::datatable(., options=list(autoWidth=TRUE, scrollX=TRUE, scrollCollapse=TRUE))
 ```
 
 ## Statistical analysis

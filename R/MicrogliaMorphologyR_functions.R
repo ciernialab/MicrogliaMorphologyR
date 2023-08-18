@@ -501,7 +501,7 @@ clusterpercentage_boxplots <- function(data,...){
   y <- unname(sapply(rlang::enexprs(...), as.character))
   z <- paste0(y, collapse="*")
   data %>%
-    ggplot(aes(x=`k2$cluster`, y=percentage*100, fill=as.character(`k2$cluster`))) +
+    ggplot(aes(x=Cluster, y=percentage*100, fill=as.character(Cluster))) +
     facet_wrap(as.formula(paste("~",z))) +
     geom_bar(position="dodge", stat="identity") +
     ggtitle("K-means cluster percentages") +
@@ -596,6 +596,65 @@ stats_morphologymeasures <- function(data,model,posthoc.sex,posthoc.nosex,adjust
   final.output
 }
 
+#' Stats analysis: cluster-level changes
+#'
+#' Linear mixed model to statistically assess how your experimental variables of interest
+#' influence cluster percentages, at animal level
+#'
+#' @param data is your input data frame
+#' @param model is your linear mixed model (e.g., Value~ Cluster*Treatment*Sex + (1|MouseID))
+#' @param posthoc.sex is your posthoc comparisons when considering sex (e.g., ~Cluster*Treatment|Sex)
+#' @param posthoc.nosex is your posthoc comparisons when not considering sex (e.g., ~Cluster*Treatment)
+#' @param adjust is your method of multiple test correction
+#' @export
+stats_cluster.animal <- function(data,model,posthoc.sex,posthoc.nosex,adjust){
+
+  y.model <- as.character(model)
+  z.model <- as.character(posthoc.sex)
+  a.model <- as.character(posthoc.nosex)
+
+  log_ggqqplots = NULL
+  final.output = list()
+
+  # linear mixed effects model
+  options(contrasts=c("contr.sum","contr.poly"))
+  model <- lmerTest::lmer(as.formula(paste(y.model)), data=data)
+
+  ### Test ANOVA assumptions
+  # visual check of distribution
+  log_ggqqplots = ggqqplot(residuals(model))
+
+  # anova
+  anova = anova(model)
+  anova
+
+  # posthocs 1: considering sex
+  ph <- emmeans(model, as.formula(paste(z.model)))
+  ph2 <- test(pairs(ph, by="Cluster"), by=NULL, adjust=adjust)
+  posthoc1 <- as.data.frame(ph2)
+  posthoc1
+
+  # posthocs 2: not considering sex
+  ph <- emmeans(model, as.formula(paste(a.model)))
+  ph2 <- test(pairs(ph, by="Cluster"), by=NULL, adjust=adjust)
+  posthoc2 <- as.data.frame(ph2)
+  posthoc2
+
+  # annotate as significant for easy filtering
+  anova$Significant <- ifelse(anova$`Pr(>F)` < 0.05, "significant", "ns")
+  posthoc1$Significant <- ifelse(posthoc1$`p.value` < 0.05, "significant", "ns")
+  posthoc2$Significant <- ifelse(posthoc2$`p.value` < 0.05, "significant", "ns")
+
+  final.output[[1]] = anova
+  final.output[[2]] = posthoc1
+  final.output[[3]] = posthoc2
+  #final.output[[4]] = do.call("grid.arrange", c(log_ggqqplots, ncol=8))
+  final.output[[4]] = log_ggqqplots
+  final.output[[5]] = print(model)
+
+  final.output
+}
+
 #' Data visualization: individual morphology measures
 #'
 #' Linear mixed model to statistically assess how your experimental variables of interest
@@ -614,7 +673,3 @@ cell.level_boxplots <- function(data,group){
     ylab("Value") +
     ggtitle("Individual morphology measure changes at cell level")
 }
-
-
-
-
