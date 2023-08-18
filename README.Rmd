@@ -50,11 +50,32 @@ finaldata <- metadata_columns(data,
                               sep="_")
 ```
 
-For demonstration purposes, MicrogliaMorphologyR comes with a dataset called 'data_2xLPS', which is one of the datasets described in the manuscript. Female or male 8 week-old Cx3cr1-eGFP mice were given 2 i.p. injections of either PBS vehicle solution or 0.5mg/kg lipopolysaccharides (LPS), spaced 24 hours apart. Brains were collected 24 hours after the final injection, and brain sections were immunofluorescently stained and imaged for 3 different, commonly used microglia markers: Cx3cr1, P2ry12, and Iba1.
+For demonstration purposes, we will use one of the datasets that comes packaged with MicrogliaMorphologyR. 'data_2xLPS' contains morphology data collected from female and male 8 week-old Cx3cr1-eGFP mice, which were given 2 i.p. injections of either PBS vehicle solution or 0.5mg/kg lipopolysaccharides (LPS), spaced 24 hours apart. Brains were collected 24 hours after the final injections, and brain sections were immunofluorescently stained and imaged for 3 different, commonly used microglia markers: Cx3cr1, P2ry12, and Iba1.
+
+### TO DO
+1. update data_2xLPS dataset
+2. 
 
 ### load in example dataset
 ```{r}
 data_2xLPS <- MicrogliaMorphologyR::data_2xLPS
+
+data_2xLPS <- data_2xLPS %>% 
+  mutate(Subregion = case_when(BrainRegion == "ACC" ~ "ACC",
+                               BrainRegion == "IL" ~ "IL",
+                               BrainRegion == "PL" ~ "PL",
+                               TRUE ~ as.character(Subregion))) %>%
+  mutate(BrainRegion = case_when(Subregion == "ACC" ~ "FC",
+                                 Subregion == "IL" ~ "FC",
+                                 Subregion == "PL" ~ "FC",
+                                 TRUE ~ as.character(BrainRegion)))
+data_2xLPS %>% select(MouseID=="3"&BrainRegion=="HC") %>% View()
+
+data_2xLPS <- data_2xLPS %>%
+  filter(!(MouseID=="3" &BrainRegion=="HC"))
+
+levels(factor(data_2xLPS$BrainRegion))
+levels(factor(data_2xLPS$Subregion))
 str(data_2xLPS)
 ```
 
@@ -135,7 +156,7 @@ fviz_nbclust(sampling, kmeans, method = 'wss', nstart=25, iter.max=50) # 4 clust
 fviz_nbclust(sampling, kmeans, method = 'silhouette', nstart=25, iter.max=50) # 4 clusters
 ```
 
-From using wss and silhouette methods to check the optimal numbers of clusters for our dataset, it appears that our data would be optimally clustered using k=4. There are many more cluster optimization methods that you can try out to explore your data (insert link). Next, we use the clusterfeatures function within MicrogliaMorphologyR to assess how clustering at k = 4 influences how the clusters are defined by morphology features (and if they make sense according to what we know about microglia morphology). 
+From using wss and silhouette methods to check the optimal numbers of clusters for our dataset, it appears that our data would be optimally clustered using k=4. There are many more cluster optimization methods that you can try out to explore your data (insert link). Next, we use the clusterfeatures function within MicrogliaMorphologyR to assess how a parameter of k = 4 influences how the clusters are defined by morphology features (and if they make sense according to what we know about microglia morphology). 
 
 ```{r}
 # cluster and combine with original data
@@ -154,9 +175,8 @@ plot + scale_colour_viridis_d() # customizeable example: add color scheme of cho
 ### Cluster characterization
 ```{r}
 # cluster percentages across variables of interest
-cp <- clusterpercentage(pca_kmeans, Antibody, Treatment, Sex)
+cp <- clusterpercentage(pca_kmeans, "Cluster", MouseID, Antibody, Treatment, Sex, BrainRegion)
 cp$Treatment <- factor(cp$Treatment, levels=c("PBS","2xLPS"))
-clusterpercentage_boxplots(cp, Antibody, Treatment, Sex)
 ```
 
 ### Cluster fuzzy k-means
@@ -167,10 +187,23 @@ data_fuzzykmeans <- fcm(kmeans_input, centers=4, nstart=25)
 ```
 
 ```{r}
-data_fuzzykmeans <- MicrogliaMorphologyR::
-data_pca_fuzzykmeans <- cbind(pca_data[1:2], data_2xLPS, as.data.frame(data_fuzzykmeans$u), 
-                              as.data.frame(data_fuzzykmeans$cluster) %>% rename(Cluster=`data_fuzzykmeans$cluster`))
+data_fuzzykmeans <- MicrogliaMorphologyR::data_fuzzykmeans
+data_pca_fuzzykmeans <- cbind(pca_data[1:5], data_2xLPS, as.data.frame(data_fuzzykmeans$u), 
+                              as.data.frame(data_fuzzykmeans$cluster) %>%
+                                rename(Cluster=`data_fuzzykmeans$cluster`))
 str(data_pca_fuzzykmeans)
+clusterfeatures(pca_kmeans, start=11, end=37)
+
+data_pca_fuzzykmeans %>% 
+  filter(BrainRegion=="HC") %>%
+  ggplot(aes(x=PC1, y=PC2, color=as.character(Cluster))) +
+  facet_wrap(~Antibody*Sex*Treatment) +
+  geom_point() +
+  scale_color_viridis_d()
+
+cp <- clusterpercentage(data_pca_fuzzykmeans, "Cluster", Antibody, Sex, Treatment, BrainRegion)
+cp$Treatment <- factor(cp$Treatment, levels=c("PBS","2xLPS"))
+clusterpercentage_boxplots(cp %>% filter(BrainRegion=="STR"), Antibody, Sex, Treatment)
 ```
 
 ## Statistical analysis
