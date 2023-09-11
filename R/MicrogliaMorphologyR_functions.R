@@ -282,7 +282,7 @@ featurecorrelations <- function(data,start,end,rthresh,pthresh,title){
 
   # make heatmap
   pheatmap(hi$r, display_numbers = mat2,
-           fontsize_number=26, fontsize=20, fontsize_row=18, fontsize_col=18,
+           fontsize_number=20, fontsize=20, fontsize_row=12, fontsize_col=12,
            main=title)
 }
 
@@ -405,7 +405,7 @@ pcfeaturecorrelations <- function(pca_data, pc.start, pc.end, feature.start, fea
   bat2[filter] <- ""
 
   pheatmap(bat1, display_numbers = bat2, border_color=NA,
-           #fontsize_number=20, fontsize=12, fontsize_row=12, fontsize_col=12,
+           fontsize_number=20, fontsize=12, fontsize_row=12, fontsize_col=12,
            angle_col=0, main=title)
 }
 
@@ -503,13 +503,13 @@ clusterpercentage_boxplots <- function(data,...){
   data %>%
     ggplot(aes(x=Cluster, y=percentage*100, fill=as.character(Cluster))) +
     facet_wrap(as.formula(paste("~",z))) +
-    geom_bar(position="dodge", stat="identity") +
+    geom_boxplot(position="dodge") +
+    geom_point() +
     ggtitle("K-means cluster percentages") +
     labs(fill="Cluster") +
     theme_minimal(base_size=16) +
     xlab("Cluster") +
-    ylab("Percentage") +
-    geom_text(aes(label = round(percentage*100,1)), vjust = 1.5)
+    ylab("Percentage")
 }
 
 #' Stats analysis: individual morphology measures
@@ -596,52 +596,148 @@ stats_morphologymeasures <- function(data,model,posthoc.sex,posthoc.nosex,adjust
   final.output
 }
 
+#' Stats analysis: individual morphology measures
+#'
+#' Linear mixed model to statistically assess how your experimental variables of interest
+#' influence each morphology measure, at the cell level
+#'
+#' @param data is your input data frame
+#' @param model is your linear mixed model (e.g., Value ~ Treatment*Sex + (1|MouseID))
+#' @param posthoc.sex is your posthoc comparisons when considering sex (e.g., ~Treatment|Sex)
+#' @param posthoc.nosex is your posthoc comparisons when not considering sex (e.g., ~Treatment)
+#' @param adjust is your method of multiple test correction
+#' @export
+stats_morphologymeasures_lm <- function(data,model,posthoc.sex,posthoc.nosex,adjust){
+
+  y.model <- as.character(model)
+  z.model <- as.character(posthoc.sex)
+  a.model <- as.character(posthoc.nosex)
+
+  measure <- unique(as.character(data$Measure))
+  log_ggqqplots = list()
+  final.output = list()
+
+  # for writing out results to
+  anova.out <- NULL
+  posthoc.out <- NULL
+  posthoc.out2 <- NULL
+
+  for(m in measure){
+
+    tmp <- data %>% filter(Measure == m)
+    tmp <- as.data.frame(tmp)
+
+    print(m)
+
+    # linear mixed effects model
+    # summary(model) gives you
+    options(contrasts=c("contr.sum","contr.poly"))
+    model <- lm(as.formula(paste(y.model)), data=tmp)
+
+    ### Test ANOVA assumptions
+    # visual check of distribution
+    log_ggqqplots[[m]] =
+      ggqqplot(residuals(model)) +
+      labs(title=m)
+
+    # anova
+    #anova = anova(model, test="F", type="III")
+    anova = anova(model)
+    anova$measure <- paste(m)
+
+    #posthocs test 1 (if there are sex differences)
+    refgrid <- ref.grid(model)
+    ph <- emmeans(refgrid, as.formula(paste(z.model)))
+    ph2 <- summary(contrast(ph, method="pairwise", adjust=adjust), infer=TRUE)
+    #holm good for unequal sample sizes, adjusts at p-value level
+    outsum <- as.data.frame(ph2)
+    outsum$measure <- paste(m)
+
+    #posthocs test 2 (if there aren't sex differences) #make a second output file
+    refgrid <- ref.grid(model)
+    ph <- emmeans(refgrid, as.formula(paste(a.model)))
+    ph2 <- summary(contrast(ph, method="pairwise", adjust=adjust), infer=TRUE)
+    outsum2 <- as.data.frame(ph2)
+    outsum2$measure <- paste(m)
+
+    # save everything before looping to next subregion
+    anova.out <- rbind(anova.out,anova)
+    posthoc.out <- rbind(posthoc.out,outsum)
+    posthoc.out2 <- rbind(posthoc.out2,outsum2)
+  }
+
+  anova.out$Significant <- ifelse(anova.out$`Pr(>F)` < 0.05, "significant", "ns")
+  posthoc.out$Significant <- ifelse(posthoc.out$`p.value` < 0.05, "significant", "ns")
+  posthoc.out2$Significant <- ifelse(posthoc.out2$`p.value` < 0.05, "significant", "ns")
+
+  final.output[[1]] = anova.out
+  final.output[[2]] = posthoc.out
+  final.output[[3]] = posthoc.out2
+  #final.output[[4]] = do.call("grid.arrange", c(log_ggqqplots, ncol=8))
+  final.output[[4]] = log_ggqqplots
+  final.output[[5]] = print(model)
+
+  final.output
+}
+
 #' Stats analysis: cluster-level changes
 #'
 #' Linear mixed model to statistically assess how your experimental variables of interest
 #' influence cluster percentages, at animal level
 #'
 #' @param data is your input data frame
-#' @param model is your linear mixed model (e.g., Value~ Cluster*Treatment*Sex + (1|MouseID))
-#' @param posthoc.sex is your posthoc comparisons when considering sex (e.g., ~Cluster*Treatment|Sex)
-#' @param posthoc.nosex is your posthoc comparisons when not considering sex (e.g., ~Cluster*Treatment)
+#' @param model is your linear mixed model (e.g., Value ~ Cluster*Treatment*Sex + (1|MouseID))
+#' @param groupby do you want to group by clusters so that your posthocs are run within each cluster rather than within and across?
+#' @param posthoc1 is your first set of posthoc comparisons (e.g., considering sex: ~Cluster*Treatment|Sex)
+#' @param posthoc2 is your second set of posthoc comparisons (e.g., not considering sex: ~Cluster*Treatment)
 #' @param adjust is your method of multiple test correction
 #' @export
-stats_cluster.animal <- function(data,model,posthoc.sex,posthoc.nosex,adjust){
+stats_cluster.animal <- function(data, model, groupby, posthoc1, posthoc2, adjust){
 
   y.model <- as.character(model)
-  z.model <- as.character(posthoc.sex)
-  a.model <- as.character(posthoc.nosex)
+  z.model <- as.character(posthoc1)
+  a.model <- as.character(posthoc2)
 
-  log_ggqqplots = NULL
+  #modelcheck = NULL
   final.output = list()
 
   # linear mixed effects model
   options(contrasts=c("contr.sum","contr.poly"))
-  model <- lmerTest::lmer(as.formula(paste(y.model)), data=data)
+  #model <- lmerTest::lmer(as.formula(paste(y.model)), data=data)
+  #model <- glmmadmb(as.formula(paste(y.model)), data=data, family="beta")
+  model <- glmmTMB(as.formula(paste(y.model)), data=data, family=beta_family(link="logit"))
+
 
   ### Test ANOVA assumptions
   # visual check of distribution
-  log_ggqqplots = ggqqplot(residuals(model))
+  # log_ggqqplots = ggqqplot(residuals(model))
+  res = simulateResiduals(model)
+  plot(res, rank = T)
+  modelcheck <- recordPlot()
+  plot.new()
+  modelcheck
 
   # anova
-  anova = anova(model)
+  anova = car::Anova(model)
   anova
 
   # posthocs 1: considering sex
   ph <- emmeans(model, as.formula(paste(z.model)))
-  ph2 <- test(pairs(ph, by="Cluster"), by=NULL, adjust=adjust)
+  ph2 <- contrast(ph, method="pairwise", adjust=adjust)
   posthoc1 <- as.data.frame(ph2)
   posthoc1
 
   # posthocs 2: not considering sex
   ph <- emmeans(model, as.formula(paste(a.model)))
-  ph2 <- test(pairs(ph, by="Cluster"), by=NULL, adjust=adjust)
+  ph2 <- contrast(ph, method="pairwise", adjust=adjust)
   posthoc2 <- as.data.frame(ph2)
   posthoc2
 
+  # posthocs not looking within cluster
+  #test(pairs(ph), by=NULL, adjust="dunnet")
+
   # annotate as significant for easy filtering
-  anova$Significant <- ifelse(anova$`Pr(>F)` < 0.05, "significant", "ns")
+  #anova$Significant <- ifelse(anova$`Pr(>F)` < 0.05, "significant", "ns")
   posthoc1$Significant <- ifelse(posthoc1$`p.value` < 0.05, "significant", "ns")
   posthoc2$Significant <- ifelse(posthoc2$`p.value` < 0.05, "significant", "ns")
 
@@ -649,7 +745,7 @@ stats_cluster.animal <- function(data,model,posthoc.sex,posthoc.nosex,adjust){
   final.output[[2]] = posthoc1
   final.output[[3]] = posthoc2
   #final.output[[4]] = do.call("grid.arrange", c(log_ggqqplots, ncol=8))
-  final.output[[4]] = log_ggqqplots
+  final.output[[4]] = modelcheck
   final.output[[5]] = print(model)
 
   final.output

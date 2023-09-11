@@ -4,16 +4,18 @@
 \alias{stats_cluster.animal}
 \title{Stats analysis: cluster-level changes}
 \usage{
-stats_cluster.animal(data, model, posthoc.sex, posthoc.nosex, adjust)
+stats_cluster.animal(data, model, groupby, posthoc1, posthoc2, adjust)
 }
 \arguments{
 \item{data}{is your input data frame}
 
-\item{model}{is your linear mixed model (e.g., Value~ Cluster\emph{Treatment}Sex + (1|MouseID))}
+\item{model}{is your linear mixed model (e.g., Value ~ Cluster\emph{Treatment}Sex + (1|MouseID))}
 
-\item{posthoc.sex}{is your posthoc comparisons when considering sex (e.g., ~Cluster*Treatment|Sex)}
+\item{groupby}{do you want to group by clusters so that your posthocs are run within each cluster rather than within and across?}
 
-\item{posthoc.nosex}{is your posthoc comparisons when not considering sex (e.g., ~Cluster*Treatment)}
+\item{posthoc1}{is your first set of posthoc comparisons (e.g., considering sex: ~Cluster*Treatment|Sex)}
+
+\item{posthoc2}{is your second set of posthoc comparisons (e.g., not considering sex: ~Cluster*Treatment)}
 
 \item{adjust}{is your method of multiple test correction}
 }
