@@ -1,6 +1,7 @@
 ---
 title: "MicrogliaMorphologyR"
 output: github_document
+always_allow_html: true
 ---
 
 ```{r setup, include=FALSE}
@@ -26,6 +27,7 @@ library(MicrogliaMorphologyR)
 
 ### load other packages used in this tutorial -- UPDATE TO INCLUDE AS DEPENDENCIES
 ```{r}
+devtools::load_all()
 library(MicrogliaMorphologyR)
 library(tidyverse)
 library(Hmisc)
@@ -58,7 +60,7 @@ finaldata <- metadata_columns(data,
 For demonstration purposes, we will use one of the datasets that comes packaged with MicrogliaMorphologyR. 'data_2xLPS' contains morphology data collected from female and male 8 week-old Cx3cr1-eGFP mice, which were given 2 i.p. injections of either PBS vehicle solution or 0.5mg/kg lipopolysaccharides (LPS), spaced 24 hours apart. In this genetic mouse line, Cx3cr1-expressing cells including microglia have an endogenous reporter which makes them yellow when immunofluorescently imaged. Brains were collected 24 hours after the final injections, and brain sections were immunofluorescently stained and imaged for 2 additional, commonly used microglia markers: P2ry12, and Iba1.
 
 ### load in example dataset
-```{r}
+```{r, eval=FALSE}
 data_2xLPS <- MicrogliaMorphologyR::data_2xLPS
 str(data_2xLPS)
 
@@ -252,7 +254,7 @@ stats.testing[[3]] %>% DT::datatable(., options=list(autoWidth=TRUE, scrollX=TRU
 ```
 
 ### Individual morphology measures
-```{r}
+```{r, eval=FALSE}
 # at the cell-level
 DF <- data_pca_fuzzykmeans %>% group_by(MouseID, Sex, Treatment) %>% gather(Measure, Value, 14:40)
 stats <- stats_morphologymeasures(DF %>% filter(BrainRegion=="FC", Antibody=="Iba1"), "Value ~ Treatment + (1|MouseID)", "~Treatment", "~Treatment", "holm")
@@ -283,7 +285,7 @@ stats[[3]] %>% DT::datatable(., options=list(autoWidth=TRUE, scrollX=TRUE, scrol
 ```
 
 ### testing
-```{r}
+```{r, eval=FALSE}
 data <- MicrogliaMorphologyR::data_2xLPS_fuzzykmeans
 hist(data_2xLPS_fuzzykmeans$`Cluster 3`)
 

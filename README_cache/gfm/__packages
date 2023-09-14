@@ -12,3 +12,11 @@ Hmisc
 pheatmap
 factoextra
 MicrogliaMorphologyR
+Matrix
+lme4
+lmerTest
+nlme
+SciViews
+ggpubr
+glmmTMB
+DHARMa
