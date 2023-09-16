@@ -148,15 +148,15 @@ finaldata <- metadata_columns(data,
 ```
 
 For demonstration purposes, we will use one of the datasets that comes
-packaged with MicrogliaMorphologyR. ‘data_2xLPS’ contains morphology
-data collected from female and male 8 week-old Cx3cr1-eGFP mice, which
-were given 2 i.p. injections of either PBS vehicle solution or 0.5mg/kg
-lipopolysaccharides (LPS), spaced 24 hours apart. In this genetic mouse
-line, Cx3cr1-expressing cells including microglia have an endogenous
-reporter which makes them yellow when immunofluorescently imaged. Brains
-were collected 24 hours after the final injections, and brain sections
-were immunofluorescently stained and imaged for 2 additional, commonly
-used microglia markers: P2ry12, and Iba1.
+packaged with MicrogliaMorphologyR. ‘data_2xLPS_mouse’ contains
+morphology data collected from female and male 8 week-old Cx3cr1-eGFP
+mice, which were given 2 i.p. injections of either PBS vehicle solution
+or 0.5mg/kg lipopolysaccharides (LPS), spaced 24 hours apart. In this
+genetic mouse line, Cx3cr1-expressing cells including microglia have an
+endogenous reporter which makes them yellow when immunofluorescently
+imaged. Brains were collected 24 hours after the final injections, and
+brain sections were immunofluorescently stained and imaged for 2
+additional, commonly used microglia markers: P2ry12, and Iba1.
 
 ### load in example dataset
 
@@ -250,9 +250,9 @@ samplesize(data_2xLPS, MouseID, Antibody)
     ##  4 2       Cx3cr1    2496
     ##  5 2       Iba1      2927
     ##  6 2       P2ry12    4341
-    ##  7 3       Cx3cr1    1968
-    ##  8 3       Iba1      2118
-    ##  9 3       P2ry12    3119
+    ##  7 3       Cx3cr1    1145
+    ##  8 3       Iba1      1310
+    ##  9 3       P2ry12    1978
     ## 10 4       Cx3cr1    1775
     ## 11 4       Iba1      2044
     ## 12 4       P2ry12    2372
@@ -274,9 +274,9 @@ samplesize(data_2xLPS, Sex, Treatment, Antibody)
     ##  1 F     2xLPS     Cx3cr1    3478
     ##  2 F     2xLPS     Iba1      3781
     ##  3 F     2xLPS     P2ry12    4477
-    ##  4 F     PBS       Cx3cr1    4464
-    ##  5 F     PBS       Iba1      5045
-    ##  6 F     PBS       P2ry12    7460
+    ##  4 F     PBS       Cx3cr1    3641
+    ##  5 F     PBS       Iba1      4237
+    ##  6 F     PBS       P2ry12    6319
     ##  7 M     2xLPS     Cx3cr1    2771
     ##  8 M     2xLPS     Iba1      3095
     ##  9 M     2xLPS     P2ry12    3665
@@ -316,17 +316,17 @@ pca_data <- pcadata(data_2xLPS_logtransformed, start=9, end=35,
 str(pca_data)
 ```
 
-    ## 'data.frame':    46104 obs. of  45 variables:
-    ##  $ PC1                                                          : num  -3.195 -3.738 0.129 -2.498 -1.472 ...
-    ##  $ PC2                                                          : num  0.705 0.667 0.53 1.433 -0.101 ...
-    ##  $ PC3                                                          : num  2.298 -0.144 1.175 2.139 2.372 ...
-    ##  $ PC4                                                          : num  -0.253 -1.562 -1.429 0.888 -0.761 ...
-    ##  $ PC5                                                          : num  0.279 -0.469 -0.103 0.27 0.771 ...
-    ##  $ PC6                                                          : num  0.4783 -0.2311 -0.6197 0.0147 0.4442 ...
-    ##  $ PC7                                                          : num  0.178 0.505 0.166 -0.196 0.537 ...
-    ##  $ PC8                                                          : num  -0.047 -0.642 -0.148 -0.654 0.36 ...
-    ##  $ PC9                                                          : num  1.471 -0.0422 0.7785 -1.3843 0.2157 ...
-    ##  $ PC10                                                         : num  0.743 -0.278 0.372 0.484 -0.05 ...
+    ## 'data.frame':    43332 obs. of  45 variables:
+    ##  $ PC1                                                          : num  -3.4084 -3.9724 -0.0521 -2.6969 -1.6742 ...
+    ##  $ PC2                                                          : num  0.676 0.688 0.498 1.384 -0.156 ...
+    ##  $ PC3                                                          : num  2.454 -0.159 1.111 2.354 2.442 ...
+    ##  $ PC4                                                          : num  -0.701 -1.782 -1.71 0.689 -1.047 ...
+    ##  $ PC5                                                          : num  0.5192 -0.3 0.0515 0.252 0.9873 ...
+    ##  $ PC6                                                          : num  0.0984 -0.3944 -0.885 -0.0486 0.123 ...
+    ##  $ PC7                                                          : num  -0.189 -0.491 -0.15 0.201 -0.525 ...
+    ##  $ PC8                                                          : num  -0.222 -0.595 -0.195 -0.521 0.348 ...
+    ##  $ PC9                                                          : num  -1.417 0.176 -0.674 1.452 -0.184 ...
+    ##  $ PC10                                                         : num  0.7371 -0.2788 0.3673 0.485 -0.0569 ...
     ##  $ Antibody                                                     : chr  "Cx3cr1" "Cx3cr1" "Cx3cr1" "Cx3cr1" ...
     ##  $ MouseID                                                      : chr  "1" "1" "1" "1" ...
     ##  $ Sex                                                          : chr  "F" "F" "F" "F" ...
@@ -471,9 +471,9 @@ pca_kmeans <- cbind(pca_data[1:2], data_2xLPS, as.data.frame(data_kmeans$cluster
 str(pca_kmeans)
 ```
 
-    ## 'data.frame':    46104 obs. of  38 variables:
-    ##  $ PC1                                                          : num  -3.195 -3.738 0.129 -2.498 -1.472 ...
-    ##  $ PC2                                                          : num  0.705 0.667 0.53 1.433 -0.101 ...
+    ## 'data.frame':    43332 obs. of  38 variables:
+    ##  $ PC1                                                          : num  -3.4084 -3.9724 -0.0521 -2.6969 -1.6742 ...
+    ##  $ PC2                                                          : num  0.676 0.688 0.498 1.384 -0.156 ...
     ##  $ Antibody                                                     : chr  "Cx3cr1" "Cx3cr1" "Cx3cr1" "Cx3cr1" ...
     ##  $ MouseID                                                      : chr  "1" "1" "1" "1" ...
     ##  $ Sex                                                          : chr  "F" "F" "F" "F" ...
@@ -509,7 +509,7 @@ str(pca_kmeans)
     ##  $ # of triple points                                           : int  6 5 10 5 6 6 7 4 10 4 ...
     ##  $ # of quadruple points                                        : int  0 1 1 0 0 0 0 1 1 0 ...
     ##  $ Maximum branch length                                        : num  29.2 15.1 21.3 16.2 23.8 ...
-    ##  $ Cluster                                                      : int  2 1 3 2 2 2 4 2 4 2 ...
+    ##  $ Cluster                                                      : int  4 2 3 4 4 4 2 4 1 4 ...
 
 ### Plot k-means clusters in PC space
 
@@ -544,7 +544,7 @@ cp$Treatment <- factor(cp$Treatment, levels=c("PBS","2xLPS"))
 # Quick check of cluster proportions when considering experimental variables of interest
 cp %>% 
   filter(BrainRegion=="STR") %>% # in this example, we filter for our brain region of interest
-  clusterpercentage_boxplots(Antibody, Treatment, Sex) # grouping variables
+  clusterpercentage_boxplots(Antibody, Treatment) # grouping variables
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
@@ -595,78 +595,35 @@ stats.input$Treatment <- factor(stats.input$Treatment)
 
 # run stats analysis for changes in cluster percentages, at the animal level
 # you can specify up to two posthoc comparisons (posthoc1 and posthoc2 arguments) - if you only have one set of posthocs to run, specify the same comparison twice for both arguments. you will just get the same results in output[[2]] and output[[3]].
-stats.testing <- stats_cluster.animal(stats.input, "percentage ~ Cluster*Treatment*Sex + (1|MouseID)", 
-                                      "yes", "~Cluster*Treatment|Sex", "~Cluster|Sex*Treatment", "bonferroni")
+stats.testing <- stats_cluster.animal(stats.input, "percentage ~ Cluster*Treatment + (1|MouseID)", 
+                                      "yes", "~Cluster*Treatment", "~Treatment|Cluster", "bonferroni")
 ```
-
-    ## qu = 0.75, log(sigma) = -2.709683 : outer Newton did not converge fully.
-
-    ## qu = 0.75, log(sigma) = -2.911941 : outer Newton did not converge fully.
-
-    ## qu = 0.75, log(sigma) = -3.036943 : outer Newton did not converge fully.
-
-    ## qu = 0.75, log(sigma) = -3.114198 : outer Newton did not converge fully.
-
-    ## qu = 0.75, log(sigma) = -3.161945 : outer Newton did not converge fully.
-
-    ## qu = 0.75, log(sigma) = -3.191454 : outer Newton did not converge fully.
-
-    ## qu = 0.75, log(sigma) = -3.418712 : outer Newton did not converge fully.
-
-    ## qu = 0.75, log(sigma) = -3.014197 : outer Newton did not converge fully.
-
-    ## qu = 0.75, log(sigma) = -3.303483 : outer Newton did not converge fully.
-
-    ## qu = 0.75, log(sigma) = -3.333562 : outer Newton did not converge fully.
-
-    ## qu = 0.75, log(sigma) = -3.339858 : outer Newton did not converge fully.
-
-    ## qu = 0.75, log(sigma) = -3.341914 : outer Newton did not converge fully.
-
-    ## qu = 0.75, log(sigma) = -3.340457 : outer Newton did not converge fully.
-
-    ## qu = 0.75, log(sigma) = -3.337453 : outer Newton did not converge fully.
-
-    ## qu = 0.75, log(sigma) = -3.338939 : outer Newton did not converge fully.
-
-    ## qu = 0.75, log(sigma) = -3.339507 : outer Newton did not converge fully.
-
-    ## qu = 0.75, log(sigma) = -3.339724 : outer Newton did not converge fully.
-
-    ## Warning in newton(lsp = lsp, X = G$X, y = G$y, Eb = G$Eb, UrS = G$UrS, L = G$L,
-    ## : Fitting terminated with step failure - check results carefully
 
 ![](README_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
 
-    ## Formula:          percentage ~ Cluster * Treatment * Sex + (1 | MouseID)
+    ## Formula:          percentage ~ Cluster * Treatment + (1 | MouseID)
     ## Data: data
     ##       AIC       BIC    logLik  df.resid 
-    ## -61.45332 -43.53013  48.72666         2 
+    ## -78.28956 -66.50903  49.14478        14 
     ## Random-effects (co)variances:
     ## 
     ## Conditional model:
     ##  Groups  Name        Std.Dev. 
-    ##  MouseID (Intercept) 2.677e-06
+    ##  MouseID (Intercept) 3.295e-06
     ## 
-    ## Number of obs: 20 / Conditional model: MouseID, 5
+    ## Number of obs: 24 / Conditional model: MouseID, 6
     ## 
-    ## Dispersion parameter for beta family ():  351 
+    ## Dispersion parameter for beta family ():  171 
     ## 
     ## Fixed Effects:
     ## 
     ## Conditional model:
-    ##              (Intercept)                  Cluster1                  Cluster2  
-    ##                 -1.21765                  -0.17644                  -0.78612  
-    ##                 Cluster3                Treatment1                      Sex1  
-    ##                  0.77672                  -0.07914                  -0.02194  
-    ##      Cluster1:Treatment1       Cluster2:Treatment1       Cluster3:Treatment1  
-    ##                  0.29962                  -0.64944                   0.23786  
-    ##            Cluster1:Sex1             Cluster2:Sex1             Cluster3:Sex1  
-    ##                 -0.12219                   0.10252                   0.00771  
-    ##          Treatment1:Sex1  Cluster1:Treatment1:Sex1  Cluster2:Treatment1:Sex1  
-    ##                 -0.02199                   0.07691                  -0.23583  
-    ## Cluster3:Treatment1:Sex1  
-    ##                  0.10298
+    ##         (Intercept)             Cluster1             Cluster2  
+    ##            -1.18704              0.16188             -0.24193  
+    ##            Cluster3           Treatment1  Cluster1:Treatment1  
+    ##             0.63270             -0.05973              0.10620  
+    ## Cluster2:Treatment1  Cluster3:Treatment1  
+    ##             0.29651              0.26851
 
 ``` r
 stats.testing[[1]] # anova
@@ -675,14 +632,10 @@ stats.testing[[1]] # anova
     ## Analysis of Deviance Table (Type II Wald chisquare tests)
     ## 
     ## Response: percentage
-    ##                          Chisq Df Pr(>Chisq)    
-    ## Cluster               277.5490  3  < 2.2e-16 ***
-    ## Treatment               0.0593  1   0.807564    
-    ## Sex                     0.0409  1   0.839652    
-    ## Cluster:Treatment     119.4864  3  < 2.2e-16 ***
-    ## Cluster:Sex             9.5327  3   0.022986 *  
-    ## Treatment:Sex           0.2147  1   0.643141    
-    ## Cluster:Treatment:Sex  13.5355  3   0.003611 ** 
+    ##                     Chisq Df Pr(>Chisq)    
+    ## Cluster           96.0328  3     <2e-16 ***
+    ## Treatment          0.3341  1     0.5633    
+    ## Cluster:Treatment 78.3763  3     <2e-16 ***
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
@@ -690,103 +643,48 @@ stats.testing[[1]] # anova
 stats.testing[[2]] # posthoc 1
 ```
 
-    ## Sex = F:
     ##  contrast                          estimate        SE  df z.ratio p.value
-    ##  Cluster1 PBS - Cluster2 PBS      1.6467797 0.1913236 Inf   8.607  <.0001
-    ##  Cluster1 PBS - Cluster3 PBS     -1.0473601 0.1183006 Inf  -8.853  <.0001
-    ##  Cluster1 PBS - Cluster4 PBS     -0.2877816 0.1240098 Inf  -2.321  0.5686
-    ##  Cluster1 PBS - Cluster1 2xLPS    0.5508112 0.1779713 Inf   3.095  0.0551
-    ##  Cluster1 PBS - Cluster2 2xLPS   -0.3260276 0.1492421 Inf  -2.185  0.8098
-    ##  Cluster1 PBS - Cluster3 2xLPS   -0.5679391 0.1450175 Inf  -3.916  0.0025
-    ##  Cluster1 PBS - Cluster4 2xLPS   -0.1542579 0.1531191 Inf  -1.007  1.0000
-    ##  Cluster2 PBS - Cluster3 PBS     -2.6941398 0.1847361 Inf -14.584  <.0001
-    ##  Cluster2 PBS - Cluster4 PBS     -1.9345613 0.1884136 Inf -10.268  <.0001
-    ##  Cluster2 PBS - Cluster1 2xLPS   -1.0959685 0.2275363 Inf  -4.817  <.0001
-    ##  Cluster2 PBS - Cluster2 2xLPS   -1.9728073 0.2059008 Inf  -9.581  <.0001
-    ##  Cluster2 PBS - Cluster3 2xLPS   -2.2147188 0.2028694 Inf -10.917  <.0001
-    ##  Cluster2 PBS - Cluster4 2xLPS   -1.8010376 0.2087203 Inf  -8.629  <.0001
-    ##  Cluster3 PBS - Cluster4 PBS      0.7595784 0.1135034 Inf   6.692  <.0001
-    ##  Cluster3 PBS - Cluster1 2xLPS    1.5981713 0.1708291 Inf   9.355  <.0001
-    ##  Cluster3 PBS - Cluster2 2xLPS    0.7213325 0.1406330 Inf   5.129  <.0001
-    ##  Cluster3 PBS - Cluster3 2xLPS    0.4794209 0.1361388 Inf   3.522  0.0120
-    ##  Cluster3 PBS - Cluster4 2xLPS    0.8931022 0.1447429 Inf   6.170  <.0001
-    ##  Cluster4 PBS - Cluster1 2xLPS    0.8385929 0.1748254 Inf   4.797  <.0001
-    ##  Cluster4 PBS - Cluster2 2xLPS   -0.0382459 0.1454711 Inf  -0.263  1.0000
-    ##  Cluster4 PBS - Cluster3 2xLPS   -0.2801575 0.1411328 Inf  -1.985  1.0000
-    ##  Cluster4 PBS - Cluster4 2xLPS    0.1335237 0.1494467 Inf   0.893  1.0000
-    ##  Cluster1 2xLPS - Cluster2 2xLPS -0.8768388 0.1935428 Inf  -4.530  0.0002
-    ##  Cluster1 2xLPS - Cluster3 2xLPS -1.1187504 0.1903061 Inf  -5.879  <.0001
-    ##  Cluster1 2xLPS - Cluster4 2xLPS -0.7050691 0.1965464 Inf  -3.587  0.0094
-    ##  Cluster2 2xLPS - Cluster3 2xLPS -0.2419116 0.1637472 Inf  -1.477  1.0000
-    ##  Cluster2 2xLPS - Cluster4 2xLPS  0.1717697 0.1709651 Inf   1.005  1.0000
-    ##  Cluster3 2xLPS - Cluster4 2xLPS  0.4136812 0.1672895 Inf   2.473  0.3753
+    ##  Cluster1 PBS - Cluster2 PBS      0.2135047 0.1433691 Inf   1.489  1.0000
+    ##  Cluster1 PBS - Cluster3 PBS     -0.6331272 0.1331835 Inf  -4.754  0.0001
+    ##  Cluster1 PBS - Cluster4 PBS      1.4919558 0.1898065 Inf   7.860  <.0001
+    ##  Cluster1 PBS - Cluster1 2xLPS    0.0929459 0.1411275 Inf   0.659  1.0000
+    ##  Cluster1 PBS - Cluster2 2xLPS    0.6870626 0.1552822 Inf   4.425  0.0003
+    ##  Cluster1 PBS - Cluster3 2xLPS   -0.2155741 0.1366563 Inf  -1.577  1.0000
+    ##  Cluster1 PBS - Cluster4 2xLPS    0.0300620 0.1400727 Inf   0.215  1.0000
+    ##  Cluster2 PBS - Cluster3 PBS     -0.8466319 0.1371397 Inf  -6.173  <.0001
+    ##  Cluster2 PBS - Cluster4 PBS      1.2784511 0.1925746 Inf   6.639  <.0001
+    ##  Cluster2 PBS - Cluster1 2xLPS   -0.1205588 0.1448605 Inf  -0.832  1.0000
+    ##  Cluster2 PBS - Cluster2 2xLPS    0.4735579 0.1586746 Inf   2.984  0.0795
+    ##  Cluster2 PBS - Cluster3 2xLPS   -0.4290788 0.1405113 Inf  -3.054  0.0633
+    ##  Cluster2 PBS - Cluster4 2xLPS   -0.1834427 0.1438338 Inf  -1.275  1.0000
+    ##  Cluster3 PBS - Cluster4 PBS      2.1250830 0.1851987 Inf  11.475  <.0001
+    ##  Cluster3 PBS - Cluster1 2xLPS    0.7260731 0.1347911 Inf   5.387  <.0001
+    ##  Cluster3 PBS - Cluster2 2xLPS    1.3201898 0.1495656 Inf   8.827  <.0001
+    ##  Cluster3 PBS - Cluster3 2xLPS    0.4175531 0.1300945 Inf   3.210  0.0372
+    ##  Cluster3 PBS - Cluster4 2xLPS    0.6631892 0.1336846 Inf   4.961  <.0001
+    ##  Cluster4 PBS - Cluster1 2xLPS   -1.3990099 0.1909261 Inf  -7.327  <.0001
+    ##  Cluster4 PBS - Cluster2 2xLPS   -0.8048932 0.2015312 Inf  -3.994  0.0018
+    ##  Cluster4 PBS - Cluster3 2xLPS   -1.7075299 0.1876771 Inf  -9.098  <.0001
+    ##  Cluster4 PBS - Cluster4 2xLPS   -1.4618938 0.1901547 Inf  -7.688  <.0001
+    ##  Cluster1 2xLPS - Cluster2 2xLPS  0.5941167 0.1566574 Inf   3.792  0.0042
+    ##  Cluster1 2xLPS - Cluster3 2xLPS -0.3085200 0.1382221 Inf  -2.232  0.7171
+    ##  Cluster1 2xLPS - Cluster4 2xLPS -0.0628839 0.1415997 Inf  -0.444  1.0000
+    ##  Cluster2 2xLPS - Cluster3 2xLPS -0.9026367 0.1526535 Inf  -5.913  <.0001
+    ##  Cluster2 2xLPS - Cluster4 2xLPS -0.6570006 0.1557104 Inf  -4.219  0.0007
+    ##  Cluster3 2xLPS - Cluster4 2xLPS  0.2456361 0.1371443 Inf   1.791  1.0000
     ##  Significant
+    ##  ns         
+    ##  significant
+    ##  significant
+    ##  ns         
+    ##  significant
+    ##  ns         
+    ##  ns         
     ##  significant
     ##  significant
     ##  ns         
     ##  ns         
     ##  ns         
-    ##  significant
-    ##  ns         
-    ##  significant
-    ##  significant
-    ##  significant
-    ##  significant
-    ##  significant
-    ##  significant
-    ##  significant
-    ##  significant
-    ##  significant
-    ##  significant
-    ##  significant
-    ##  significant
-    ##  ns         
-    ##  ns         
-    ##  ns         
-    ##  significant
-    ##  significant
-    ##  significant
-    ##  ns         
-    ##  ns         
-    ##  ns         
-    ## 
-    ## Sex = M:
-    ##  contrast                          estimate        SE  df z.ratio p.value
-    ##  Cluster1 PBS - Cluster2 PBS      1.4707013 0.2384554 Inf   6.168  <.0001
-    ##  Cluster1 PBS - Cluster3 PBS     -0.7354300 0.1635055 Inf  -4.498  0.0002
-    ##  Cluster1 PBS - Cluster4 PBS     -0.0614424 0.1720581 Inf  -0.357  1.0000
-    ##  Cluster1 PBS - Cluster1 2xLPS    0.3311221 0.1817559 Inf   1.822  1.0000
-    ##  Cluster1 PBS - Cluster2 2xLPS    0.5291951 0.1882609 Inf   2.811  0.1383
-    ##  Cluster1 PBS - Cluster3 2xLPS   -0.5799659 0.1646825 Inf  -3.522  0.0120
-    ##  Cluster1 PBS - Cluster4 2xLPS   -0.0637001 0.1720134 Inf  -0.370  1.0000
-    ##  Cluster2 PBS - Cluster3 PBS     -2.2061313 0.2314368 Inf  -9.532  <.0001
-    ##  Cluster2 PBS - Cluster4 PBS     -1.5321436 0.2375413 Inf  -6.450  <.0001
-    ##  Cluster2 PBS - Cluster1 2xLPS   -1.1395792 0.2446450 Inf  -4.658  0.0001
-    ##  Cluster2 PBS - Cluster2 2xLPS   -0.9415062 0.2495080 Inf  -3.773  0.0045
-    ##  Cluster2 PBS - Cluster3 2xLPS   -2.0506671 0.2322667 Inf  -8.829  <.0001
-    ##  Cluster2 PBS - Cluster4 2xLPS   -1.5344014 0.2375090 Inf  -6.460  <.0001
-    ##  Cluster3 PBS - Cluster4 PBS      0.6739877 0.1621666 Inf   4.156  0.0009
-    ##  Cluster3 PBS - Cluster1 2xLPS    1.0665521 0.1724249 Inf   6.186  <.0001
-    ##  Cluster3 PBS - Cluster2 2xLPS    1.2646251 0.1792709 Inf   7.054  <.0001
-    ##  Cluster3 PBS - Cluster3 2xLPS    0.1554642 0.1543155 Inf   1.007  1.0000
-    ##  Cluster3 PBS - Cluster4 2xLPS    0.6717299 0.1621192 Inf   4.143  0.0010
-    ##  Cluster4 PBS - Cluster1 2xLPS    0.3925645 0.1805531 Inf   2.174  0.8313
-    ##  Cluster4 PBS - Cluster2 2xLPS    0.5906375 0.1871001 Inf   3.157  0.0447
-    ##  Cluster4 PBS - Cluster3 2xLPS   -0.5185235 0.1633533 Inf  -3.174  0.0421
-    ##  Cluster4 PBS - Cluster4 2xLPS   -0.0022577 0.1707416 Inf  -0.013  1.0000
-    ##  Cluster1 2xLPS - Cluster2 2xLPS  0.1980730 0.1960520 Inf   1.010  1.0000
-    ##  Cluster1 2xLPS - Cluster3 2xLPS -0.9110879 0.1735409 Inf  -5.250  <.0001
-    ##  Cluster1 2xLPS - Cluster4 2xLPS -0.3948222 0.1805105 Inf  -2.187  0.8043
-    ##  Cluster2 2xLPS - Cluster3 2xLPS -1.1091609 0.1803441 Inf  -6.150  <.0001
-    ##  Cluster2 2xLPS - Cluster4 2xLPS -0.5928952 0.1870590 Inf  -3.170  0.0427
-    ##  Cluster3 2xLPS - Cluster4 2xLPS  0.5162657 0.1633062 Inf   3.161  0.0440
-    ##  Significant
-    ##  significant
-    ##  significant
-    ##  ns         
-    ##  ns         
-    ##  ns         
-    ##  significant
     ##  ns         
     ##  significant
     ##  significant
@@ -797,18 +695,12 @@ stats.testing[[2]] # posthoc 1
     ##  significant
     ##  significant
     ##  significant
-    ##  ns         
-    ##  significant
-    ##  ns         
-    ##  significant
     ##  significant
     ##  ns         
     ##  ns         
     ##  significant
+    ##  significant
     ##  ns         
-    ##  significant
-    ##  significant
-    ##  significant
     ## 
     ## Results are given on the log odds ratio (not the response) scale. 
     ## P value adjustment: bonferroni method for 28 tests
@@ -817,44 +709,23 @@ stats.testing[[2]] # posthoc 1
 stats.testing[[3]] # posthoc 2
 ```
 
-    ## Sex = F, Treatment = PBS:
-    ##  contrast              estimate        SE  df z.ratio p.value Significant
-    ##  Cluster1 - Cluster2  1.6467797 0.1913236 Inf   8.607  <.0001 significant
-    ##  Cluster1 - Cluster3 -1.0473601 0.1183006 Inf  -8.853  <.0001 significant
-    ##  Cluster1 - Cluster4 -0.2877816 0.1240098 Inf  -2.321  0.1218 ns         
-    ##  Cluster2 - Cluster3 -2.6941398 0.1847361 Inf -14.584  <.0001 significant
-    ##  Cluster2 - Cluster4 -1.9345613 0.1884136 Inf -10.268  <.0001 significant
-    ##  Cluster3 - Cluster4  0.7595784 0.1135034 Inf   6.692  <.0001 significant
+    ## Cluster = 1:
+    ##  contrast      estimate        SE  df z.ratio p.value Significant
+    ##  PBS - 2xLPS  0.0929459 0.1411275 Inf   0.659  0.5102 ns         
     ## 
-    ## Sex = M, Treatment = PBS:
-    ##  contrast              estimate        SE  df z.ratio p.value Significant
-    ##  Cluster1 - Cluster2  1.4707013 0.2384554 Inf   6.168  <.0001 significant
-    ##  Cluster1 - Cluster3 -0.7354300 0.1635055 Inf  -4.498  <.0001 significant
-    ##  Cluster1 - Cluster4 -0.0614424 0.1720581 Inf  -0.357  1.0000 ns         
-    ##  Cluster2 - Cluster3 -2.2061313 0.2314368 Inf  -9.532  <.0001 significant
-    ##  Cluster2 - Cluster4 -1.5321436 0.2375413 Inf  -6.450  <.0001 significant
-    ##  Cluster3 - Cluster4  0.6739877 0.1621666 Inf   4.156  0.0002 significant
+    ## Cluster = 2:
+    ##  contrast      estimate        SE  df z.ratio p.value Significant
+    ##  PBS - 2xLPS  0.4735579 0.1586746 Inf   2.984  0.0028 significant
     ## 
-    ## Sex = F, Treatment = 2xLPS:
-    ##  contrast              estimate        SE  df z.ratio p.value Significant
-    ##  Cluster1 - Cluster2 -0.8768388 0.1935428 Inf  -4.530  <.0001 significant
-    ##  Cluster1 - Cluster3 -1.1187504 0.1903061 Inf  -5.879  <.0001 significant
-    ##  Cluster1 - Cluster4 -0.7050691 0.1965464 Inf  -3.587  0.0020 significant
-    ##  Cluster2 - Cluster3 -0.2419116 0.1637472 Inf  -1.477  0.8375 ns         
-    ##  Cluster2 - Cluster4  0.1717697 0.1709651 Inf   1.005  1.0000 ns         
-    ##  Cluster3 - Cluster4  0.4136812 0.1672895 Inf   2.473  0.0804 ns         
+    ## Cluster = 3:
+    ##  contrast      estimate        SE  df z.ratio p.value Significant
+    ##  PBS - 2xLPS  0.4175531 0.1300945 Inf   3.210  0.0013 significant
     ## 
-    ## Sex = M, Treatment = 2xLPS:
-    ##  contrast              estimate        SE  df z.ratio p.value Significant
-    ##  Cluster1 - Cluster2  0.1980730 0.1960520 Inf   1.010  1.0000 ns         
-    ##  Cluster1 - Cluster3 -0.9110879 0.1735409 Inf  -5.250  <.0001 significant
-    ##  Cluster1 - Cluster4 -0.3948222 0.1805105 Inf  -2.187  0.1723 ns         
-    ##  Cluster2 - Cluster3 -1.1091609 0.1803441 Inf  -6.150  <.0001 significant
-    ##  Cluster2 - Cluster4 -0.5928952 0.1870590 Inf  -3.170  0.0092 significant
-    ##  Cluster3 - Cluster4  0.5162657 0.1633062 Inf   3.161  0.0094 significant
+    ## Cluster = 4:
+    ##  contrast      estimate        SE  df z.ratio p.value Significant
+    ##  PBS - 2xLPS -1.4618938 0.1901547 Inf  -7.688  <.0001 significant
     ## 
-    ## Results are given on the log odds ratio (not the response) scale. 
-    ## P value adjustment: bonferroni method for 6 tests
+    ## Results are given on the log odds ratio (not the response) scale.
 
 ``` r
 stats.testing[[4]] # DHARMa model check
@@ -866,50 +737,35 @@ stats.testing[[4]] # DHARMa model check
 stats.testing[[5]] # summary of model
 ```
 
-    ## Formula:          percentage ~ Cluster * Treatment * Sex + (1 | MouseID)
+    ## Formula:          percentage ~ Cluster * Treatment + (1 | MouseID)
     ## Data: data
     ##       AIC       BIC    logLik  df.resid 
-    ## -61.45332 -43.53013  48.72666         2 
+    ## -78.28956 -66.50903  49.14478        14 
     ## Random-effects (co)variances:
     ## 
     ## Conditional model:
     ##  Groups  Name        Std.Dev. 
-    ##  MouseID (Intercept) 2.677e-06
+    ##  MouseID (Intercept) 3.295e-06
     ## 
-    ## Number of obs: 20 / Conditional model: MouseID, 5
+    ## Number of obs: 24 / Conditional model: MouseID, 6
     ## 
-    ## Dispersion parameter for beta family ():  351 
+    ## Dispersion parameter for beta family ():  171 
     ## 
     ## Fixed Effects:
     ## 
     ## Conditional model:
-    ##              (Intercept)                  Cluster1                  Cluster2  
-    ##                 -1.21765                  -0.17644                  -0.78612  
-    ##                 Cluster3                Treatment1                      Sex1  
-    ##                  0.77672                  -0.07914                  -0.02194  
-    ##      Cluster1:Treatment1       Cluster2:Treatment1       Cluster3:Treatment1  
-    ##                  0.29962                  -0.64944                   0.23786  
-    ##            Cluster1:Sex1             Cluster2:Sex1             Cluster3:Sex1  
-    ##                 -0.12219                   0.10252                   0.00771  
-    ##          Treatment1:Sex1  Cluster1:Treatment1:Sex1  Cluster2:Treatment1:Sex1  
-    ##                 -0.02199                   0.07691                  -0.23583  
-    ## Cluster3:Treatment1:Sex1  
-    ##                  0.10298
+    ##         (Intercept)             Cluster1             Cluster2  
+    ##            -1.18704              0.16188             -0.24193  
+    ##            Cluster3           Treatment1  Cluster1:Treatment1  
+    ##             0.63270             -0.05973              0.10620  
+    ## Cluster2:Treatment1  Cluster3:Treatment1  
+    ##             0.29651              0.26851
 
 ``` r
 # filterable data tables of posthoc outputs: 
 stats.testing[[2]] %>% DT::datatable(., options=list(autoWidth=TRUE, scrollX=TRUE, scrollCollapse=TRUE))
-```
-
-<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-5be27de076132534988b" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-5be27de076132534988b">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48","49","50","51","52","53","54","55","56"],["Cluster1 PBS - Cluster2 PBS","Cluster1 PBS - Cluster3 PBS","Cluster1 PBS - Cluster4 PBS","Cluster1 PBS - Cluster1 2xLPS","Cluster1 PBS - Cluster2 2xLPS","Cluster1 PBS - Cluster3 2xLPS","Cluster1 PBS - Cluster4 2xLPS","Cluster2 PBS - Cluster3 PBS","Cluster2 PBS - Cluster4 PBS","Cluster2 PBS - Cluster1 2xLPS","Cluster2 PBS - Cluster2 2xLPS","Cluster2 PBS - Cluster3 2xLPS","Cluster2 PBS - Cluster4 2xLPS","Cluster3 PBS - Cluster4 PBS","Cluster3 PBS - Cluster1 2xLPS","Cluster3 PBS - Cluster2 2xLPS","Cluster3 PBS - Cluster3 2xLPS","Cluster3 PBS - Cluster4 2xLPS","Cluster4 PBS - Cluster1 2xLPS","Cluster4 PBS - Cluster2 2xLPS","Cluster4 PBS - Cluster3 2xLPS","Cluster4 PBS - Cluster4 2xLPS","Cluster1 2xLPS - Cluster2 2xLPS","Cluster1 2xLPS - Cluster3 2xLPS","Cluster1 2xLPS - Cluster4 2xLPS","Cluster2 2xLPS - Cluster3 2xLPS","Cluster2 2xLPS - Cluster4 2xLPS","Cluster3 2xLPS - Cluster4 2xLPS","Cluster1 PBS - Cluster2 PBS","Cluster1 PBS - Cluster3 PBS","Cluster1 PBS - Cluster4 PBS","Cluster1 PBS - Cluster1 2xLPS","Cluster1 PBS - Cluster2 2xLPS","Cluster1 PBS - Cluster3 2xLPS","Cluster1 PBS - Cluster4 2xLPS","Cluster2 PBS - Cluster3 PBS","Cluster2 PBS - Cluster4 PBS","Cluster2 PBS - Cluster1 2xLPS","Cluster2 PBS - Cluster2 2xLPS","Cluster2 PBS - Cluster3 2xLPS","Cluster2 PBS - Cluster4 2xLPS","Cluster3 PBS - Cluster4 PBS","Cluster3 PBS - Cluster1 2xLPS","Cluster3 PBS - Cluster2 2xLPS","Cluster3 PBS - Cluster3 2xLPS","Cluster3 PBS - Cluster4 2xLPS","Cluster4 PBS - Cluster1 2xLPS","Cluster4 PBS - Cluster2 2xLPS","Cluster4 PBS - Cluster3 2xLPS","Cluster4 PBS - Cluster4 2xLPS","Cluster1 2xLPS - Cluster2 2xLPS","Cluster1 2xLPS - Cluster3 2xLPS","Cluster1 2xLPS - Cluster4 2xLPS","Cluster2 2xLPS - Cluster3 2xLPS","Cluster2 2xLPS - Cluster4 2xLPS","Cluster3 2xLPS - Cluster4 2xLPS"],["F","F","F","F","F","F","F","F","F","F","F","F","F","F","F","F","F","F","F","F","F","F","F","F","F","F","F","F","M","M","M","M","M","M","M","M","M","M","M","M","M","M","M","M","M","M","M","M","M","M","M","M","M","M","M","M"],[1.64677968553228,-1.047360081856269,-0.2877816370890969,0.5508112264714777,-0.3260275648825592,-0.5679391328752353,-0.1542578965995365,-2.69413976738855,-1.934561322621377,-1.095968459060803,-1.97280725041484,-2.214718818407516,-1.801037582131817,0.7595784447671724,1.598171308327747,0.72133251697371,0.479420948981034,0.8931021852567328,0.8385928635605747,-0.03824592779346234,-0.2801574957861384,0.1335237404895604,-0.876838791354037,-1.118750359346713,-0.7050691230710143,-0.2419115679926761,0.1717696682830227,0.4136812362756988,1.470701256033359,-0.7354300431296438,-0.06144238687444242,0.3311220921375371,0.5291950646536887,-0.5799658534009459,-0.06370011545205502,-2.206131299163003,-1.532143642907802,-1.139579163895822,-0.9415061913796704,-2.050667109434305,-1.534401371485414,0.6739876562552013,1.066552135267181,1.264625107783333,0.1554641897286979,0.6717299276775888,0.3925644790119796,0.5906374515281312,-0.5185234665265035,-0.002257728577612611,0.1980729725161516,-0.911087945538483,-0.3948222075895921,-1.109160918054635,-0.5928951801057438,0.5162657379488909],[0.1913235527192592,0.1183006300792719,0.1240097868922667,0.1779712748157844,0.1492420653607785,0.1450174806823749,0.1531190663780136,0.1847361447085434,0.1884136474988924,0.2275362647330284,0.205900849049996,0.2028694143385633,0.2087202676471178,0.1135033534981077,0.1708290748192772,0.1406330246907571,0.1361388045624038,0.1447429407538236,0.1748254511896984,0.1454711332997189,0.1411327969147708,0.1494467096631069,0.1935428392855575,0.1903061394267794,0.1965464114509367,0.1637472207003841,0.1709650849859018,0.167289536957842,0.2384553999998109,0.1635055516636244,0.1720581083368064,0.1817559283846264,0.188260909050921,0.1646824715049368,0.1720134237197455,0.231436769369048,0.2375413421217154,0.244644958171869,0.2495079884561018,0.2322667285139896,0.2375090389952919,0.1621666225453919,0.172424945137069,0.1792708677129248,0.1543155133246437,0.1621191946633753,0.1805530915796267,0.1871000984677494,0.1633532727609524,0.1707416247056197,0.1960519754945835,0.1735408872783976,0.1805105197854782,0.1803440924094484,0.1870590239310837,0.1633061924174207],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[8.6073024576786,-8.85337703742106,-2.320636494110797,3.094944546762475,-2.184555434115835,-3.91634946492531,-1.007437546795847,-14.58371761324277,-10.26762842448952,-4.816675971835603,-9.581345873594776,-10.91696757556282,-8.628953969994043,6.692123372194777,9.355382331833606,5.129182982161362,3.521559855928332,6.170264198070332,4.796743596849867,-0.2629107708583188,-1.985063018026375,0.8934538658666947,-4.530463615139638,-5.878687690877961,-3.58729074657778,-1.477347627385462,1.004706126383567,2.47284584438744,6.167615646508847,-4.497890350797532,-0.357102536279011,1.821795278318661,2.810966266558032,-3.521721820792324,-0.3703206068140301,-9.532328441921498,-6.450008361587585,-4.658093804227269,-3.77345109150811,-8.8289318171147,-6.460391478051622,4.156142895968288,6.18560228869046,7.05427002120857,1.00744368715307,4.143432423732244,2.174232939339356,3.156799255399322,-3.174245962523808,-0.01322307071579776,1.010308475680848,-5.249990131011019,-2.187253175376181,-6.150248135305843,-3.169562032592335,3.161335956136211],[2.094397147326671e-16,2.377486170193768e-17,0.5685811834454084,0.05511791512862506,0.809800840346067,0.002517197380375854,1,9.983656200168755e-47,2.760762940833779e-23,4.087144249095487e-05,2.682076797124078e-20,2.677799263701387e-26,1.73363684171571e-16,6.158748372857196e-10,2.332341244566712e-19,8.148066625220371e-06,0.01201244247297945,1.908927398868745e-08,4.515442725301727e-05,1,1,1,0.0001647922934639745,1.157888865740619e-07,0.009355687171955694,1,1,0.3753174555132773,1.941167393782645e-08,0.0001921670101916492,1,1,0.1383002996849293,0.0120051063133419,1,4.306241431816427e-20,3.131631457131703e-09,8.936222117925193e-05,0.004508134235530688,2.95904328168919e-17,2.924108961974382e-09,0.0009062632082695614,1.73224249679633e-08,4.858256428575206e-11,1,0.000958008583025701,0.8312540821611694,0.04466311310635673,0.04206337219055695,1,1,4.259006060618942e-06,0.80427331432598,2.166130920608778e-08,0.04274728245799979,0.04397323004547844],["significant","significant","ns","ns","ns","significant","ns","significant","significant","significant","significant","significant","significant","significant","significant","significant","significant","significant","significant","ns","ns","ns","significant","significant","significant","ns","ns","ns","significant","significant","ns","ns","ns","significant","ns","significant","significant","significant","significant","significant","significant","significant","significant","significant","ns","significant","ns","significant","significant","ns","ns","significant","ns","significant","significant","significant"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>contrast<\/th>\n      <th>Sex<\/th>\n      <th>estimate<\/th>\n      <th>SE<\/th>\n      <th>df<\/th>\n      <th>z.ratio<\/th>\n      <th>p.value<\/th>\n      <th>Significant<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"autoWidth":true,"scrollX":true,"scrollCollapse":true,"columnDefs":[{"className":"dt-right","targets":[3,4,5,6,7]},{"orderable":false,"targets":0}],"order":[],"orderClasses":false},"selection":{"mode":"multiple","selected":null,"target":"row","selectable":null}},"evals":[],"jsHooks":[]}</script>
-
-``` r
 stats.testing[[3]] %>% DT::datatable(., options=list(autoWidth=TRUE, scrollX=TRUE, scrollCollapse=TRUE))
 ```
-
-<div class="datatables html-widget html-fill-item-overflow-hidden html-fill-item" id="htmlwidget-6450ad625a6e7cb77d9c" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-6450ad625a6e7cb77d9c">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24"],["Cluster1 - Cluster2","Cluster1 - Cluster3","Cluster1 - Cluster4","Cluster2 - Cluster3","Cluster2 - Cluster4","Cluster3 - Cluster4","Cluster1 - Cluster2","Cluster1 - Cluster3","Cluster1 - Cluster4","Cluster2 - Cluster3","Cluster2 - Cluster4","Cluster3 - Cluster4","Cluster1 - Cluster2","Cluster1 - Cluster3","Cluster1 - Cluster4","Cluster2 - Cluster3","Cluster2 - Cluster4","Cluster3 - Cluster4","Cluster1 - Cluster2","Cluster1 - Cluster3","Cluster1 - Cluster4","Cluster2 - Cluster3","Cluster2 - Cluster4","Cluster3 - Cluster4"],["F","F","F","F","F","F","M","M","M","M","M","M","F","F","F","F","F","F","M","M","M","M","M","M"],["PBS","PBS","PBS","PBS","PBS","PBS","PBS","PBS","PBS","PBS","PBS","PBS","2xLPS","2xLPS","2xLPS","2xLPS","2xLPS","2xLPS","2xLPS","2xLPS","2xLPS","2xLPS","2xLPS","2xLPS"],[1.64677968553228,-1.047360081856269,-0.2877816370890969,-2.69413976738855,-1.934561322621377,0.7595784447671724,1.470701256033359,-0.7354300431296438,-0.06144238687444242,-2.206131299163003,-1.532143642907802,0.6739876562552013,-0.876838791354037,-1.118750359346713,-0.7050691230710143,-0.2419115679926761,0.1717696682830227,0.4136812362756988,0.1980729725161516,-0.911087945538483,-0.3948222075895921,-1.109160918054635,-0.5928951801057438,0.5162657379488909],[0.1913235527192592,0.1183006300792719,0.1240097868922667,0.1847361447085434,0.1884136474988924,0.1135033534981077,0.2384553999998109,0.1635055516636244,0.1720581083368064,0.231436769369048,0.2375413421217154,0.1621666225453919,0.1935428392855575,0.1903061394267794,0.1965464114509367,0.1637472207003841,0.1709650849859018,0.167289536957842,0.1960519754945835,0.1735408872783976,0.1805105197854782,0.1803440924094484,0.1870590239310837,0.1633061924174207],[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[8.6073024576786,-8.85337703742106,-2.320636494110797,-14.58371761324277,-10.26762842448952,6.692123372194777,6.167615646508847,-4.497890350797532,-0.357102536279011,-9.532328441921498,-6.450008361587585,4.156142895968288,-4.530463615139638,-5.878687690877961,-3.58729074657778,-1.477347627385462,1.004706126383567,2.47284584438744,1.010308475680848,-5.249990131011019,-2.187253175376181,-6.150248135305843,-3.169562032592335,3.161335956136211],[4.487993887128581e-17,5.094613221843789e-18,0.1218388250240161,2.139354900036162e-47,5.915920587500956e-24,1.319731794183685e-10,4.159644415248524e-09,4.117864504106768e-05,1,9.227660211035199e-21,6.710638836710792e-10,0.000194199258914906,3.531263431370883e-05,2.481190426587041e-08,0.00200479010827622,0.8374948635815662,1,0.08042516903855942,1,9.126441558469161e-07,0.1723442816412814,4.641709115590239e-09,0.009160131955285668,0.009422835009745379],["significant","significant","ns","significant","significant","significant","significant","significant","ns","significant","significant","significant","significant","significant","significant","ns","ns","ns","ns","significant","ns","significant","significant","significant"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>contrast<\/th>\n      <th>Sex<\/th>\n      <th>Treatment<\/th>\n      <th>estimate<\/th>\n      <th>SE<\/th>\n      <th>df<\/th>\n      <th>z.ratio<\/th>\n      <th>p.value<\/th>\n      <th>Significant<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"autoWidth":true,"scrollX":true,"scrollCollapse":true,"columnDefs":[{"className":"dt-right","targets":[4,5,6,7,8]},{"orderable":false,"targets":0}],"order":[],"orderClasses":false},"selection":{"mode":"multiple","selected":null,"target":"row","selectable":null}},"evals":[],"jsHooks":[]}</script>
 
 ### Individual morphology measures
 

@@ -44,10 +44,10 @@ finaldata <- metadata_columns(data,
                               sep="_")
 ```
 
-For demonstration purposes, we will use one of the datasets that comes packaged with MicrogliaMorphologyR. 'data_2xLPS' contains morphology data collected from female and male 8 week-old Cx3cr1-eGFP mice, which were given 2 i.p. injections of either PBS vehicle solution or 0.5mg/kg lipopolysaccharides (LPS), spaced 24 hours apart. In this genetic mouse line, Cx3cr1-expressing cells including microglia have an endogenous reporter which makes them yellow when immunofluorescently imaged. Brains were collected 24 hours after the final injections, and brain sections were immunofluorescently stained and imaged for 2 additional, commonly used microglia markers: P2ry12, and Iba1.
+For demonstration purposes, we will use one of the datasets that comes packaged with MicrogliaMorphologyR. 'data_2xLPS_mouse' contains morphology data collected from female and male 8 week-old Cx3cr1-eGFP mice, which were given 2 i.p. injections of either PBS vehicle solution or 0.5mg/kg lipopolysaccharides (LPS), spaced 24 hours apart. In this genetic mouse line, Cx3cr1-expressing cells including microglia have an endogenous reporter which makes them yellow when immunofluorescently imaged. Brains were collected 24 hours after the final injections, and brain sections were immunofluorescently stained and imaged for 2 additional, commonly used microglia markers: P2ry12, and Iba1.
 
 ### load in example dataset
-```{r, eval=FALSE}
+```{r}
 data_2xLPS <- MicrogliaMorphologyR::data_2xLPS_mouse
 ```
 
@@ -176,7 +176,7 @@ cp$Treatment <- factor(cp$Treatment, levels=c("PBS","2xLPS"))
 # Quick check of cluster proportions when considering experimental variables of interest
 cp %>% 
   filter(BrainRegion=="STR") %>% # in this example, we filter for our brain region of interest
-  clusterpercentage_boxplots(Antibody, Treatment, Sex) # grouping variables
+  clusterpercentage_boxplots(Antibody, Treatment) # grouping variables
 ```
 
 ```{r}
@@ -212,15 +212,17 @@ stats.input$Treatment <- factor(stats.input$Treatment)
 
 # run stats analysis for changes in cluster percentages, at the animal level
 # you can specify up to two posthoc comparisons (posthoc1 and posthoc2 arguments) - if you only have one set of posthocs to run, specify the same comparison twice for both arguments. you will just get the same results in output[[2]] and output[[3]].
-stats.testing <- stats_cluster.animal(stats.input, "percentage ~ Cluster*Treatment*Sex + (1|MouseID)", 
-                                      "yes", "~Cluster*Treatment|Sex", "~Cluster|Sex*Treatment", "bonferroni")
+stats.testing <- stats_cluster.animal(stats.input, "percentage ~ Cluster*Treatment + (1|MouseID)", 
+                                      "yes", "~Cluster*Treatment", "~Treatment|Cluster", "bonferroni")
 
 stats.testing[[1]] # anova
 stats.testing[[2]] # posthoc 1
 stats.testing[[3]] # posthoc 2
 stats.testing[[4]] # DHARMa model check
 stats.testing[[5]] # summary of model
+```
 
+```{r, eval=FALSE}
 # filterable data tables of posthoc outputs: 
 stats.testing[[2]] %>% DT::datatable(., options=list(autoWidth=TRUE, scrollX=TRUE, scrollCollapse=TRUE))
 stats.testing[[3]] %>% DT::datatable(., options=list(autoWidth=TRUE, scrollX=TRUE, scrollCollapse=TRUE))
