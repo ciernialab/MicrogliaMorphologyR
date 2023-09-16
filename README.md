@@ -124,6 +124,7 @@ devtools::load_all()
 
 ``` r
 library(MicrogliaMorphologyR)
+set.seed(1)
 ```
 
 We will start by loading in your MicrogliaMorphology output (FracLac and
@@ -154,7 +155,7 @@ mice, which were given 2 i.p. injections of either PBS vehicle solution
 or 0.5mg/kg lipopolysaccharides (LPS), spaced 24 hours apart. In this
 genetic mouse line, Cx3cr1-expressing cells including microglia have an
 endogenous reporter which makes them yellow when immunofluorescently
-imaged. Brains were collected 24 hours after the final injections, and
+imaged. Brains were collected 3 hours after the final injections, and
 brain sections were immunofluorescently stained and imaged for 2
 additional, commonly used microglia markers: P2ry12, and Iba1.
 
@@ -168,13 +169,7 @@ MicrogliaMorphologyR comes with a number of functions which allow you to
 explore which features have extreme outliers and how normalizing in
 various ways changes your feature distributions. This allows you to
 explore and transform your data in a dataset-appropriate manner for
-downstream analyses. You can also generate a heatmap of correlations
-across the 27 different morphology features to investigate how they
-relate to each other. You can use this function to verify that features
-which explain similar aspects of cell morphology are more related to
-each other (e.g, features which describe cell area/territory span should
-all be highly correlated to each other compared to other features which
-do not).
+downstream analyses.
 
 ### exploratory data visualization and data transformation for downstream analyses
 
@@ -304,7 +299,6 @@ clustering steps.
 ## Dimensionality reduction using PCA
 
 ``` r
-set.seed(1)
 pcadata_elbow(data_2xLPS_logtransformed, start=9, end=35)
 ```
 
@@ -365,6 +359,13 @@ str(pca_data)
 
 ### generate heatmap of correlations between PCs and features
 
+You can generate a heatmap of correlations across the 27 different
+morphology features to investigate how they relate to each other. You
+can use this function to verify that features which explain similar
+aspects of cell morphology are more related to each other (e.g, features
+which describe cell area/territory span should all be highly correlated
+to each other compared to other features which do not).
+
 ``` r
 pcfeaturecorrelations(pca_data, pc.start=1, pc.end=3, 
                       feature.start=19, feature.end=45, 
@@ -416,7 +417,6 @@ kmeans_input <- pca_data_scale[1:3]
 
 ``` r
 # check for optimal number of clusters using wss and silhouette methods
-set.seed(2)
 sampling <- kmeans_input[sample(nrow(kmeans_input), 5000),] #sample 5000 random rows for cluster optimization
 
 fviz_nbclust(sampling, kmeans, method = 'wss', nstart=25, iter.max=50) # 4 clusters
@@ -454,8 +454,6 @@ determine to generate your final dataset for downstream analysis.
 
 ``` r
 # cluster and combine with original data
-library(ppclust)
-set.seed(3)
 data_kmeans <- fcm(kmeans_input, centers=4, nstart=25)
 pca_kmeans <- cbind(pca_data[1:5], data_kmeans)
 str(pca_kmeans)
@@ -534,6 +532,20 @@ clusterfeatures(pca_kmeans, start=11, end=37)
 
 ![](README_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
+After comparing the individual features across clusters, we can
+characterize the clusters as follows: \* Cluster 1 = rod-like (greatest
+oblongness, lowest circularity) \* Cluster 2 = ameboid (lowest territory
+span, high circularity, smallest branch lengths) \* Cluster 3 = ramified
+(largest territory span and branching complexity) \* Cluster 4 =
+hypertrophic (average territory span, high branch thickness as explained
+by pixel density in hull)
+
+### ColorByCluster
+
+``` r
+# insert here
+```
+
 ### Cluster characterization
 
 ``` r
@@ -541,13 +553,20 @@ clusterfeatures(pca_kmeans, start=11, end=37)
 cp <- clusterpercentage(pca_kmeans, "Cluster", MouseID, Antibody, Treatment, Sex, BrainRegion)
 cp$Treatment <- factor(cp$Treatment, levels=c("PBS","2xLPS"))
 
+# update cluster labels
+cp <- cp %>% mutate(Cluster = 
+                      case_when(Cluster=="1" ~ "Rod-like",
+                                Cluster=="2" ~ "Ameboid",
+                                Cluster=="3" ~ "Ramified",
+                                Cluster=="4" ~ "Hypertrophic"))
+
 # Quick check of cluster proportions when considering experimental variables of interest
 cp %>% 
   filter(BrainRegion=="STR") %>% # in this example, we filter for our brain region of interest
   clusterpercentage_boxplots(Antibody, Treatment) # grouping variables
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
 
 ``` r
 # example graph of data given variables of interest
@@ -564,7 +583,7 @@ cp %>%
   theme(axis.text.x=element_text(angle=45, vjust=1, hjust=1))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
 
 ## Statistical analysis
 
@@ -599,7 +618,7 @@ stats.testing <- stats_cluster.animal(stats.input, "percentage ~ Cluster*Treatme
                                       "~Cluster*Treatment", "~Treatment|Cluster", "bonferroni")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
 
     ## Formula:          percentage ~ Cluster * Treatment + (1 | MouseID)
     ## Data: data
@@ -609,7 +628,7 @@ stats.testing <- stats_cluster.animal(stats.input, "percentage ~ Cluster*Treatme
     ## 
     ## Conditional model:
     ##  Groups  Name        Std.Dev. 
-    ##  MouseID (Intercept) 3.295e-06
+    ##  MouseID (Intercept) 3.514e-06
     ## 
     ## Number of obs: 24 / Conditional model: MouseID, 6
     ## 
@@ -619,11 +638,11 @@ stats.testing <- stats_cluster.animal(stats.input, "percentage ~ Cluster*Treatme
     ## 
     ## Conditional model:
     ##         (Intercept)             Cluster1             Cluster2  
-    ##            -1.18704              0.16188             -0.24193  
+    ##            -1.18704             -0.24193             -0.55266  
     ##            Cluster3           Treatment1  Cluster1:Treatment1  
-    ##             0.63270             -0.05973              0.10620  
+    ##             0.63270             -0.05973              0.29651  
     ## Cluster2:Treatment1  Cluster3:Treatment1  
-    ##             0.29651              0.26851
+    ##            -0.67122              0.26851
 
 ``` r
 stats.testing[[1]] # anova
@@ -643,45 +662,39 @@ stats.testing[[1]] # anova
 stats.testing[[2]] # posthoc 1
 ```
 
-    ##  contrast                          estimate        SE  df z.ratio p.value
-    ##  Cluster1 PBS - Cluster2 PBS      0.2135047 0.1433691 Inf   1.489  1.0000
-    ##  Cluster1 PBS - Cluster3 PBS     -0.6331272 0.1331835 Inf  -4.754  0.0001
-    ##  Cluster1 PBS - Cluster4 PBS      1.4919558 0.1898065 Inf   7.860  <.0001
-    ##  Cluster1 PBS - Cluster1 2xLPS    0.0929459 0.1411275 Inf   0.659  1.0000
-    ##  Cluster1 PBS - Cluster2 2xLPS    0.6870626 0.1552822 Inf   4.425  0.0003
-    ##  Cluster1 PBS - Cluster3 2xLPS   -0.2155741 0.1366563 Inf  -1.577  1.0000
-    ##  Cluster1 PBS - Cluster4 2xLPS    0.0300620 0.1400727 Inf   0.215  1.0000
-    ##  Cluster2 PBS - Cluster3 PBS     -0.8466319 0.1371397 Inf  -6.173  <.0001
-    ##  Cluster2 PBS - Cluster4 PBS      1.2784511 0.1925746 Inf   6.639  <.0001
-    ##  Cluster2 PBS - Cluster1 2xLPS   -0.1205588 0.1448605 Inf  -0.832  1.0000
-    ##  Cluster2 PBS - Cluster2 2xLPS    0.4735579 0.1586746 Inf   2.984  0.0795
-    ##  Cluster2 PBS - Cluster3 2xLPS   -0.4290788 0.1405113 Inf  -3.054  0.0633
-    ##  Cluster2 PBS - Cluster4 2xLPS   -0.1834427 0.1438338 Inf  -1.275  1.0000
-    ##  Cluster3 PBS - Cluster4 PBS      2.1250830 0.1851987 Inf  11.475  <.0001
-    ##  Cluster3 PBS - Cluster1 2xLPS    0.7260731 0.1347911 Inf   5.387  <.0001
-    ##  Cluster3 PBS - Cluster2 2xLPS    1.3201898 0.1495656 Inf   8.827  <.0001
-    ##  Cluster3 PBS - Cluster3 2xLPS    0.4175531 0.1300945 Inf   3.210  0.0372
-    ##  Cluster3 PBS - Cluster4 2xLPS    0.6631892 0.1336846 Inf   4.961  <.0001
-    ##  Cluster4 PBS - Cluster1 2xLPS   -1.3990099 0.1909261 Inf  -7.327  <.0001
-    ##  Cluster4 PBS - Cluster2 2xLPS   -0.8048932 0.2015312 Inf  -3.994  0.0018
-    ##  Cluster4 PBS - Cluster3 2xLPS   -1.7075299 0.1876771 Inf  -9.098  <.0001
-    ##  Cluster4 PBS - Cluster4 2xLPS   -1.4618938 0.1901547 Inf  -7.688  <.0001
-    ##  Cluster1 2xLPS - Cluster2 2xLPS  0.5941167 0.1566574 Inf   3.792  0.0042
-    ##  Cluster1 2xLPS - Cluster3 2xLPS -0.3085200 0.1382221 Inf  -2.232  0.7171
-    ##  Cluster1 2xLPS - Cluster4 2xLPS -0.0628839 0.1415997 Inf  -0.444  1.0000
-    ##  Cluster2 2xLPS - Cluster3 2xLPS -0.9026367 0.1526535 Inf  -5.913  <.0001
-    ##  Cluster2 2xLPS - Cluster4 2xLPS -0.6570006 0.1557104 Inf  -4.219  0.0007
-    ##  Cluster3 2xLPS - Cluster4 2xLPS  0.2456361 0.1371443 Inf   1.791  1.0000
+    ##  contrast                                estimate        SE  df z.ratio p.value
+    ##  Ameboid PBS - Hypertrophic PBS         1.2784511 0.1925746 Inf   6.639  <.0001
+    ##  Ameboid PBS - Ramified PBS            -0.8466319 0.1371397 Inf  -6.173  <.0001
+    ##  Ameboid PBS - (Rod-like PBS)          -0.2135047 0.1433691 Inf  -1.489  1.0000
+    ##  Ameboid PBS - Ameboid 2xLPS            0.4735579 0.1586746 Inf   2.984  0.0795
+    ##  Ameboid PBS - Hypertrophic 2xLPS      -0.1834427 0.1438338 Inf  -1.275  1.0000
+    ##  Ameboid PBS - Ramified 2xLPS          -0.4290788 0.1405113 Inf  -3.054  0.0633
+    ##  Ameboid PBS - (Rod-like 2xLPS)        -0.1205588 0.1448605 Inf  -0.832  1.0000
+    ##  Hypertrophic PBS - Ramified PBS       -2.1250830 0.1851987 Inf -11.475  <.0001
+    ##  Hypertrophic PBS - (Rod-like PBS)     -1.4919558 0.1898065 Inf  -7.860  <.0001
+    ##  Hypertrophic PBS - Ameboid 2xLPS      -0.8048932 0.2015312 Inf  -3.994  0.0018
+    ##  Hypertrophic PBS - Hypertrophic 2xLPS -1.4618938 0.1901547 Inf  -7.688  <.0001
+    ##  Hypertrophic PBS - Ramified 2xLPS     -1.7075299 0.1876771 Inf  -9.098  <.0001
+    ##  Hypertrophic PBS - (Rod-like 2xLPS)   -1.3990099 0.1909261 Inf  -7.327  <.0001
+    ##  Ramified PBS - (Rod-like PBS)          0.6331272 0.1331835 Inf   4.754  0.0001
+    ##  Ramified PBS - Ameboid 2xLPS           1.3201898 0.1495656 Inf   8.827  <.0001
+    ##  Ramified PBS - Hypertrophic 2xLPS      0.6631892 0.1336846 Inf   4.961  <.0001
+    ##  Ramified PBS - Ramified 2xLPS          0.4175531 0.1300945 Inf   3.210  0.0372
+    ##  Ramified PBS - (Rod-like 2xLPS)        0.7260731 0.1347911 Inf   5.387  <.0001
+    ##  (Rod-like PBS) - Ameboid 2xLPS         0.6870626 0.1552822 Inf   4.425  0.0003
+    ##  (Rod-like PBS) - Hypertrophic 2xLPS    0.0300620 0.1400727 Inf   0.215  1.0000
+    ##  (Rod-like PBS) - Ramified 2xLPS       -0.2155741 0.1366563 Inf  -1.577  1.0000
+    ##  (Rod-like PBS) - (Rod-like 2xLPS)      0.0929459 0.1411275 Inf   0.659  1.0000
+    ##  Ameboid 2xLPS - Hypertrophic 2xLPS    -0.6570006 0.1557104 Inf  -4.219  0.0007
+    ##  Ameboid 2xLPS - Ramified 2xLPS        -0.9026367 0.1526535 Inf  -5.913  <.0001
+    ##  Ameboid 2xLPS - (Rod-like 2xLPS)      -0.5941167 0.1566574 Inf  -3.792  0.0042
+    ##  Hypertrophic 2xLPS - Ramified 2xLPS   -0.2456361 0.1371443 Inf  -1.791  1.0000
+    ##  Hypertrophic 2xLPS - (Rod-like 2xLPS)  0.0628839 0.1415997 Inf   0.444  1.0000
+    ##  Ramified 2xLPS - (Rod-like 2xLPS)      0.3085200 0.1382221 Inf   2.232  0.7171
     ##  Significant
-    ##  ns         
     ##  significant
     ##  significant
     ##  ns         
-    ##  significant
-    ##  ns         
-    ##  ns         
-    ##  significant
-    ##  significant
     ##  ns         
     ##  ns         
     ##  ns         
@@ -696,10 +709,16 @@ stats.testing[[2]] # posthoc 1
     ##  significant
     ##  significant
     ##  significant
+    ##  significant
+    ##  significant
+    ##  ns         
     ##  ns         
     ##  ns         
     ##  significant
     ##  significant
+    ##  significant
+    ##  ns         
+    ##  ns         
     ##  ns         
     ## 
     ## Results are given on the log odds ratio (not the response) scale. 
@@ -709,21 +728,21 @@ stats.testing[[2]] # posthoc 1
 stats.testing[[3]] # posthoc 2
 ```
 
-    ## Cluster = 1:
-    ##  contrast      estimate        SE  df z.ratio p.value Significant
-    ##  PBS - 2xLPS  0.0929459 0.1411275 Inf   0.659  0.5102 ns         
-    ## 
-    ## Cluster = 2:
+    ## Cluster = Ameboid:
     ##  contrast      estimate        SE  df z.ratio p.value Significant
     ##  PBS - 2xLPS  0.4735579 0.1586746 Inf   2.984  0.0028 significant
     ## 
-    ## Cluster = 3:
+    ## Cluster = Hypertrophic:
+    ##  contrast      estimate        SE  df z.ratio p.value Significant
+    ##  PBS - 2xLPS -1.4618938 0.1901547 Inf  -7.688  <.0001 significant
+    ## 
+    ## Cluster = Ramified:
     ##  contrast      estimate        SE  df z.ratio p.value Significant
     ##  PBS - 2xLPS  0.4175531 0.1300945 Inf   3.210  0.0013 significant
     ## 
-    ## Cluster = 4:
+    ## Cluster = Rod-like:
     ##  contrast      estimate        SE  df z.ratio p.value Significant
-    ##  PBS - 2xLPS -1.4618938 0.1901547 Inf  -7.688  <.0001 significant
+    ##  PBS - 2xLPS  0.0929459 0.1411275 Inf   0.659  0.5102 ns         
     ## 
     ## Results are given on the log odds ratio (not the response) scale.
 
@@ -731,7 +750,7 @@ stats.testing[[3]] # posthoc 2
 stats.testing[[4]] # DHARMa model check
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-18-2.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-19-2.png)<!-- -->
 
 ``` r
 stats.testing[[5]] # summary of model
@@ -745,7 +764,7 @@ stats.testing[[5]] # summary of model
     ## 
     ## Conditional model:
     ##  Groups  Name        Std.Dev. 
-    ##  MouseID (Intercept) 3.295e-06
+    ##  MouseID (Intercept) 3.514e-06
     ## 
     ## Number of obs: 24 / Conditional model: MouseID, 6
     ## 
@@ -755,11 +774,11 @@ stats.testing[[5]] # summary of model
     ## 
     ## Conditional model:
     ##         (Intercept)             Cluster1             Cluster2  
-    ##            -1.18704              0.16188             -0.24193  
+    ##            -1.18704             -0.24193             -0.55266  
     ##            Cluster3           Treatment1  Cluster1:Treatment1  
-    ##             0.63270             -0.05973              0.10620  
+    ##             0.63270             -0.05973              0.29651  
     ## Cluster2:Treatment1  Cluster3:Treatment1  
-    ##             0.29651              0.26851
+    ##            -0.67122              0.26851
 
 ### Individual morphology measures, at the animal level (averaged for each measure)
 
@@ -1019,7 +1038,7 @@ stats.testing[[3]] # posthoc 2
 do.call("grid.arrange", c(stats.testing[[4]], ncol=4)) # qqplots to check normality assumptions
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
 
 ``` r
 stats.testing[[5]] # summary of model
@@ -1267,7 +1286,7 @@ stats[[3]] # posthoc 2
 do.call("grid.arrange", c(stats[[4]], ncol=4)) # qqplots to check normality assumptions
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
 
 ``` r
 stats[[5]] # summary of model
@@ -1294,15 +1313,114 @@ MicrogliaMorphologyR functions like `transform_minmax` or
 `transform_scale` or other data transformations), and rerun the stats
 for those morphology features using the code above.
 
-### testing
+### Example of additional analyses possible with fuzzy k-means (soft clustering) membership scores
+
+Here, we will use a fuzzy k-means dataset that comes pre-loaded with the
+package for demonstration purposes, as running the actual fuzzy
+clustering step using the `fcm` function in the `ppclust`
+(package)\[<https://cran.r-project.org/web/packages/ppclust/vignettes/fcm.html>\]
+is time-intensive and computationally-expensive.
+
+Load in example dataset:
 
 ``` r
-data <- MicrogliaMorphologyR::data_2xLPS_fuzzykmeans
-hist(data_2xLPS_fuzzykmeans$`Cluster 3`)
+data_fuzzykmeans <- MicrogliaMorphologyR::data_2xLPS_fuzzykmeans
+colnames(data_fuzzykmeans)
+```
 
-data <- data_2xLPS_fuzzykmeans %>% 
+    ##  [1] "Antibody"                                                     
+    ##  [2] "MouseID"                                                      
+    ##  [3] "Sex"                                                          
+    ##  [4] "Treatment"                                                    
+    ##  [5] "BrainRegion"                                                  
+    ##  [6] "Subregion"                                                    
+    ##  [7] "ID"                                                           
+    ##  [8] "UniqueID"                                                     
+    ##  [9] "Foreground pixels"                                            
+    ## [10] "Density of foreground pixels in hull area"                    
+    ## [11] "Span ratio of hull (major/minor axis)"                        
+    ## [12] "Maximum span across hull"                                     
+    ## [13] "Area"                                                         
+    ## [14] "Perimeter"                                                    
+    ## [15] "Circularity"                                                  
+    ## [16] "Width of bounding rectangle"                                  
+    ## [17] "Height of bounding rectangle"                                 
+    ## [18] "Maximum radius from hull's center of mass"                    
+    ## [19] "Max/min radii from hull's center of mass"                     
+    ## [20] "Relative variation (CV) in radii from hull's center of mass"  
+    ## [21] "Mean radius"                                                  
+    ## [22] "Diameter of bounding circle"                                  
+    ## [23] "Maximum radius from circle's center of mass"                  
+    ## [24] "Max/min radii from circle's center of mass"                   
+    ## [25] "Relative variation (CV) in radii from circle's center of mass"
+    ## [26] "Mean radius from circle's center of mass"                     
+    ## [27] "# of branches"                                                
+    ## [28] "# of junctions"                                               
+    ## [29] "# of end point voxels"                                        
+    ## [30] "# of junction voxels"                                         
+    ## [31] "# of slab voxels"                                             
+    ## [32] "Average branch length"                                        
+    ## [33] "# of triple points"                                           
+    ## [34] "# of quadruple points"                                        
+    ## [35] "Maximum branch length"                                        
+    ## [36] "Cluster 1"                                                    
+    ## [37] "Cluster 2"                                                    
+    ## [38] "Cluster 3"                                                    
+    ## [39] "Cluster 4"                                                    
+    ## [40] "Cluster"
+
+``` r
+# check cluster features to determine cluster labels
+clusterfeatures(data_fuzzykmeans, start=9, end=35)
+```
+
+![](README_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
+
+``` r
+# update cluster labels
+data_fuzzykmeans <- data_fuzzykmeans %>% mutate(Cluster = 
+                      case_when(Cluster=="1" ~ "Ramified",
+                                Cluster=="2" ~ "Ameboid",
+                                Cluster=="3" ~ "Hypertrophic",
+                                Cluster=="4" ~ "Rod-like"))
+```
+
+#### Example: Characterization of just the high-scoring cells within each cluster (i.e., quintessential ‘rod-like’, ‘ameboid’, ‘hypertrophic’, or ‘ramified’ cells)
+
+``` r
+nrow(data_fuzzykmeans) # 43332 cells
+```
+
+    ## [1] 43332
+
+``` r
+data <- data_fuzzykmeans %>% 
   filter(`Cluster 1` > 0.70|
          `Cluster 2` > 0.70|
          `Cluster 3` > 0.70|
          `Cluster 4` > 0.70)
+nrow(data) # 7965 cells
 ```
+
+    ## [1] 7965
+
+``` r
+# calculate cluster percentages across variables of interest
+cp <- clusterpercentage(data, "Cluster", MouseID, Antibody, Treatment, Sex, BrainRegion)
+cp$Treatment <- factor(cp$Treatment, levels=c("PBS","2xLPS"))
+
+# example graph of data given variables of interest
+cp %>% 
+  filter(Antibody=="Iba1") %>%
+  ggplot(aes(x=Cluster, y=percentage, group=interaction(Cluster, Treatment))) +
+  facet_wrap(~BrainRegion) +
+  geom_boxplot(aes(group=interaction(Cluster, Treatment), fill=Treatment)) +
+  scale_fill_manual(values=c("#fde725","#482878")) +
+  geom_point(position=position_dodge(width=0.8), size=0.75, aes(group=interaction(Cluster,Treatment), color=Sex)) +
+  ggtitle("2xLPS mouse dataset: K-means clusters") +
+  labs(fill="Treatment") +
+  theme_bw(base_size=14) +
+  theme(axis.text.x=element_text(angle=45, vjust=1, hjust=1))
+```
+
+![](README_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->

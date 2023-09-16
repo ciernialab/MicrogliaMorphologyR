@@ -26,6 +26,7 @@ BiocManager::install('ciernialab/MicrogliaMorphologyR')
 ```{r}
 devtools::load_all()
 library(MicrogliaMorphologyR)
+set.seed(1)
 ```
 
 We will start by loading in your MicrogliaMorphology output (FracLac and SkeletonAnalysis files) and formatting the data so that you have a final dataframe which contains your cell-level data, with every row as a single cell and every column as either a metadata descriptor or morphology measure.
@@ -44,14 +45,14 @@ finaldata <- metadata_columns(data,
                               sep="_")
 ```
 
-For demonstration purposes, we will use one of the datasets that comes packaged with MicrogliaMorphologyR. 'data_2xLPS_mouse' contains morphology data collected from female and male 8 week-old Cx3cr1-eGFP mice, which were given 2 i.p. injections of either PBS vehicle solution or 0.5mg/kg lipopolysaccharides (LPS), spaced 24 hours apart. In this genetic mouse line, Cx3cr1-expressing cells including microglia have an endogenous reporter which makes them yellow when immunofluorescently imaged. Brains were collected 24 hours after the final injections, and brain sections were immunofluorescently stained and imaged for 2 additional, commonly used microglia markers: P2ry12, and Iba1.
+For demonstration purposes, we will use one of the datasets that comes packaged with MicrogliaMorphologyR. 'data_2xLPS_mouse' contains morphology data collected from female and male 8 week-old Cx3cr1-eGFP mice, which were given 2 i.p. injections of either PBS vehicle solution or 0.5mg/kg lipopolysaccharides (LPS), spaced 24 hours apart. In this genetic mouse line, Cx3cr1-expressing cells including microglia have an endogenous reporter which makes them yellow when immunofluorescently imaged. Brains were collected 3 hours after the final injections, and brain sections were immunofluorescently stained and imaged for 2 additional, commonly used microglia markers: P2ry12, and Iba1.
 
 ### load in example dataset
 ```{r}
 data_2xLPS <- MicrogliaMorphologyR::data_2xLPS_mouse
 ```
 
-MicrogliaMorphologyR comes with a number of functions which allow you to explore which features have extreme outliers and how normalizing in various ways changes your feature distributions. This allows you to explore and transform your data in a dataset-appropriate manner for downstream analyses. You can also generate a heatmap of correlations across the 27 different morphology features to investigate how they relate to each other. You can use this function to verify that features which explain similar aspects of cell morphology are more related to each other (e.g, features which describe cell area/territory span should all be highly correlated to each other compared to other features which do not).
+MicrogliaMorphologyR comes with a number of functions which allow you to explore which features have extreme outliers and how normalizing in various ways changes your feature distributions. This allows you to explore and transform your data in a dataset-appropriate manner for downstream analyses.
 
 ### exploratory data visualization and data transformation for downstream analyses
 ```{r}
@@ -86,7 +87,6 @@ Now, since we have gotten a better feel for our data and how to transform it if 
 
 ## Dimensionality reduction using PCA
 ```{r}
-set.seed(1)
 pcadata_elbow(data_2xLPS_logtransformed, start=9, end=35)
 pca_data <- pcadata(data_2xLPS_logtransformed, start=9, end=35,
                     pc.start=1, pc.end=10)
@@ -94,6 +94,8 @@ str(pca_data)
 ```
 
 ### generate heatmap of correlations between PCs and features
+
+You can generate a heatmap of correlations across the 27 different morphology features to investigate how they relate to each other. You can use this function to verify that features which explain similar aspects of cell morphology are more related to each other (e.g, features which describe cell area/territory span should all be highly correlated to each other compared to other features which do not).
 ```{r, fig.width=10, fig.height=8}
 pcfeaturecorrelations(pca_data, pc.start=1, pc.end=3, 
                       feature.start=19, feature.end=45, 
@@ -123,7 +125,6 @@ kmeans_input <- pca_data_scale[1:3]
 ### Cluster optimization prior to running fuzzy k-means
 ```{r}
 # check for optimal number of clusters using wss and silhouette methods
-set.seed(2)
 sampling <- kmeans_input[sample(nrow(kmeans_input), 5000),] #sample 5000 random rows for cluster optimization
 
 fviz_nbclust(sampling, kmeans, method = 'wss', nstart=25, iter.max=50) # 4 clusters
@@ -139,8 +140,6 @@ Next, we proceed with clustering. You can cluster using fuzzy k-means or regular
 ### Fuzzy k-means (soft clustering)
 ```{r, eval=FALSE}
 # cluster and combine with original data
-library(ppclust)
-set.seed(3)
 data_kmeans <- fcm(kmeans_input, centers=4, nstart=25)
 pca_kmeans <- cbind(pca_data[1:5], data_kmeans)
 str(pca_kmeans)
@@ -167,11 +166,30 @@ plot + scale_colour_viridis_d() # customizeable example: add color scheme of cho
 clusterfeatures(pca_kmeans, start=11, end=37)
 ```
 
+After comparing the individual features across clusters, we can characterize the clusters as follows:
+* Cluster 1 = rod-like (greatest oblongness, lowest circularity)
+* Cluster 2 = ameboid (lowest territory span, high circularity, smallest branch lengths)
+* Cluster 3 = ramified (largest territory span and branching complexity)
+* Cluster 4 = hypertrophic (average territory span, high branch thickness as explained by pixel density in hull)
+
+### ColorByCluster
+```{r}
+# insert here
+```
+
 ### Cluster characterization
+
 ```{r, fig.width=13, fig.height=12.5}
 # calculate cluster percentages across variables of interest
 cp <- clusterpercentage(pca_kmeans, "Cluster", MouseID, Antibody, Treatment, Sex, BrainRegion)
 cp$Treatment <- factor(cp$Treatment, levels=c("PBS","2xLPS"))
+
+# update cluster labels
+cp <- cp %>% mutate(Cluster = 
+                      case_when(Cluster=="1" ~ "Rod-like",
+                                Cluster=="2" ~ "Ameboid",
+                                Cluster=="3" ~ "Ramified",
+                                Cluster=="4" ~ "Hypertrophic"))
 
 # Quick check of cluster proportions when considering experimental variables of interest
 cp %>% 
@@ -226,7 +244,7 @@ stats.testing[[5]] # summary of model
 #### e.g., How does each individual morphology measure change with LPS treatment?
 
 The stats_morphologymeasures.animal function fits a linear model using the `lm` function for each morphology measure individually within your dataset.
-```{r, fig.width=13, fig.height=12.5}
+```{r, fig.width=13, fig.height=14}
 # prepare data for downstream analysis
 data <- data_2xLPS %>% 
   group_by(MouseID, Sex, Treatment, BrainRegion, Antibody) %>% 
@@ -253,7 +271,7 @@ stats.testing[[5]] # summary of model
 
 The stats_morphologymeasures.cell function fits a linear mixed effects model considering MouseID as a repeated measure using the `lmerTest` package, for each morphology measure individually within your dataset. The `lmerTest` package "provides p-values in type I, II or III anova and summary tables for linear mixed models...via Satterthwaite's degrees of freedom method." You can learn more about the package by reading the `lmerTest` [reference manual](https://cran.r-project.org/web/packages/lmerTest/lmerTest.pdf)
 
-```{r, fig.width=13, fig.height=12.5}
+```{r, fig.width=13, fig.height=14}
 # prepare data for downstream analysis
 data <- data_2xLPS_logtransformed %>% 
   group_by(MouseID, Sex, Treatment) %>% 
@@ -277,14 +295,49 @@ stats[[5]] # summary of model
 ```
 If you find that any individual morphology measures violate assumptions of normality after checking the qqplots contained in stats.input[[4]], you can filter your data for those measures, transform your data in the suitable manner (i.e., using MicrogliaMorphologyR functions like `transform_minmax` or `transform_scale` or other data transformations), and rerun the stats for those morphology features using the code above.
 
-### testing
-```{r, eval=FALSE}
-data <- MicrogliaMorphologyR::data_2xLPS_fuzzykmeans
-hist(data_2xLPS_fuzzykmeans$`Cluster 3`)
+### Example of additional analyses possible with fuzzy k-means (soft clustering) membership scores
+Here, we will use a fuzzy k-means dataset that comes pre-loaded with the package for demonstration purposes, as running the actual fuzzy clustering step using the `fcm` function in the `ppclust` (package)[https://cran.r-project.org/web/packages/ppclust/vignettes/fcm.html] is time-intensive and computationally-expensive.
 
-data <- data_2xLPS_fuzzykmeans %>% 
+Load in example dataset:
+```{r}
+data_fuzzykmeans <- MicrogliaMorphologyR::data_2xLPS_fuzzykmeans
+colnames(data_fuzzykmeans)
+
+# check cluster features to determine cluster labels
+clusterfeatures(data_fuzzykmeans, start=9, end=35)
+
+# update cluster labels
+data_fuzzykmeans <- data_fuzzykmeans %>% mutate(Cluster = 
+                      case_when(Cluster=="1" ~ "Ramified",
+                                Cluster=="2" ~ "Ameboid",
+                                Cluster=="3" ~ "Hypertrophic",
+                                Cluster=="4" ~ "Rod-like"))
+```
+
+#### Example: Characterization of just the high-scoring cells within each cluster (i.e., quintessential 'rod-like', 'ameboid', 'hypertrophic', or 'ramified' cells)
+```{r, fig.width=13, fig.height=5}
+nrow(data_fuzzykmeans) # 43332 cells
+data <- data_fuzzykmeans %>% 
   filter(`Cluster 1` > 0.70|
          `Cluster 2` > 0.70|
          `Cluster 3` > 0.70|
          `Cluster 4` > 0.70)
+nrow(data) # 7965 cells
+
+# calculate cluster percentages across variables of interest
+cp <- clusterpercentage(data, "Cluster", MouseID, Antibody, Treatment, Sex, BrainRegion)
+cp$Treatment <- factor(cp$Treatment, levels=c("PBS","2xLPS"))
+
+# example graph of data given variables of interest
+cp %>% 
+  filter(Antibody=="Iba1") %>%
+  ggplot(aes(x=Cluster, y=percentage, group=interaction(Cluster, Treatment))) +
+  facet_wrap(~BrainRegion) +
+  geom_boxplot(aes(group=interaction(Cluster, Treatment), fill=Treatment)) +
+  scale_fill_manual(values=c("#fde725","#482878")) +
+  geom_point(position=position_dodge(width=0.8), size=0.75, aes(group=interaction(Cluster,Treatment), color=Sex)) +
+  ggtitle("2xLPS mouse dataset: K-means clusters") +
+  labs(fill="Treatment") +
+  theme_bw(base_size=14) +
+  theme(axis.text.x=element_text(angle=45, vjust=1, hjust=1))
 ```
