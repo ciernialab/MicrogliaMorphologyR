@@ -161,23 +161,7 @@ used microglia markers: P2ry12, and Iba1.
 ### load in example dataset
 
 ``` r
-data_2xLPS <- MicrogliaMorphologyR::data_2xLPS
-str(data_2xLPS)
-
-data_2xLPS <- data_2xLPS %>% 
-  mutate(Subregion = case_when(BrainRegion == "ACC" ~ "ACC",
-                               BrainRegion == "IL" ~ "IL",
-                               BrainRegion == "PL" ~ "PL",
-                               TRUE ~ as.character(Subregion))) %>%
-  mutate(BrainRegion = case_when(Subregion == "ACC" ~ "FC",
-                                 Subregion == "IL" ~ "FC",
-                                 Subregion == "PL" ~ "FC",
-                                 TRUE ~ as.character(BrainRegion)))
-
-data_2xLPS <- data_2xLPS %>% filter(!(MouseID=="3" &BrainRegion=="HC"))
-levels(factor(data_2xLPS$BrainRegion))
-levels(factor(data_2xLPS$Subregion))
-str(data_2xLPS)
+data_2xLPS <- MicrogliaMorphologyR::data_2xLPS_mouse
 ```
 
 MicrogliaMorphologyR comes with a number of functions which allow you to

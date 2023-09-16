@@ -48,23 +48,7 @@ For demonstration purposes, we will use one of the datasets that comes packaged 
 
 ### load in example dataset
 ```{r, eval=FALSE}
-data_2xLPS <- MicrogliaMorphologyR::data_2xLPS
-str(data_2xLPS)
-
-data_2xLPS <- data_2xLPS %>% 
-  mutate(Subregion = case_when(BrainRegion == "ACC" ~ "ACC",
-                               BrainRegion == "IL" ~ "IL",
-                               BrainRegion == "PL" ~ "PL",
-                               TRUE ~ as.character(Subregion))) %>%
-  mutate(BrainRegion = case_when(Subregion == "ACC" ~ "FC",
-                                 Subregion == "IL" ~ "FC",
-                                 Subregion == "PL" ~ "FC",
-                                 TRUE ~ as.character(BrainRegion)))
-
-data_2xLPS <- data_2xLPS %>% filter(!(MouseID=="3" &BrainRegion=="HC"))
-levels(factor(data_2xLPS$BrainRegion))
-levels(factor(data_2xLPS$Subregion))
-str(data_2xLPS)
+data_2xLPS <- MicrogliaMorphologyR::data_2xLPS_mouse
 ```
 
 MicrogliaMorphologyR comes with a number of functions which allow you to explore which features have extreme outliers and how normalizing in various ways changes your feature distributions. This allows you to explore and transform your data in a dataset-appropriate manner for downstream analyses. You can also generate a heatmap of correlations across the 27 different morphology features to investigate how they relate to each other. You can use this function to verify that features which explain similar aspects of cell morphology are more related to each other (e.g, features which describe cell area/territory span should all be highly correlated to each other compared to other features which do not).
