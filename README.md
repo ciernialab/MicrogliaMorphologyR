@@ -24,22 +24,15 @@ data.
 
 ``` r
 BiocManager::install('ciernialab/MicrogliaMorphologyR')
-library(MicrogliaMorphologyR)
 ```
-
-### load other packages used in this tutorial – UPDATE TO INCLUDE AS DEPENDENCIES
 
 ``` r
 devtools::load_all()
 ```
 
     ## ℹ Loading MicrogliaMorphologyR
-
-``` r
-library(MicrogliaMorphologyR)
-library(tidyverse)
-```
-
+    ## Loading required package: tidyverse
+    ## 
     ## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
     ## ✔ dplyr     1.1.2     ✔ readr     2.1.4
     ## ✔ forcats   1.0.0     ✔ stringr   1.5.0
@@ -47,87 +40,91 @@ library(tidyverse)
     ## ✔ lubridate 1.9.2     ✔ tidyr     1.3.0
     ## ✔ purrr     1.0.2     
     ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-    ## ✖ dplyr::combine() masks MicrogliaMorphologyR::combine()
-    ## ✖ dplyr::filter()  masks stats::filter()
-    ## ✖ dplyr::lag()     masks stats::lag()
+    ## ✖ dplyr::filter() masks stats::filter()
+    ## ✖ dplyr::lag()    masks stats::lag()
     ## ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
-
-``` r
-library(Hmisc)
-```
-
+    ## Loading required package: Hmisc
+    ## 
     ## 
     ## Attaching package: 'Hmisc'
+    ## 
     ## 
     ## The following objects are masked from 'package:dplyr':
     ## 
     ##     src, summarize
     ## 
+    ## 
     ## The following objects are masked from 'package:base':
     ## 
     ##     format.pval, units
-
-``` r
-library(pheatmap)
-library(factoextra)
-```
-
+    ## 
+    ## 
+    ## Loading required package: pheatmap
+    ## 
+    ## Loading required package: factoextra
+    ## 
     ## Welcome! Want to learn more? See two factoextra-related books at https://goo.gl/ve3WBa
-
-``` r
-library(lmerTest)
-```
-
+    ## 
+    ## Loading required package: lmerTest
+    ## 
     ## Loading required package: lme4
+    ## 
     ## Loading required package: Matrix
     ## 
+    ## 
     ## Attaching package: 'Matrix'
+    ## 
     ## 
     ## The following objects are masked from 'package:tidyr':
     ## 
     ##     expand, pack, unpack
     ## 
     ## 
-    ## Attaching package: 'lme4'
-    ## 
-    ## The following object is masked from 'package:MicrogliaMorphologyR':
-    ## 
-    ##     lmer
-    ## 
     ## 
     ## Attaching package: 'lmerTest'
+    ## 
     ## 
     ## The following object is masked from 'package:lme4':
     ## 
     ##     lmer
     ## 
+    ## 
     ## The following object is masked from 'package:stats':
     ## 
     ##     step
-
-``` r
-library(nlme)
-```
-
+    ## 
+    ## 
+    ## Loading required package: nlme
+    ## 
     ## 
     ## Attaching package: 'nlme'
+    ## 
     ## 
     ## The following object is masked from 'package:lme4':
     ## 
     ##     lmList
     ## 
+    ## 
     ## The following object is masked from 'package:dplyr':
     ## 
     ##     collapse
+    ## 
+    ## 
+    ## Loading required package: SciViews
+    ## 
+    ## Loading required package: ggpubr
+    ## 
+    ## Loading required package: glmmTMB
+    ## 
+    ## Loading required package: DHARMa
+    ## 
+    ## This is DHARMa 0.4.6. For overview type '?DHARMa'. For recent changes, type news(package = 'DHARMa')
+    ## 
+    ## Loading required package: ppclust
 
 ``` r
-library(SciViews)
-library(ggpubr)
-library(glmmTMB)
-library(DHARMa)
+library(MicrogliaMorphologyR)
 ```
-
-    ## This is DHARMa 0.4.6. For overview type '?DHARMa'. For recent changes, type news(package = 'DHARMa')
 
 We will start by loading in your MicrogliaMorphology output (FracLac and
 SkeletonAnalysis files) and formatting the data so that you have a final
@@ -583,7 +580,7 @@ cp %>%
   theme(axis.text.x=element_text(angle=45, vjust=1, hjust=1))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-16-2.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
 
 ## Statistical analysis
 
@@ -655,7 +652,7 @@ stats.testing <- stats_cluster.animal(stats.input, "percentage ~ Cluster*Treatme
     ## Warning in newton(lsp = lsp, X = G$X, y = G$y, Eb = G$Eb, UrS = G$UrS, L = G$L,
     ## : Fitting terminated with step failure - check results carefully
 
-![](README_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
 
     ## Formula:          percentage ~ Cluster * Treatment * Sex + (1 | MouseID)
     ## Data: data
@@ -879,7 +876,7 @@ stats.testing[[3]] # posthoc 2
 stats.testing[[4]] # DHARMa model check
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-17-2.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-18-2.png)<!-- -->
 
 ``` r
 stats.testing[[5]] # summary of model

@@ -21,23 +21,11 @@ MicrogliaMorphologyR is an R package for microglia morphology analysis, that is 
 ### install and load package
 ```{r, eval=FALSE}
 BiocManager::install('ciernialab/MicrogliaMorphologyR')
-library(MicrogliaMorphologyR)
 ```
 
-### load other packages used in this tutorial -- UPDATE TO INCLUDE AS DEPENDENCIES
 ```{r}
 devtools::load_all()
 library(MicrogliaMorphologyR)
-library(tidyverse)
-library(Hmisc)
-library(pheatmap)
-library(factoextra)
-library(lmerTest)
-library(nlme)
-library(SciViews)
-library(ggpubr)
-library(glmmTMB)
-library(DHARMa)
 ```
 
 We will start by loading in your MicrogliaMorphology output (FracLac and SkeletonAnalysis files) and formatting the data so that you have a final dataframe which contains your cell-level data, with every row as a single cell and every column as either a metadata descriptor or morphology measure.
@@ -196,7 +184,7 @@ clusterfeatures(pca_kmeans, start=11, end=37)
 ```
 
 ### Cluster characterization
-```{r}
+```{r, fig.width=13, fig.height=12.5}
 # calculate cluster percentages across variables of interest
 cp <- clusterpercentage(pca_kmeans, "Cluster", MouseID, Antibody, Treatment, Sex, BrainRegion)
 cp$Treatment <- factor(cp$Treatment, levels=c("PBS","2xLPS"))
@@ -205,7 +193,9 @@ cp$Treatment <- factor(cp$Treatment, levels=c("PBS","2xLPS"))
 cp %>% 
   filter(BrainRegion=="STR") %>% # in this example, we filter for our brain region of interest
   clusterpercentage_boxplots(Antibody, Treatment, Sex) # grouping variables
+```
 
+```{r}
 # example graph of data given variables of interest
 cp %>% 
   filter(Antibody=="Iba1") %>%
