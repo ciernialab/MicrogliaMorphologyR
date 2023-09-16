@@ -2,7 +2,7 @@ MicrogliaMorphologyR
 ================
 
 **Created**: 26 June, 2023 by Jenn Kim  
-**Last updated**: 11 September, 2023
+**Last updated**: 16 September, 2023
 
 ## Welcome to MicrogliaMorphologyR!
 
@@ -38,9 +38,43 @@ devtools::load_all()
 ``` r
 library(MicrogliaMorphologyR)
 library(tidyverse)
+```
+
+    ## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+    ## ✔ dplyr     1.1.2     ✔ readr     2.1.4
+    ## ✔ forcats   1.0.0     ✔ stringr   1.5.0
+    ## ✔ ggplot2   3.4.3     ✔ tibble    3.2.1
+    ## ✔ lubridate 1.9.2     ✔ tidyr     1.3.0
+    ## ✔ purrr     1.0.2     
+    ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+    ## ✖ dplyr::combine() masks MicrogliaMorphologyR::combine()
+    ## ✖ dplyr::filter()  masks stats::filter()
+    ## ✖ dplyr::lag()     masks stats::lag()
+    ## ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+
+``` r
 library(Hmisc)
+```
+
+    ## 
+    ## Attaching package: 'Hmisc'
+    ## 
+    ## The following objects are masked from 'package:dplyr':
+    ## 
+    ##     src, summarize
+    ## 
+    ## The following objects are masked from 'package:base':
+    ## 
+    ##     format.pval, units
+
+``` r
 library(pheatmap)
 library(factoextra)
+```
+
+    ## Welcome! Want to learn more? See two factoextra-related books at https://goo.gl/ve3WBa
+
+``` r
 library(lmerTest)
 ```
 
