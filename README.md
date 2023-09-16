@@ -596,7 +596,7 @@ stats.input$Treatment <- factor(stats.input$Treatment)
 # run stats analysis for changes in cluster percentages, at the animal level
 # you can specify up to two posthoc comparisons (posthoc1 and posthoc2 arguments) - if you only have one set of posthocs to run, specify the same comparison twice for both arguments. you will just get the same results in output[[2]] and output[[3]].
 stats.testing <- stats_cluster.animal(stats.input, "percentage ~ Cluster*Treatment + (1|MouseID)", 
-                                      "yes", "~Cluster*Treatment", "~Treatment|Cluster", "bonferroni")
+                                      "~Cluster*Treatment", "~Treatment|Cluster", "bonferroni")
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->

@@ -405,7 +405,7 @@ pcfeaturecorrelations <- function(pca_data, pc.start, pc.end, feature.start, fea
   bat2[filter] <- ""
 
   pheatmap(bat1, display_numbers = bat2, border_color=NA,
-           fontsize_number=20, fontsize=12, fontsize_row=12, fontsize_col=12,
+           fontsize_number=20, fontsize=14, fontsize_row=12, fontsize_col=12,
            angle_col=0, main=title)
 }
 
@@ -432,7 +432,7 @@ plots_expvariable <- function(data, pc.xaxis, pc.yaxis){
       labs(title=v)
   }
 
-  do.call("grid.arrange", c(plots_variables, ncol=4))
+  do.call("grid.arrange", c(plots_variables))
 }
 
 
@@ -687,12 +687,11 @@ stats_morphologymeasures_lm <- function(data,model,posthoc.sex,posthoc.nosex,adj
 #'
 #' @param data is your input data frame
 #' @param model is your linear mixed model (e.g., Value ~ Cluster*Treatment*Sex + (1|MouseID))
-#' @param groupby do you want to group by clusters so that your posthocs are run within each cluster rather than within and across?
 #' @param posthoc1 is your first set of posthoc comparisons (e.g., considering sex: ~Cluster*Treatment|Sex)
 #' @param posthoc2 is your second set of posthoc comparisons (e.g., not considering sex: ~Cluster*Treatment)
 #' @param adjust is your method of multiple test correction
 #' @export
-stats_cluster.animal <- function(data, model, groupby, posthoc1, posthoc2, adjust){
+stats_cluster.animal <- function(data, model, posthoc1, posthoc2, adjust){
 
   y.model <- as.character(model)
   z.model <- as.character(posthoc1)

@@ -4,14 +4,12 @@
 \alias{stats_cluster.animal}
 \title{Stats analysis: cluster-level changes}
 \usage{
-stats_cluster.animal(data, model, groupby, posthoc1, posthoc2, adjust)
+stats_cluster.animal(data, model, posthoc1, posthoc2, adjust)
 }
 \arguments{
 \item{data}{is your input data frame}
 
 \item{model}{is your linear mixed model (e.g., Value ~ Cluster\emph{Treatment}Sex + (1|MouseID))}
-
-\item{groupby}{do you want to group by clusters so that your posthocs are run within each cluster rather than within and across?}
 
 \item{posthoc1}{is your first set of posthoc comparisons (e.g., considering sex: ~Cluster*Treatment|Sex)}
 

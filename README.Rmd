@@ -94,7 +94,7 @@ str(pca_data)
 ```
 
 ### generate heatmap of correlations between PCs and features
-```{r}
+```{r, fig.width=10, fig.height=8}
 pcfeaturecorrelations(pca_data, pc.start=1, pc.end=3, 
                       feature.start=19, feature.end=45, 
                       rthresh=0.75, pthresh=0.05, 
@@ -102,7 +102,7 @@ pcfeaturecorrelations(pca_data, pc.start=1, pc.end=3,
 ```
 
 ### visually explore different sources of variability in dataset
-```{r}
+```{r, fig.width=13, fig.height=12.5}
 # gather your data by experimental variables (e.g., Treatment, Sex, MouseID, etc.)
 gathered_expvariables <- pca_data %>% gather(variable, value, 11:16) 
 
@@ -179,7 +179,7 @@ cp %>%
   clusterpercentage_boxplots(Antibody, Treatment) # grouping variables
 ```
 
-```{r}
+```{r, fig.width=13, fig.height=5}
 # example graph of data given variables of interest
 cp %>% 
   filter(Antibody=="Iba1") %>%
@@ -213,7 +213,7 @@ stats.input$Treatment <- factor(stats.input$Treatment)
 # run stats analysis for changes in cluster percentages, at the animal level
 # you can specify up to two posthoc comparisons (posthoc1 and posthoc2 arguments) - if you only have one set of posthocs to run, specify the same comparison twice for both arguments. you will just get the same results in output[[2]] and output[[3]].
 stats.testing <- stats_cluster.animal(stats.input, "percentage ~ Cluster*Treatment + (1|MouseID)", 
-                                      "yes", "~Cluster*Treatment", "~Treatment|Cluster", "bonferroni")
+                                      "~Cluster*Treatment", "~Treatment|Cluster", "bonferroni")
 
 stats.testing[[1]] # anova
 stats.testing[[2]] # posthoc 1
