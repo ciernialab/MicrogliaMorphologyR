@@ -560,7 +560,7 @@ cp %>%
   geom_point(position=position_dodge(width=0.8), size=0.75, aes(group=interaction(Cluster,Treatment), color=Sex)) +
   ggtitle("2xLPS mouse dataset: K-means clusters") +
   labs(fill="Treatment") +
-  theme_bw(base_size=10) +
+  theme_bw(base_size=14) +
   theme(axis.text.x=element_text(angle=45, vjust=1, hjust=1))
 ```
 
@@ -761,43 +761,538 @@ stats.testing[[5]] # summary of model
     ## Cluster2:Treatment1  Cluster3:Treatment1  
     ##             0.29651              0.26851
 
+### Individual morphology measures, at the animal level (averaged for each measure)
+
+#### e.g., How does each individual morphology measure change with LPS treatment?
+
+The stats_morphologymeasures.animal function fits a linear model using
+the `lm` function for each morphology measure individually within your
+dataset.
+
 ``` r
-# filterable data tables of posthoc outputs: 
-stats.testing[[2]] %>% DT::datatable(., options=list(autoWidth=TRUE, scrollX=TRUE, scrollCollapse=TRUE))
-stats.testing[[3]] %>% DT::datatable(., options=list(autoWidth=TRUE, scrollX=TRUE, scrollCollapse=TRUE))
+# prepare data for downstream analysis
+data <- data_2xLPS %>% 
+  group_by(MouseID, Sex, Treatment, BrainRegion, Antibody) %>% 
+  summarise(across("Foreground pixels":"Maximum branch length", ~mean(.x))) %>% 
+  gather(Measure, Value, "Foreground pixels":"Maximum branch length")
 ```
 
-### Individual morphology measures
+    ## `summarise()` has grouped output by 'MouseID', 'Sex', 'Treatment',
+    ## 'BrainRegion'. You can override using the `.groups` argument.
 
 ``` r
-# at the cell-level
-DF <- data_pca_fuzzykmeans %>% group_by(MouseID, Sex, Treatment) %>% gather(Measure, Value, 14:40)
-stats <- stats_morphologymeasures(DF %>% filter(BrainRegion=="FC", Antibody=="Iba1"), "Value ~ Treatment + (1|MouseID)", "~Treatment", "~Treatment", "holm")
+# filter out data you want to run stats on and make sure to make any variables included in model into factors
+stats.input <- data %>% filter(BrainRegion=="FC", Antibody=="Iba1") 
+stats.input$Treatment <- factor(stats.input$Treatment)
 
-stats[[1]]
-stats[[2]]
-stats[[3]]
-do.call("grid.arrange", c(stats[[4]], ncol=4))
-stats[[5]]
-
-stats[[1]] %>% DT::datatable(., options=list(autoWidth=TRUE, scrollX=TRUE, scrollCollapse=TRUE))
-stats[[2]] %>% DT::datatable(., options=list(autoWidth=TRUE, scrollX=TRUE, scrollCollapse=TRUE))
-stats[[3]] %>% DT::datatable(., options=list(autoWidth=TRUE, scrollX=TRUE, scrollCollapse=TRUE))
-
-# at the animal-level (averaged for each measure)
-DF <- data_pca_fuzzykmeans %>% group_by(MouseID, Sex, Treatment, BrainRegion, Antibody) %>% summarise(across("Foreground pixels":"Maximum branch length", ~mean(.x))) %>% gather(Measure, Value, "Foreground pixels":"Maximum branch length")
-stats <- stats_morphologymeasures_lm(DF %>% filter(BrainRegion=="FC", Antibody=="Iba1"), "Value ~ Treatment", "~Treatment", "~Treatment", "holm")
-
-stats[[1]]
-stats[[2]]
-stats[[3]]
-do.call("grid.arrange", c(stats[[4]], ncol=4))
-stats[[5]]
-
-stats[[1]] %>% DT::datatable(., options=list(autoWidth=TRUE, scrollX=TRUE, scrollCollapse=TRUE))
-stats[[2]] %>% DT::datatable(., options=list(autoWidth=TRUE, scrollX=TRUE, scrollCollapse=TRUE))
-stats[[3]] %>% DT::datatable(., options=list(autoWidth=TRUE, scrollX=TRUE, scrollCollapse=TRUE))
+# run stats analysis for changes in individual morphology measures
+# you can specify up to two posthoc comparisons (posthoc1 and posthoc2 arguments) - if you only have one set of posthocs to run, specify the same comparison twice for both arguments. you will just get the same results in output[[2]] and output[[3]].
+stats.testing <- stats_morphologymeasures.animal(stats.input, "Value ~ Treatment", 
+                                                 "~Treatment", "~Treatment", "bonferroni")
 ```
+
+    ## [1] "Foreground pixels"
+    ## [1] "Density of foreground pixels in hull area"
+    ## [1] "Span ratio of hull (major/minor axis)"
+    ## [1] "Maximum span across hull"
+    ## [1] "Area"
+    ## [1] "Perimeter"
+    ## [1] "Circularity"
+    ## [1] "Width of bounding rectangle"
+    ## [1] "Height of bounding rectangle"
+    ## [1] "Maximum radius from hull's center of mass"
+    ## [1] "Max/min radii from hull's center of mass"
+    ## [1] "Relative variation (CV) in radii from hull's center of mass"
+    ## [1] "Mean radius"
+    ## [1] "Diameter of bounding circle"
+    ## [1] "Maximum radius from circle's center of mass"
+    ## [1] "Max/min radii from circle's center of mass"
+    ## [1] "Relative variation (CV) in radii from circle's center of mass"
+    ## [1] "Mean radius from circle's center of mass"
+    ## [1] "# of branches"
+    ## [1] "# of junctions"
+    ## [1] "# of end point voxels"
+    ## [1] "# of junction voxels"
+    ## [1] "# of slab voxels"
+    ## [1] "Average branch length"
+    ## [1] "# of triple points"
+    ## [1] "# of quadruple points"
+    ## [1] "Maximum branch length"
+    ## 
+    ## Call:
+    ## lm(formula = as.formula(paste(y.model)), data = tmp)
+    ## 
+    ## Coefficients:
+    ## (Intercept)   Treatment1  
+    ##     18.5887       0.8136
+
+``` r
+stats.testing[[1]] # anova
+```
+
+    ## Analysis of Variance Table
+    ## 
+    ## Response: Value
+    ##             Df Sum Sq Mean Sq F value  Pr(>F) measure Significant
+    ## Treatment    1  89448   89448  4.9907 0.08922      13           1
+    ## Residuals    4  71692   17923                      13            
+    ## Treatment1   1      0       0 44.3032 0.00265      11           2
+    ## Residuals1   4      0       0                      11            
+    ## Treatment2   1      0       0  2.8170 0.16857      26           1
+    ## Residuals2   4      0       0                      26            
+    ## Treatment3   1      4       4  0.2709 0.63023      20           1
+    ## Residuals3   4     59      15                      20            
+    ## Treatment4   1 662332  662332  4.3751 0.10463       8           1
+    ## Residuals4   4 605544  151386                       8            
+    ## Treatment5   1    123     123  1.5384 0.28264      23           1
+    ## Residuals5   4    319      80                      23            
+    ## Treatment6   1      0       0  3.8684 0.12061      10           1
+    ## Residuals6   4      0       0                      10            
+    ## Treatment7   1      1       1  0.0742 0.79878      27           1
+    ## Residuals7   4     68      17                      27            
+    ## Treatment8   1     35      35  4.4467 0.10264      14           1
+    ## Residuals8   4     31       8                      14            
+    ## Treatment9   1      0       0  0.0496 0.83461      19           1
+    ## Residuals9   4     22       6                      19            
+    ## Treatment10  1      0       0  3.9645 0.11730      16           1
+    ## Residuals10  4      0       0                      16            
+    ## Treatment11  1      0       0  8.5949 0.04274      25           2
+    ## Residuals11  4      0       0                      25            
+    ## Treatment12  1      3       3  1.3312 0.31283      21           1
+    ## Residuals12  4     10       2                      21            
+    ## Treatment13  1      5       5  0.2928 0.61717      12           1
+    ## Residuals13  4     62      15                      12            
+    ## Treatment14  1      1       1  0.2928 0.61717      18           1
+    ## Residuals14  4     15       4                      18            
+    ## Treatment15  1      0       0  3.9421 0.11806      15           1
+    ## Residuals15  4      0       0                      15            
+    ## Treatment16  1      0       0  6.8378 0.05911      24           1
+    ## Residuals16  4      0       0                      24            
+    ## Treatment17  1      3       3  1.1510 0.34375      22           1
+    ## Residuals17  4     10       3                      22            
+    ## Treatment18  1     95      95 10.6483 0.03099       1           2
+    ## Residuals18  4     36       9                       1            
+    ## Treatment19  1     27      27 10.1322 0.03344       4           2
+    ## Residuals19  4     11       3                       4            
+    ## Treatment20  1     12      12 13.8497 0.02045       2           2
+    ## Residuals20  4      3       1                       2            
+    ## Treatment21  1    104     104  8.6805 0.04213       3           2
+    ## Residuals21  4     48      12                       3            
+    ## Treatment22  1   3505    3505  7.3093 0.05389       6           1
+    ## Residuals22  4   1918     479                       6            
+    ## Treatment23  1      3       3 13.5254 0.02125       9           2
+    ## Residuals23  4      1       0                       9            
+    ## Treatment24  1     23      23 10.4407 0.03194       7           2
+    ## Residuals24  4      9       2                       7            
+    ## Treatment25  1      0       0  6.8687 0.05875       5           1
+    ## Residuals25  4      0       0                       5            
+    ## Treatment26  1      4       4  8.9637 0.04018      17           2
+    ## Residuals26  4      2       0                      17
+
+``` r
+stats.testing[[2]] # posthoc 1
+```
+
+    ##  contrast     estimate       SE df   lower.CL upper.CL t.ratio p.value
+    ##  2xLPS - PBS  244.1962 109.3098  4   -59.2965 547.6889   2.234  0.0892
+    ##  2xLPS - PBS    0.0730   0.0110  4     0.0426   0.1035   6.656  0.0026
+    ##  2xLPS - PBS    0.0919   0.0548  4    -0.0601   0.2440   1.678  0.1686
+    ##  2xLPS - PBS   -1.6312   3.1343  4   -10.3334   7.0710  -0.520  0.6302
+    ##  2xLPS - PBS -664.4959 317.6855  4 -1546.5322 217.5404  -2.092  0.1046
+    ##  2xLPS - PBS   -9.0370   7.2859  4   -29.2660  11.1920  -1.240  0.2826
+    ##  2xLPS - PBS   -0.0173   0.0088  4    -0.0417   0.0071  -1.967  0.1206
+    ##  2xLPS - PBS   -0.9183   3.3709  4   -10.2773   8.4407  -0.272  0.7988
+    ##  2xLPS - PBS   -4.8245   2.2879  4   -11.1767   1.5276  -2.109  0.1026
+    ##  2xLPS - PBS   -0.4278   1.9202  4    -5.7592   4.9036  -0.223  0.8346
+    ##  2xLPS - PBS    0.1229   0.0617  4    -0.0485   0.2942   1.991  0.1173
+    ##  2xLPS - PBS    0.0152   0.0052  4     0.0008   0.0297   2.932  0.0427
+    ##  2xLPS - PBS   -1.4843   1.2864  4    -5.0560   2.0875  -1.154  0.3128
+    ##  2xLPS - PBS   -1.7382   3.2124  4   -10.6572   7.1808  -0.541  0.6172
+    ##  2xLPS - PBS   -0.8691   1.6062  4    -5.3286   3.5904  -0.541  0.6172
+    ##  2xLPS - PBS    0.1294   0.0652  4    -0.0515   0.3103   1.985  0.1181
+    ##  2xLPS - PBS    0.0120   0.0046  4    -0.0007   0.0248   2.615  0.0591
+    ##  2xLPS - PBS   -1.3952   1.3004  4    -5.0057   2.2154  -1.073  0.3438
+    ##  2xLPS - PBS   -7.9429   2.4341  4   -14.7010  -1.1847  -3.263  0.0310
+    ##  2xLPS - PBS   -4.2604   1.3384  4    -7.9765  -0.5443  -3.183  0.0334
+    ##  2xLPS - PBS   -2.7806   0.7472  4    -4.8551  -0.7061  -3.722  0.0204
+    ##  2xLPS - PBS   -8.3302   2.8274  4   -16.1803  -0.4802  -2.946  0.0421
+    ##  2xLPS - PBS  -48.3360  17.8786  4   -97.9749   1.3029  -2.704  0.0539
+    ##  2xLPS - PBS    1.5148   0.4119  4     0.3712   2.6584   3.678  0.0212
+    ##  2xLPS - PBS   -3.9444   1.2207  4    -7.3336  -0.5551  -3.231  0.0319
+    ##  2xLPS - PBS   -0.3074   0.1173  4    -0.6330   0.0183  -2.621  0.0587
+    ##  2xLPS - PBS    1.6271   0.5435  4     0.1182   3.1360   2.994  0.0402
+    ##  measure                                                       Significant
+    ##  Foreground pixels                                             ns         
+    ##  Density of foreground pixels in hull area                     significant
+    ##  Span ratio of hull (major/minor axis)                         ns         
+    ##  Maximum span across hull                                      ns         
+    ##  Area                                                          ns         
+    ##  Perimeter                                                     ns         
+    ##  Circularity                                                   ns         
+    ##  Width of bounding rectangle                                   ns         
+    ##  Height of bounding rectangle                                  ns         
+    ##  Maximum radius from hull's center of mass                     ns         
+    ##  Max/min radii from hull's center of mass                      ns         
+    ##  Relative variation (CV) in radii from hull's center of mass   significant
+    ##  Mean radius                                                   ns         
+    ##  Diameter of bounding circle                                   ns         
+    ##  Maximum radius from circle's center of mass                   ns         
+    ##  Max/min radii from circle's center of mass                    ns         
+    ##  Relative variation (CV) in radii from circle's center of mass ns         
+    ##  Mean radius from circle's center of mass                      ns         
+    ##  # of branches                                                 significant
+    ##  # of junctions                                                significant
+    ##  # of end point voxels                                         significant
+    ##  # of junction voxels                                          significant
+    ##  # of slab voxels                                              ns         
+    ##  Average branch length                                         significant
+    ##  # of triple points                                            significant
+    ##  # of quadruple points                                         ns         
+    ##  Maximum branch length                                         significant
+    ## 
+    ## Confidence level used: 0.95
+
+``` r
+stats.testing[[3]] # posthoc 2
+```
+
+    ##  contrast     estimate       SE df   lower.CL upper.CL t.ratio p.value
+    ##  2xLPS - PBS  244.1962 109.3098  4   -59.2965 547.6889   2.234  0.0892
+    ##  2xLPS - PBS    0.0730   0.0110  4     0.0426   0.1035   6.656  0.0026
+    ##  2xLPS - PBS    0.0919   0.0548  4    -0.0601   0.2440   1.678  0.1686
+    ##  2xLPS - PBS   -1.6312   3.1343  4   -10.3334   7.0710  -0.520  0.6302
+    ##  2xLPS - PBS -664.4959 317.6855  4 -1546.5322 217.5404  -2.092  0.1046
+    ##  2xLPS - PBS   -9.0370   7.2859  4   -29.2660  11.1920  -1.240  0.2826
+    ##  2xLPS - PBS   -0.0173   0.0088  4    -0.0417   0.0071  -1.967  0.1206
+    ##  2xLPS - PBS   -0.9183   3.3709  4   -10.2773   8.4407  -0.272  0.7988
+    ##  2xLPS - PBS   -4.8245   2.2879  4   -11.1767   1.5276  -2.109  0.1026
+    ##  2xLPS - PBS   -0.4278   1.9202  4    -5.7592   4.9036  -0.223  0.8346
+    ##  2xLPS - PBS    0.1229   0.0617  4    -0.0485   0.2942   1.991  0.1173
+    ##  2xLPS - PBS    0.0152   0.0052  4     0.0008   0.0297   2.932  0.0427
+    ##  2xLPS - PBS   -1.4843   1.2864  4    -5.0560   2.0875  -1.154  0.3128
+    ##  2xLPS - PBS   -1.7382   3.2124  4   -10.6572   7.1808  -0.541  0.6172
+    ##  2xLPS - PBS   -0.8691   1.6062  4    -5.3286   3.5904  -0.541  0.6172
+    ##  2xLPS - PBS    0.1294   0.0652  4    -0.0515   0.3103   1.985  0.1181
+    ##  2xLPS - PBS    0.0120   0.0046  4    -0.0007   0.0248   2.615  0.0591
+    ##  2xLPS - PBS   -1.3952   1.3004  4    -5.0057   2.2154  -1.073  0.3438
+    ##  2xLPS - PBS   -7.9429   2.4341  4   -14.7010  -1.1847  -3.263  0.0310
+    ##  2xLPS - PBS   -4.2604   1.3384  4    -7.9765  -0.5443  -3.183  0.0334
+    ##  2xLPS - PBS   -2.7806   0.7472  4    -4.8551  -0.7061  -3.722  0.0204
+    ##  2xLPS - PBS   -8.3302   2.8274  4   -16.1803  -0.4802  -2.946  0.0421
+    ##  2xLPS - PBS  -48.3360  17.8786  4   -97.9749   1.3029  -2.704  0.0539
+    ##  2xLPS - PBS    1.5148   0.4119  4     0.3712   2.6584   3.678  0.0212
+    ##  2xLPS - PBS   -3.9444   1.2207  4    -7.3336  -0.5551  -3.231  0.0319
+    ##  2xLPS - PBS   -0.3074   0.1173  4    -0.6330   0.0183  -2.621  0.0587
+    ##  2xLPS - PBS    1.6271   0.5435  4     0.1182   3.1360   2.994  0.0402
+    ##  measure                                                       Significant
+    ##  Foreground pixels                                             ns         
+    ##  Density of foreground pixels in hull area                     significant
+    ##  Span ratio of hull (major/minor axis)                         ns         
+    ##  Maximum span across hull                                      ns         
+    ##  Area                                                          ns         
+    ##  Perimeter                                                     ns         
+    ##  Circularity                                                   ns         
+    ##  Width of bounding rectangle                                   ns         
+    ##  Height of bounding rectangle                                  ns         
+    ##  Maximum radius from hull's center of mass                     ns         
+    ##  Max/min radii from hull's center of mass                      ns         
+    ##  Relative variation (CV) in radii from hull's center of mass   significant
+    ##  Mean radius                                                   ns         
+    ##  Diameter of bounding circle                                   ns         
+    ##  Maximum radius from circle's center of mass                   ns         
+    ##  Max/min radii from circle's center of mass                    ns         
+    ##  Relative variation (CV) in radii from circle's center of mass ns         
+    ##  Mean radius from circle's center of mass                      ns         
+    ##  # of branches                                                 significant
+    ##  # of junctions                                                significant
+    ##  # of end point voxels                                         significant
+    ##  # of junction voxels                                          significant
+    ##  # of slab voxels                                              ns         
+    ##  Average branch length                                         significant
+    ##  # of triple points                                            significant
+    ##  # of quadruple points                                         ns         
+    ##  Maximum branch length                                         significant
+    ## 
+    ## Confidence level used: 0.95
+
+``` r
+do.call("grid.arrange", c(stats.testing[[4]], ncol=4)) # qqplots to check normality assumptions
+```
+
+![](README_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
+
+``` r
+stats.testing[[5]] # summary of model
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = as.formula(paste(y.model)), data = tmp)
+    ## 
+    ## Coefficients:
+    ## (Intercept)   Treatment1  
+    ##     18.5887       0.8136
+
+### Individual morphology measures, at the cell level
+
+#### e.g., How does each individual morphology measure change with LPS treatment?
+
+The stats_morphologymeasures.cell function fits a linear mixed effects
+model considering MouseID as a repeated measure using the `lmerTest`
+package, for each morphology measure individually within your dataset.
+The `lmerTest` package “provides p-values in type I, II or III anova and
+summary tables for linear mixed models…via Satterthwaite’s degrees of
+freedom method.” You can learn more about the package by reading the
+`lmerTest` [reference
+manual](https://cran.r-project.org/web/packages/lmerTest/lmerTest.pdf)
+
+``` r
+# prepare data for downstream analysis
+data <- data_2xLPS_logtransformed %>% 
+  group_by(MouseID, Sex, Treatment) %>% 
+  gather(Measure, Value, "Foreground pixels":"Maximum branch length")
+
+# filter out data you want to run stats on and make sure to make any variables included in model into factors
+stats.input <- data %>% filter(BrainRegion=="FC", Antibody=="Iba1") 
+stats.input$Treatment <- factor(stats.input$Treatment)
+stats.input$MouseID <- factor(stats.input$MouseID)
+
+# run stats analysis for changes in individual morphology measures
+# you can specify up to two posthoc comparisons (posthoc1 and posthoc2 arguments) - if you only have one set of posthocs to run, specify the same comparison twice for both arguments. you will just get the same results in output[[2]] and output[[3]].
+stats <- stats_morphologymeasures.cell(stats.input, "Value ~ Treatment + (1|MouseID)", 
+                                  "~Treatment", "~Treatment", "bonferroni")
+```
+
+    ## [1] "Foreground pixels"
+    ## [1] "Density of foreground pixels in hull area"
+    ## [1] "Span ratio of hull (major/minor axis)"
+    ## [1] "Maximum span across hull"
+    ## [1] "Area"
+    ## [1] "Perimeter"
+    ## [1] "Circularity"
+    ## [1] "Width of bounding rectangle"
+    ## [1] "Height of bounding rectangle"
+    ## [1] "Maximum radius from hull's center of mass"
+    ## [1] "Max/min radii from hull's center of mass"
+    ## [1] "Relative variation (CV) in radii from hull's center of mass"
+    ## [1] "Mean radius"
+    ## [1] "Diameter of bounding circle"
+    ## [1] "Maximum radius from circle's center of mass"
+    ## [1] "Max/min radii from circle's center of mass"
+    ## [1] "Relative variation (CV) in radii from circle's center of mass"
+    ## [1] "Mean radius from circle's center of mass"
+    ## [1] "# of branches"
+    ## [1] "# of junctions"
+    ## [1] "# of end point voxels"
+    ## [1] "# of junction voxels"
+    ## [1] "# of slab voxels"
+    ## [1] "Average branch length"
+    ## [1] "# of triple points"
+    ## [1] "# of quadruple points"
+    ## [1] "Maximum branch length"
+    ## Linear mixed model fit by REML ['lmerModLmerTest']
+    ## Formula: as.formula(paste(y.model))
+    ##    Data: tmp
+    ## REML criterion at convergence: 818.6555
+    ## Random effects:
+    ##  Groups   Name        Std.Dev.
+    ##  MouseID  (Intercept) 0.02886 
+    ##  Residual             0.27717 
+    ## Number of obs: 2930, groups:  MouseID, 6
+    ## Fixed Effects:
+    ## (Intercept)   Treatment1  
+    ##     2.93346      0.03625
+
+``` r
+stats[[1]] # anova
+```
+
+    ## Type III Analysis of Variance Table with Satterthwaite's method
+    ##             Sum Sq Mean Sq NumDF  DenDF F value  Pr(>F) measure Significant
+    ## Treatment   1.0004  1.0004     1 3.9833  6.3314 0.06588      13           1
+    ## Treatment1  0.2202  0.2202     1 3.9604 40.4440 0.00324      11           2
+    ## Treatment2  0.0837  0.0837     1 3.9673  2.6753 0.17784      26           1
+    ## Treatment3  0.0224  0.0224     1 3.9787  0.2723 0.62948      20           1
+    ## Treatment4  0.9566  0.9566     1 3.9787  3.3352 0.14223       8           1
+    ## Treatment5  0.1001  0.1001     1 3.9843  1.3684 0.30727      23           1
+    ## Treatment6  0.0091  0.0091     1 4.0246  3.8811 0.11973      10           1
+    ## Treatment7  0.0118  0.0118     1 4.0060  0.1040 0.76320      27           1
+    ## Treatment8  0.4372  0.4372     1 3.9337  4.3527 0.10644      14           1
+    ## Treatment9  0.0043  0.0043     1 4.0067  0.0519 0.83088      19           1
+    ## Treatment10 0.1111  0.1111     1 3.9971  4.0780 0.11363      16           1
+    ## Treatment11 0.0243  0.0243     1 4.0197  8.1698 0.04574      25           2
+    ## Treatment12 0.1004  0.1004     1 3.9887  1.2925 0.31924      21           1
+    ## Treatment13 0.0239  0.0239     1 3.9855  0.2941 0.61651      12           1
+    ## Treatment14 0.0235  0.0235     1 3.9856  0.2938 0.61668      18           1
+    ## Treatment15 0.1819  0.1819     1 3.8887  4.0933 0.11509      15           1
+    ## Treatment16 0.0218  0.0218     1 3.7535  7.0399 0.06067      24           1
+    ## Treatment17 0.0828  0.0828     1 3.9951  1.0732 0.35881      22           1
+    ## Treatment18 4.0881  4.0881     1 4.0066 13.0920 0.02233       1           2
+    ## Treatment19 4.1851  4.1851     1 4.0077 12.6546 0.02357       4           2
+    ## Treatment20 2.5907  2.5907     1 4.0025 14.7053 0.01852       2           2
+    ## Treatment21 4.8162  4.8162     1 4.0082 11.6162 0.02698       3           2
+    ## Treatment22 1.8712  1.8712     1 4.0093  8.5146 0.04321       6           2
+    ## Treatment23 0.7570  0.7570     1 4.0068 17.5127 0.01382       9           2
+    ## Treatment24 4.1344  4.1344     1 4.0084 12.4466 0.02419       7           2
+    ## Treatment25 2.0078  2.0078     1 4.0104  8.7225 0.04169       5           2
+    ## Treatment26 0.6102  0.6102     1 4.0415  7.9426 0.04735      17           2
+
+``` r
+stats[[2]] # posthoc 1
+```
+
+    ##  contrast      estimate         SE   df t.ratio p.value
+    ##  2xLPS - PBS  0.0834128 0.03315946 4.00   2.516  0.0657
+    ##  2xLPS - PBS  0.0491561 0.00773037 4.00   6.359  0.0031
+    ##  2xLPS - PBS  0.0266657 0.01630603 4.00   1.635  0.1774
+    ##  2xLPS - PBS -0.0109156 0.02092766 3.99  -0.522  0.6295
+    ##  2xLPS - PBS -0.0727282 0.03984162 3.99  -1.825  0.1421
+    ##  2xLPS - PBS -0.0236627 0.02023734 3.99  -1.169  0.3073
+    ##  2xLPS - PBS -0.0102133 0.00518482 4.00  -1.970  0.1202
+    ##  2xLPS - PBS -0.0095440 0.02960095 4.00  -0.322  0.7633
+    ##  2xLPS - PBS -0.0418529 0.02007795 3.99  -2.085  0.1057
+    ##  2xLPS - PBS -0.0053288 0.02338982 4.00  -0.228  0.8310
+    ##  2xLPS - PBS  0.0351866 0.01742625 4.00   2.019  0.1136
+    ##  2xLPS - PBS  0.0122244 0.00427840 3.99   2.857  0.0461
+    ##  2xLPS - PBS -0.0232038 0.02042003 3.99  -1.136  0.3194
+    ##  2xLPS - PBS -0.0116260 0.02144729 3.99  -0.542  0.6166
+    ##  2xLPS - PBS -0.0115397 0.02129871 3.99  -0.542  0.6168
+    ##  2xLPS - PBS  0.0356102 0.01760600 4.00   2.023  0.1132
+    ##  2xLPS - PBS  0.0101526 0.00382877 3.99   2.652  0.0570
+    ##  2xLPS - PBS -0.0211061 0.02038353 3.99  -1.035  0.3590
+    ##  2xLPS - PBS -0.3405137 0.09411074 4.00  -3.618  0.0224
+    ##  2xLPS - PBS -0.3474417 0.09767071 4.00  -3.557  0.0236
+    ##  2xLPS - PBS -0.2369813 0.06180024 4.00  -3.835  0.0185
+    ##  2xLPS - PBS -0.3777789 0.11084401 4.00  -3.408  0.0271
+    ##  2xLPS - PBS -0.1547910 0.05305194 4.00  -2.918  0.0434
+    ##  2xLPS - PBS  0.1676091 0.04005217 4.00   4.185  0.0139
+    ##  2xLPS - PBS -0.3365390 0.09539351 4.00  -3.528  0.0243
+    ##  2xLPS - PBS -0.1583623 0.05362542 4.00  -2.953  0.0419
+    ##  2xLPS - PBS  0.0724966 0.02572870 4.00   2.818  0.0480
+    ##  measure                                                       Significant
+    ##  Foreground pixels                                             ns         
+    ##  Density of foreground pixels in hull area                     significant
+    ##  Span ratio of hull (major/minor axis)                         ns         
+    ##  Maximum span across hull                                      ns         
+    ##  Area                                                          ns         
+    ##  Perimeter                                                     ns         
+    ##  Circularity                                                   ns         
+    ##  Width of bounding rectangle                                   ns         
+    ##  Height of bounding rectangle                                  ns         
+    ##  Maximum radius from hull's center of mass                     ns         
+    ##  Max/min radii from hull's center of mass                      ns         
+    ##  Relative variation (CV) in radii from hull's center of mass   significant
+    ##  Mean radius                                                   ns         
+    ##  Diameter of bounding circle                                   ns         
+    ##  Maximum radius from circle's center of mass                   ns         
+    ##  Max/min radii from circle's center of mass                    ns         
+    ##  Relative variation (CV) in radii from circle's center of mass ns         
+    ##  Mean radius from circle's center of mass                      ns         
+    ##  # of branches                                                 significant
+    ##  # of junctions                                                significant
+    ##  # of end point voxels                                         significant
+    ##  # of junction voxels                                          significant
+    ##  # of slab voxels                                              significant
+    ##  Average branch length                                         significant
+    ##  # of triple points                                            significant
+    ##  # of quadruple points                                         significant
+    ##  Maximum branch length                                         significant
+    ## 
+    ## Degrees-of-freedom method: kenward-roger
+
+``` r
+stats[[3]] # posthoc 2
+```
+
+    ##  contrast      estimate         SE   df t.ratio p.value
+    ##  2xLPS - PBS  0.0834128 0.03315946 4.00   2.516  0.0657
+    ##  2xLPS - PBS  0.0491561 0.00773037 4.00   6.359  0.0031
+    ##  2xLPS - PBS  0.0266657 0.01630603 4.00   1.635  0.1774
+    ##  2xLPS - PBS -0.0109156 0.02092766 3.99  -0.522  0.6295
+    ##  2xLPS - PBS -0.0727282 0.03984162 3.99  -1.825  0.1421
+    ##  2xLPS - PBS -0.0236627 0.02023734 3.99  -1.169  0.3073
+    ##  2xLPS - PBS -0.0102133 0.00518482 4.00  -1.970  0.1202
+    ##  2xLPS - PBS -0.0095440 0.02960095 4.00  -0.322  0.7633
+    ##  2xLPS - PBS -0.0418529 0.02007795 3.99  -2.085  0.1057
+    ##  2xLPS - PBS -0.0053288 0.02338982 4.00  -0.228  0.8310
+    ##  2xLPS - PBS  0.0351866 0.01742625 4.00   2.019  0.1136
+    ##  2xLPS - PBS  0.0122244 0.00427840 3.99   2.857  0.0461
+    ##  2xLPS - PBS -0.0232038 0.02042003 3.99  -1.136  0.3194
+    ##  2xLPS - PBS -0.0116260 0.02144729 3.99  -0.542  0.6166
+    ##  2xLPS - PBS -0.0115397 0.02129871 3.99  -0.542  0.6168
+    ##  2xLPS - PBS  0.0356102 0.01760600 4.00   2.023  0.1132
+    ##  2xLPS - PBS  0.0101526 0.00382877 3.99   2.652  0.0570
+    ##  2xLPS - PBS -0.0211061 0.02038353 3.99  -1.035  0.3590
+    ##  2xLPS - PBS -0.3405137 0.09411074 4.00  -3.618  0.0224
+    ##  2xLPS - PBS -0.3474417 0.09767071 4.00  -3.557  0.0236
+    ##  2xLPS - PBS -0.2369813 0.06180024 4.00  -3.835  0.0185
+    ##  2xLPS - PBS -0.3777789 0.11084401 4.00  -3.408  0.0271
+    ##  2xLPS - PBS -0.1547910 0.05305194 4.00  -2.918  0.0434
+    ##  2xLPS - PBS  0.1676091 0.04005217 4.00   4.185  0.0139
+    ##  2xLPS - PBS -0.3365390 0.09539351 4.00  -3.528  0.0243
+    ##  2xLPS - PBS -0.1583623 0.05362542 4.00  -2.953  0.0419
+    ##  2xLPS - PBS  0.0724966 0.02572870 4.00   2.818  0.0480
+    ##  measure                                                       Significant
+    ##  Foreground pixels                                             ns         
+    ##  Density of foreground pixels in hull area                     significant
+    ##  Span ratio of hull (major/minor axis)                         ns         
+    ##  Maximum span across hull                                      ns         
+    ##  Area                                                          ns         
+    ##  Perimeter                                                     ns         
+    ##  Circularity                                                   ns         
+    ##  Width of bounding rectangle                                   ns         
+    ##  Height of bounding rectangle                                  ns         
+    ##  Maximum radius from hull's center of mass                     ns         
+    ##  Max/min radii from hull's center of mass                      ns         
+    ##  Relative variation (CV) in radii from hull's center of mass   significant
+    ##  Mean radius                                                   ns         
+    ##  Diameter of bounding circle                                   ns         
+    ##  Maximum radius from circle's center of mass                   ns         
+    ##  Max/min radii from circle's center of mass                    ns         
+    ##  Relative variation (CV) in radii from circle's center of mass ns         
+    ##  Mean radius from circle's center of mass                      ns         
+    ##  # of branches                                                 significant
+    ##  # of junctions                                                significant
+    ##  # of end point voxels                                         significant
+    ##  # of junction voxels                                          significant
+    ##  # of slab voxels                                              significant
+    ##  Average branch length                                         significant
+    ##  # of triple points                                            significant
+    ##  # of quadruple points                                         significant
+    ##  Maximum branch length                                         significant
+    ## 
+    ## Degrees-of-freedom method: kenward-roger
+
+``` r
+do.call("grid.arrange", c(stats[[4]], ncol=4)) # qqplots to check normality assumptions
+```
+
+![](README_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
+
+``` r
+stats[[5]] # summary of model
+```
+
+    ## Linear mixed model fit by REML ['lmerModLmerTest']
+    ## Formula: as.formula(paste(y.model))
+    ##    Data: tmp
+    ## REML criterion at convergence: 818.6555
+    ## Random effects:
+    ##  Groups   Name        Std.Dev.
+    ##  MouseID  (Intercept) 0.02886 
+    ##  Residual             0.27717 
+    ## Number of obs: 2930, groups:  MouseID, 6
+    ## Fixed Effects:
+    ## (Intercept)   Treatment1  
+    ##     2.93346      0.03625
+
+If you find that any individual morphology measures violate assumptions
+of normality after checking the qqplots contained in
+stats.input\[\[4\]\], you can filter your data for those measures,
+transform your data in the suitable manner (i.e., using
+MicrogliaMorphologyR functions like `transform_minmax` or
+`transform_scale` or other data transformations), and rerun the stats
+for those morphology features using the code above.
 
 ### testing
 

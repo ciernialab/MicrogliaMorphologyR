@@ -190,7 +190,7 @@ cp %>%
   geom_point(position=position_dodge(width=0.8), size=0.75, aes(group=interaction(Cluster,Treatment), color=Sex)) +
   ggtitle("2xLPS mouse dataset: K-means clusters") +
   labs(fill="Treatment") +
-  theme_bw(base_size=10) +
+  theme_bw(base_size=14) +
   theme(axis.text.x=element_text(angle=45, vjust=1, hjust=1))
 ```
 
@@ -222,42 +222,60 @@ stats.testing[[4]] # DHARMa model check
 stats.testing[[5]] # summary of model
 ```
 
-```{r, eval=FALSE}
-# filterable data tables of posthoc outputs: 
-stats.testing[[2]] %>% DT::datatable(., options=list(autoWidth=TRUE, scrollX=TRUE, scrollCollapse=TRUE))
-stats.testing[[3]] %>% DT::datatable(., options=list(autoWidth=TRUE, scrollX=TRUE, scrollCollapse=TRUE))
+### Individual morphology measures, at the animal level (averaged for each measure)
+#### e.g., How does each individual morphology measure change with LPS treatment?
+
+The stats_morphologymeasures.animal function fits a linear model using the `lm` function for each morphology measure individually within your dataset.
+```{r, fig.width=13, fig.height=12.5}
+# prepare data for downstream analysis
+data <- data_2xLPS %>% 
+  group_by(MouseID, Sex, Treatment, BrainRegion, Antibody) %>% 
+  summarise(across("Foreground pixels":"Maximum branch length", ~mean(.x))) %>% 
+  gather(Measure, Value, "Foreground pixels":"Maximum branch length")
+
+# filter out data you want to run stats on and make sure to make any variables included in model into factors
+stats.input <- data %>% filter(BrainRegion=="FC", Antibody=="Iba1") 
+stats.input$Treatment <- factor(stats.input$Treatment)
+
+# run stats analysis for changes in individual morphology measures
+# you can specify up to two posthoc comparisons (posthoc1 and posthoc2 arguments) - if you only have one set of posthocs to run, specify the same comparison twice for both arguments. you will just get the same results in output[[2]] and output[[3]].
+stats.testing <- stats_morphologymeasures.animal(stats.input, "Value ~ Treatment", 
+                                                 "~Treatment", "~Treatment", "bonferroni")
+
+stats.testing[[1]] # anova
+stats.testing[[2]] # posthoc 1
+stats.testing[[3]] # posthoc 2
+do.call("grid.arrange", c(stats.testing[[4]], ncol=4)) # qqplots to check normality assumptions
+stats.testing[[5]] # summary of model
 ```
+### Individual morphology measures, at the cell level
+#### e.g., How does each individual morphology measure change with LPS treatment?
 
-### Individual morphology measures
-```{r, eval=FALSE}
-# at the cell-level
-DF <- data_pca_fuzzykmeans %>% group_by(MouseID, Sex, Treatment) %>% gather(Measure, Value, 14:40)
-stats <- stats_morphologymeasures(DF %>% filter(BrainRegion=="FC", Antibody=="Iba1"), "Value ~ Treatment + (1|MouseID)", "~Treatment", "~Treatment", "holm")
+The stats_morphologymeasures.cell function fits a linear mixed effects model considering MouseID as a repeated measure using the `lmerTest` package, for each morphology measure individually within your dataset. The `lmerTest` package "provides p-values in type I, II or III anova and summary tables for linear mixed models...via Satterthwaite's degrees of freedom method." You can learn more about the package by reading the `lmerTest` [reference manual](https://cran.r-project.org/web/packages/lmerTest/lmerTest.pdf)
 
-stats[[1]]
-stats[[2]]
-stats[[3]]
-do.call("grid.arrange", c(stats[[4]], ncol=4))
-stats[[5]]
+```{r, fig.width=13, fig.height=12.5}
+# prepare data for downstream analysis
+data <- data_2xLPS_logtransformed %>% 
+  group_by(MouseID, Sex, Treatment) %>% 
+  gather(Measure, Value, "Foreground pixels":"Maximum branch length")
 
-stats[[1]] %>% DT::datatable(., options=list(autoWidth=TRUE, scrollX=TRUE, scrollCollapse=TRUE))
-stats[[2]] %>% DT::datatable(., options=list(autoWidth=TRUE, scrollX=TRUE, scrollCollapse=TRUE))
-stats[[3]] %>% DT::datatable(., options=list(autoWidth=TRUE, scrollX=TRUE, scrollCollapse=TRUE))
+# filter out data you want to run stats on and make sure to make any variables included in model into factors
+stats.input <- data %>% filter(BrainRegion=="FC", Antibody=="Iba1") 
+stats.input$Treatment <- factor(stats.input$Treatment)
+stats.input$MouseID <- factor(stats.input$MouseID)
 
-# at the animal-level (averaged for each measure)
-DF <- data_pca_fuzzykmeans %>% group_by(MouseID, Sex, Treatment, BrainRegion, Antibody) %>% summarise(across("Foreground pixels":"Maximum branch length", ~mean(.x))) %>% gather(Measure, Value, "Foreground pixels":"Maximum branch length")
-stats <- stats_morphologymeasures_lm(DF %>% filter(BrainRegion=="FC", Antibody=="Iba1"), "Value ~ Treatment", "~Treatment", "~Treatment", "holm")
+# run stats analysis for changes in individual morphology measures
+# you can specify up to two posthoc comparisons (posthoc1 and posthoc2 arguments) - if you only have one set of posthocs to run, specify the same comparison twice for both arguments. you will just get the same results in output[[2]] and output[[3]].
+stats <- stats_morphologymeasures.cell(stats.input, "Value ~ Treatment + (1|MouseID)", 
+                                  "~Treatment", "~Treatment", "bonferroni")
 
-stats[[1]]
-stats[[2]]
-stats[[3]]
-do.call("grid.arrange", c(stats[[4]], ncol=4))
-stats[[5]]
-
-stats[[1]] %>% DT::datatable(., options=list(autoWidth=TRUE, scrollX=TRUE, scrollCollapse=TRUE))
-stats[[2]] %>% DT::datatable(., options=list(autoWidth=TRUE, scrollX=TRUE, scrollCollapse=TRUE))
-stats[[3]] %>% DT::datatable(., options=list(autoWidth=TRUE, scrollX=TRUE, scrollCollapse=TRUE))
+stats[[1]] # anova
+stats[[2]] # posthoc 1
+stats[[3]] # posthoc 2
+do.call("grid.arrange", c(stats[[4]], ncol=4)) # qqplots to check normality assumptions
+stats[[5]] # summary of model
 ```
+If you find that any individual morphology measures violate assumptions of normality after checking the qqplots contained in stats.input[[4]], you can filter your data for those measures, transform your data in the suitable manner (i.e., using MicrogliaMorphologyR functions like `transform_minmax` or `transform_scale` or other data transformations), and rerun the stats for those morphology features using the code above.
 
 ### testing
 ```{r, eval=FALSE}

@@ -519,15 +519,15 @@ clusterpercentage_boxplots <- function(data,...){
 #'
 #' @param data is your input data frame
 #' @param model is your linear mixed model (e.g., Value ~ Treatment*Sex + (1|MouseID))
-#' @param posthoc.sex is your posthoc comparisons when considering sex (e.g., ~Treatment|Sex)
-#' @param posthoc.nosex is your posthoc comparisons when not considering sex (e.g., ~Treatment)
+#' @param posthoc1 is your posthoc comparisons when considering sex (e.g., ~Treatment|Sex)
+#' @param posthoc2 is your posthoc comparisons when not considering sex (e.g., ~Treatment)
 #' @param adjust is your method of multiple test correction
 #' @export
-stats_morphologymeasures <- function(data,model,posthoc.sex,posthoc.nosex,adjust){
+stats_morphologymeasures.cell <- function(data,model,posthoc1,posthoc2,adjust){
 
   y.model <- as.character(model)
-  z.model <- as.character(posthoc.sex)
-  a.model <- as.character(posthoc.nosex)
+  z.model <- as.character(posthoc1)
+  a.model <- as.character(posthoc2)
 
   measure <- unique(as.character(data$Measure))
   log_ggqqplots = list()
@@ -561,18 +561,15 @@ stats_morphologymeasures <- function(data,model,posthoc.sex,posthoc.nosex,adjust
     anova = anova(model)
     anova$measure <- paste(m)
 
-    #posthocs test 1 (if there are sex differences)
-    refgrid <- ref.grid(model)
-    ph <- emmeans(refgrid, as.formula(paste(z.model)))
-    ph2 <- summary(contrast(ph, method="pairwise", adjust=adjust), infer=TRUE)
-    #holm good for unequal sample sizes, adjusts at p-value level
+    # posthocs 1: considering sex
+    ph <- emmeans(model, as.formula(paste(z.model)))
+    ph2 <- contrast(ph, method="pairwise", adjust=adjust)
     outsum <- as.data.frame(ph2)
     outsum$measure <- paste(m)
 
-    #posthocs test 2 (if there aren't sex differences) #make a second output file
-    refgrid <- ref.grid(model)
-    ph <- emmeans(refgrid, as.formula(paste(a.model)))
-    ph2 <- summary(contrast(ph, method="pairwise", adjust=adjust), infer=TRUE)
+    # posthocs 2: considering sex
+    ph <- emmeans(model, as.formula(paste(a.model)))
+    ph2 <- contrast(ph, method="pairwise", adjust=adjust)
     outsum2 <- as.data.frame(ph2)
     outsum2$measure <- paste(m)
 
@@ -603,15 +600,15 @@ stats_morphologymeasures <- function(data,model,posthoc.sex,posthoc.nosex,adjust
 #'
 #' @param data is your input data frame
 #' @param model is your linear mixed model (e.g., Value ~ Treatment*Sex + (1|MouseID))
-#' @param posthoc.sex is your posthoc comparisons when considering sex (e.g., ~Treatment|Sex)
-#' @param posthoc.nosex is your posthoc comparisons when not considering sex (e.g., ~Treatment)
+#' @param posthoc1 is your posthoc comparisons when considering sex (e.g., ~Treatment|Sex)
+#' @param posthoc2 is your posthoc comparisons when not considering sex (e.g., ~Treatment)
 #' @param adjust is your method of multiple test correction
 #' @export
-stats_morphologymeasures_lm <- function(data,model,posthoc.sex,posthoc.nosex,adjust){
+stats_morphologymeasures.animal <- function(data,model,posthoc1,posthoc2,adjust){
 
   y.model <- as.character(model)
-  z.model <- as.character(posthoc.sex)
-  a.model <- as.character(posthoc.nosex)
+  z.model <- as.character(posthoc1)
+  a.model <- as.character(posthoc2)
 
   measure <- unique(as.character(data$Measure))
   log_ggqqplots = list()
