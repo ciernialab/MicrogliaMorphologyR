@@ -173,8 +173,20 @@ After comparing the individual features across clusters, we can characterize the
 * Cluster 4 = hypertrophic (average territory span, high branch thickness as explained by pixel density in hull)
 
 ### ColorByCluster
+
+Using the cluster classes assigned from our analyses using MicrogliaMorphologyR, we can color each cell in the original image by cluster using the MicrogliaMorphology ImageJ macro. In the following example, we are isolating out the Cluster assignments for each microglia in the Cx3cr1-stained ACC subregion image for Mouse 1. You can do this for all of the images you are interested in applying ColorByCluster to. This offers an additional method by which to visually assess and verify your suspected cluster identities before deeming them ramifed, hyper-ramified, rod-like, ameboid, or any other morphological form for downstream analysis and interpretation.
+
+# Formatting data for ColorByCluster input (Color coding in ImageJ)
 ```{r}
-# insert here
+# isolate out all the cells for your specific image of interest
+colorbycluster <- pca_kmeans %>% 
+  filter(Antibody=="Cx3cr1",MouseID=="1", BrainRegion=="FC", Subregion=="ACC") %>% select(c(Cluster, ID))
+head(colorbycluster)
+```
+
+# Save .csv file to feed into ColorByCluster function in MicrogliaMorphology ImageJ macro
+```{r, eval=FALSE}
+write.csv(colorbycluster, "filepath/Cxc3cr_Mouse1_FC_ACC_data.csv")
 ```
 
 ### Cluster characterization
@@ -296,7 +308,7 @@ stats[[5]] # summary of model
 If you find that any individual morphology measures violate assumptions of normality after checking the qqplots contained in stats.input[[4]], you can filter your data for those measures, transform your data in the suitable manner (i.e., using MicrogliaMorphologyR functions like `transform_minmax` or `transform_scale` or other data transformations), and rerun the stats for those morphology features using the code above.
 
 ### Example of additional analyses possible with fuzzy k-means (soft clustering) membership scores
-Here, we will use a fuzzy k-means dataset that comes pre-loaded with the package for demonstration purposes, as running the actual fuzzy clustering step using the `fcm` function in the `ppclust` (package)[https://cran.r-project.org/web/packages/ppclust/vignettes/fcm.html] is time-intensive and computationally-expensive.
+Here, we will use a fuzzy k-means dataset that comes pre-loaded with the package for demonstration purposes, as running the actual fuzzy clustering step using the `fcm` function in the `ppclust` [package](https://cran.r-project.org/web/packages/ppclust/vignettes/fcm.html) is time-intensive and computationally-expensive.
 
 Load in example dataset:
 ```{r}

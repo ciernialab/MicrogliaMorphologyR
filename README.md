@@ -542,8 +542,38 @@ by pixel density in hull)
 
 ### ColorByCluster
 
+Using the cluster classes assigned from our analyses using
+MicrogliaMorphologyR, we can color each cell in the original image by
+cluster using the MicrogliaMorphology ImageJ macro. In the following
+example, we are isolating out the Cluster assignments for each microglia
+in the Cx3cr1-stained ACC subregion image for Mouse 1. You can do this
+for all of the images you are interested in applying ColorByCluster to.
+This offers an additional method by which to visually assess and verify
+your suspected cluster identities before deeming them ramifed,
+hyper-ramified, rod-like, ameboid, or any other morphological form for
+downstream analysis and interpretation.
+
+# Formatting data for ColorByCluster input (Color coding in ImageJ)
+
 ``` r
-# insert here
+# isolate out all the cells for your specific image of interest
+colorbycluster <- pca_kmeans %>% 
+  filter(Antibody=="Cx3cr1",MouseID=="1", BrainRegion=="FC", Subregion=="ACC") %>% select(c(Cluster, ID))
+head(colorbycluster)
+```
+
+    ##   Cluster          ID
+    ## 1       4 00002-01053
+    ## 2       2 00009-01153
+    ## 3       3 00015-01224
+    ## 4       4 00016-01229
+    ## 5       4 00039-01394
+    ## 6       4 00044-01397
+
+# Save .csv file to feed into ColorByCluster function in MicrogliaMorphology ImageJ macro
+
+``` r
+write.csv(colorbycluster, "filepath/Cxc3cr_Mouse1_FC_ACC_data.csv")
 ```
 
 ### Cluster characterization
@@ -566,7 +596,7 @@ cp %>%
   clusterpercentage_boxplots(Antibody, Treatment) # grouping variables
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
 
 ``` r
 # example graph of data given variables of interest
@@ -583,7 +613,7 @@ cp %>%
   theme(axis.text.x=element_text(angle=45, vjust=1, hjust=1))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
 
 ## Statistical analysis
 
@@ -618,7 +648,7 @@ stats.testing <- stats_cluster.animal(stats.input, "percentage ~ Cluster*Treatme
                                       "~Cluster*Treatment", "~Treatment|Cluster", "bonferroni")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
 
     ## Formula:          percentage ~ Cluster * Treatment + (1 | MouseID)
     ## Data: data
@@ -750,7 +780,7 @@ stats.testing[[3]] # posthoc 2
 stats.testing[[4]] # DHARMa model check
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-19-2.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-20-2.png)<!-- -->
 
 ``` r
 stats.testing[[5]] # summary of model
@@ -1038,7 +1068,7 @@ stats.testing[[3]] # posthoc 2
 do.call("grid.arrange", c(stats.testing[[4]], ncol=4)) # qqplots to check normality assumptions
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
 
 ``` r
 stats.testing[[5]] # summary of model
@@ -1286,7 +1316,7 @@ stats[[3]] # posthoc 2
 do.call("grid.arrange", c(stats[[4]], ncol=4)) # qqplots to check normality assumptions
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
 
 ``` r
 stats[[5]] # summary of model
@@ -1318,7 +1348,7 @@ for those morphology features using the code above.
 Here, we will use a fuzzy k-means dataset that comes pre-loaded with the
 package for demonstration purposes, as running the actual fuzzy
 clustering step using the `fcm` function in the `ppclust`
-(package)\[<https://cran.r-project.org/web/packages/ppclust/vignettes/fcm.html>\]
+[package](https://cran.r-project.org/web/packages/ppclust/vignettes/fcm.html)
 is time-intensive and computationally-expensive.
 
 Load in example dataset:
@@ -1374,7 +1404,7 @@ colnames(data_fuzzykmeans)
 clusterfeatures(data_fuzzykmeans, start=9, end=35)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
 
 ``` r
 # update cluster labels
@@ -1423,4 +1453,4 @@ cp %>%
   theme(axis.text.x=element_text(angle=45, vjust=1, hjust=1))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->
