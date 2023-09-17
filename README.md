@@ -533,12 +533,15 @@ clusterfeatures(pca_kmeans, start=11, end=37)
 ![](README_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
 After comparing the individual features across clusters, we can
-characterize the clusters as follows: \* Cluster 1 = rod-like (greatest
-oblongness, lowest circularity) \* Cluster 2 = ameboid (lowest territory
-span, high circularity, smallest branch lengths) \* Cluster 3 = ramified
-(largest territory span and branching complexity) \* Cluster 4 =
-hypertrophic (average territory span, high branch thickness as explained
-by pixel density in hull)
+characterize the clusters as follows:
+
+-   Cluster 1 = rod-like (greatest oblongness, lowest circularity)
+-   Cluster 2 = ameboid (lowest territory span, high circularity,
+    smallest branch lengths)
+-   Cluster 3 = ramified (largest territory span and branching
+    complexity)
+-   Cluster 4 = hypertrophic (average territory span, high branch
+    thickness as explained by pixel density in hull)
 
 ### ColorByCluster
 
@@ -553,7 +556,7 @@ your suspected cluster identities before deeming them ramifed,
 hyper-ramified, rod-like, ameboid, or any other morphological form for
 downstream analysis and interpretation.
 
-# Formatting data for ColorByCluster input (Color coding in ImageJ)
+#### Formatting data for ColorByCluster input (Color coding in ImageJ)
 
 ``` r
 # isolate out all the cells for your specific image of interest
@@ -570,7 +573,7 @@ head(colorbycluster)
     ## 5       4 00039-01394
     ## 6       4 00044-01397
 
-# Save .csv file to feed into ColorByCluster function in MicrogliaMorphology ImageJ macro
+#### Save .csv file to feed into ColorByCluster function in MicrogliaMorphology ImageJ macro
 
 ``` r
 write.csv(colorbycluster, "filepath/Cxc3cr_Mouse1_FC_ACC_data.csv")

@@ -167,6 +167,7 @@ clusterfeatures(pca_kmeans, start=11, end=37)
 ```
 
 After comparing the individual features across clusters, we can characterize the clusters as follows:
+
 * Cluster 1 = rod-like (greatest oblongness, lowest circularity)
 * Cluster 2 = ameboid (lowest territory span, high circularity, smallest branch lengths)
 * Cluster 3 = ramified (largest territory span and branching complexity)
@@ -176,7 +177,7 @@ After comparing the individual features across clusters, we can characterize the
 
 Using the cluster classes assigned from our analyses using MicrogliaMorphologyR, we can color each cell in the original image by cluster using the MicrogliaMorphology ImageJ macro. In the following example, we are isolating out the Cluster assignments for each microglia in the Cx3cr1-stained ACC subregion image for Mouse 1. You can do this for all of the images you are interested in applying ColorByCluster to. This offers an additional method by which to visually assess and verify your suspected cluster identities before deeming them ramifed, hyper-ramified, rod-like, ameboid, or any other morphological form for downstream analysis and interpretation.
 
-# Formatting data for ColorByCluster input (Color coding in ImageJ)
+#### Formatting data for ColorByCluster input (Color coding in ImageJ)
 ```{r}
 # isolate out all the cells for your specific image of interest
 colorbycluster <- pca_kmeans %>% 
@@ -184,7 +185,7 @@ colorbycluster <- pca_kmeans %>%
 head(colorbycluster)
 ```
 
-# Save .csv file to feed into ColorByCluster function in MicrogliaMorphology ImageJ macro
+#### Save .csv file to feed into ColorByCluster function in MicrogliaMorphology ImageJ macro
 ```{r, eval=FALSE}
 write.csv(colorbycluster, "filepath/Cxc3cr_Mouse1_FC_ACC_data.csv")
 ```
