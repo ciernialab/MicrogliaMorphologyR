@@ -7,7 +7,7 @@
 \format{
 \subsection{\code{data_EAE}}{
 
-A data frame with 46,104 rows and 35 columns:
+A data frame with 40,334 rows and 33 columns:
 \describe{
 \item{Antibody}{Microglia marker used in immunofluorescent image}
 \item{MouseID}{Subject identifier}

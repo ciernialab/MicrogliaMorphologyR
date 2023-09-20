@@ -7,7 +7,7 @@
 \format{
 \subsection{\code{data_2xLPS_mouse}}{
 
-A data frame with 46,104 rows and 35 columns:
+A data frame with 43,332 rows and 35 columns:
 \describe{
 \item{Antibody}{Microglia marker used in immunofluorescent image}
 \item{MouseID}{Subject identifier}
