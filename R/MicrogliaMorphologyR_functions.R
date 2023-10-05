@@ -268,7 +268,7 @@ samplesize <- function(data,...){
 #' @export
 featurecorrelations <- function(data,start,end,rthresh,pthresh,title){
   # correlations with p-values
-  hi <- rcorr(as.matrix(scale(data[,start:end])), type="spearman")
+  hi <- rcorr(as.matrix(data[,start:end]), type="spearman")
   mat1 <- hi$r
   filter <- which(abs(mat1)<rthresh)
 
@@ -282,7 +282,8 @@ featurecorrelations <- function(data,start,end,rthresh,pthresh,title){
 
   # make heatmap
   pheatmap(hi$r, display_numbers = mat2,
-           fontsize_number=20, fontsize=20, fontsize_row=12, fontsize_col=12,
+           fontsize_number=12,
+           #fontsize=10, fontsize_row=10, fontsize_col=10,
            main=title)
 }
 
@@ -428,7 +429,7 @@ plots_expvariable <- function(data, pc.xaxis, pc.yaxis){
       data %>%
       filter(variable==v) %>%
       ggplot(aes(x=!!pc.xaxis, y=!!pc.yaxis, color=value)) +
-      geom_point(alpha=1/10) +
+      geom_point(alpha=1/5) +
       labs(title=v)
   }
 
@@ -548,6 +549,7 @@ stats_morphologymeasures.cell <- function(data,model,posthoc1,posthoc2,adjust){
     # linear mixed effects model
     # summary(model) gives you
     options(contrasts=c("contr.sum","contr.poly"))
+    emm_options(lmerTest.limit=nrow(tmp), pbkrtest.limit=nrow(tmp))
     model <- lmerTest::lmer(as.formula(paste(y.model)), data=tmp)
 
     ### Test ANOVA assumptions
@@ -563,14 +565,16 @@ stats_morphologymeasures.cell <- function(data,model,posthoc1,posthoc2,adjust){
 
     # posthocs 1: considering sex
     ph <- emmeans(model, as.formula(paste(z.model)))
-    ph2 <- contrast(ph, method="pairwise", adjust=adjust)
-    outsum <- as.data.frame(ph2)
+    ph2 <- contrast(ph, method="pairwise", adjust="none")
+    ph3 <- test(ph2, by=NULL, adjust=adjust)
+    outsum <- as.data.frame(ph3)
     outsum$measure <- paste(m)
 
     # posthocs 2: considering sex
     ph <- emmeans(model, as.formula(paste(a.model)))
-    ph2 <- contrast(ph, method="pairwise", adjust=adjust)
-    outsum2 <- as.data.frame(ph2)
+    ph2 <- contrast(ph, method="pairwise", adjust="none")
+    ph3 <- test(ph2, by=NULL, adjust=adjust)
+    outsum2 <- as.data.frame(ph3)
     outsum2$measure <- paste(m)
 
     # save everything before looping to next subregion
@@ -639,22 +643,23 @@ stats_morphologymeasures.animal <- function(data,model,posthoc1,posthoc2,adjust)
 
     # anova
     #anova = anova(model, test="F", type="III")
-    anova = anova(model)
+    anova = car::Anova(model)
     anova$measure <- paste(m)
 
-    #posthocs test 1 (if there are sex differences)
+    #posthocs test 1
     refgrid <- ref.grid(model)
     ph <- emmeans(refgrid, as.formula(paste(z.model)))
-    ph2 <- summary(contrast(ph, method="pairwise", adjust=adjust), infer=TRUE)
-    #holm good for unequal sample sizes, adjusts at p-value level
-    outsum <- as.data.frame(ph2)
+    ph2 <- contrast(ph, method="pairwise", adjust="none")
+    ph3 <- test(ph2, by=NULL, adjust=adjust)
+    outsum <- as.data.frame(ph3)
     outsum$measure <- paste(m)
 
-    #posthocs test 2 (if there aren't sex differences) #make a second output file
+    #posthocs test 2
     refgrid <- ref.grid(model)
     ph <- emmeans(refgrid, as.formula(paste(a.model)))
-    ph2 <- summary(contrast(ph, method="pairwise", adjust=adjust), infer=TRUE)
-    outsum2 <- as.data.frame(ph2)
+    ph2 <- contrast(ph, method="pairwise", adjust="none")
+    ph3 <- test(ph2, by=NULL, adjust=adjust)
+    outsum2 <- as.data.frame(ph3)
     outsum2$measure <- paste(m)
 
     # save everything before looping to next subregion
@@ -667,7 +672,7 @@ stats_morphologymeasures.animal <- function(data,model,posthoc1,posthoc2,adjust)
   posthoc.out$Significant <- ifelse(posthoc.out$`p.value` < 0.05, "significant", "ns")
   posthoc.out2$Significant <- ifelse(posthoc.out2$`p.value` < 0.05, "significant", "ns")
 
-  final.output[[1]] = anova.out
+  final.output[[1]] = as.data.frame(anova.out)
   final.output[[2]] = posthoc.out
   final.output[[3]] = posthoc.out2
   #final.output[[4]] = do.call("grid.arrange", c(log_ggqqplots, ncol=8))
@@ -703,7 +708,6 @@ stats_cluster.animal <- function(data, model, posthoc1, posthoc2, adjust){
   #model <- glmmadmb(as.formula(paste(y.model)), data=data, family="beta")
   model <- glmmTMB(as.formula(paste(y.model)), data=data, family=beta_family(link="logit"))
 
-
   ### Test ANOVA assumptions
   # visual check of distribution
   # log_ggqqplots = ggqqplot(residuals(model))
@@ -719,14 +723,16 @@ stats_cluster.animal <- function(data, model, posthoc1, posthoc2, adjust){
 
   # posthocs 1: considering sex
   ph <- emmeans(model, as.formula(paste(z.model)))
-  ph2 <- contrast(ph, method="pairwise", adjust=adjust)
-  posthoc1 <- as.data.frame(ph2)
+  ph2 <- contrast(ph, method="pairwise", adjust="none")
+  ph3 <- test(ph2, by=NULL, adjust=adjust)
+  posthoc1 <- as.data.frame(ph3)
   posthoc1
 
   # posthocs 2: not considering sex
   ph <- emmeans(model, as.formula(paste(a.model)))
-  ph2 <- contrast(ph, method="pairwise", adjust=adjust)
-  posthoc2 <- as.data.frame(ph2)
+  ph2 <- contrast(ph, method="pairwise", adjust="none")
+  ph3 <- test(ph2, by=NULL, adjust=adjust)
+  posthoc2 <- as.data.frame(ph3)
   posthoc2
 
   # posthocs not looking within cluster
