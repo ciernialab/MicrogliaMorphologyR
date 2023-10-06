@@ -4,14 +4,14 @@
 \alias{clusterfeatures}
 \title{Cluster-specific average morphology measures}
 \usage{
-clusterfeatures(data, start, end)
+clusterfeatures(data, featurestart, featureend)
 }
 \arguments{
 \item{data}{is your input data frame}
 
-\item{start}{is first column number of morphology measures}
+\item{featurestart}{is first column number of morphology measures}
 
-\item{end}{is last column number of morphology measures}
+\item{featureend}{is last column number of morphology measures}
 }
 \description{
 'clusterfeatures' generates heatmap visualization of average cluster-specific morphology measures relative to other clusters

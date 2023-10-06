@@ -185,7 +185,7 @@ junction voxels, triple points, branches, and junctions all explain cell
 branching complexity and are highly correlated to each other.
 
 ``` r
-featurecorrelations(data_2xLPS, start=9, end=35, rthresh=0.8, pthresh=0.05, title="Correlations across features")
+featurecorrelations(data_2xLPS, featurestart=9, featureend=35, rthresh=0.8, pthresh=0.05, title="Correlations across features")
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
@@ -329,13 +329,13 @@ useful to inform which to include for downstream clustering steps.
 ## Dimensionality reduction using PCA
 
 ``` r
-pcadata_elbow(data_2xLPS_logtransformed, start=9, end=35)
+pcadata_elbow(data_2xLPS_logtransformed, featurestart=9, featureend=35)
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 ``` r
-pca_data <- pcadata(data_2xLPS_logtransformed, start=9, end=35,
+pca_data <- pcadata(data_2xLPS_logtransformed, featurestart=9, featureend=35,
                     pc.start=1, pc.end=10)
 str(pca_data)
 ```
@@ -445,6 +445,28 @@ our toolset is highly flexible, it can also be integrated with other
 clustering approaches such as hierarchical clustering or gaussian
 mixture models.
 
+When running kmeans clustering, from the number of clusters (K) that you
+specify to create, the algorithm will randomly select K initial cluster
+centers. Each other data point’s euclidean distance will be calculated
+from these initial centers so that they are assigned as belonging to the
+cluster that they are closest to. The centroids for each of the clusters
+will be updated by calculating the new means of all the points assigned
+to each cluster. The process of randomly setting initial centers,
+assigning data points to the clusters, and updating the cluster
+centroids is iterated until the maximum number of iterations is reached.
+
+Thus, 2 main dataset-specific parameters that you should specify and
+troubleshoot for your dataset are: - **iter.max**, the maximum number of
+iterations allowed, and the number of times kmeans algorithm is run
+before results are returned. An iter.max between 10-20 is recommended -
+**nstart**, how many random sets should be chosen. An nstart of atleast
+25 initial configurations is recommended.
+
+You can read more about kmeans clustering and optimizing these
+parameters at the following links: -
+<https://uc-r.github.io/kmeans_clustering> -
+<https://andrea-grianti.medium.com/kmeans-parameters-in-rstudio-explained-c493ec5a05df>
+
 ### prepare data for clustering
 
 ``` r
@@ -472,8 +494,9 @@ fviz_nbclust(sampling, kmeans, method = 'silhouette', nstart=25, iter.max=50) # 
 
 From using the wss and silhouette methods to check the optimal numbers
 of clusters for our dataset, it appears that our data would be optimally
-clustered using k=4. There are many more cluster optimization methods
-that you can try out to explore your data (insert link).
+clustered using k=4. There are many more [cluster optimization
+methods](http://www.sthda.com/english/articles/29-cluster-validation-essentials/96-determiningthe-optimal-number-of-clusters-3-must-know-methods/)
+that you can try out to explore your data.
 
 Next, we proceed with the actual clustering. You can cluster using fuzzy
 k-means or regular k-means at this step. After clustering, we will use
@@ -510,8 +533,10 @@ str(pca_kmeans)
 ``` r
 # cluster and combine with original data
 data_kmeans <- kmeans(kmeans_input, centers=4)
+
+# Here, we are creating a new data frame that contains the first 2 PCs and original dataset, then renaming the data_kmeans$cluster column to simply say "Cluster". You can bind together as many of the PCs as you want. Binding the original, untransformed data is useful if you want to plot the raw values of any individual morphology measures downstream. 
 pca_kmeans <- cbind(pca_data[1:2], data_2xLPS, as.data.frame(data_kmeans$cluster)) %>%
-  rename(Cluster=`data_kmeans$cluster`)
+  rename(Cluster=`data_kmeans$cluster`) 
 str(pca_kmeans)
 ```
 
@@ -573,7 +598,7 @@ plot + scale_colour_viridis_d() # customizeable example: add color scheme of cho
 ### Cluster-specific measures on average for each morphology feature, relative to other clusters
 
 ``` r
-clusterfeatures(pca_kmeans, start=11, end=37)
+clusterfeatures(pca_kmeans, featurestart=11, featureend=37)
 ```
 
 ![](README_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
@@ -2250,57 +2275,6 @@ stats.testing[[5]] # summary of model
     ##            BrainRegion2  Treatment1:BrainRegion1  Treatment1:BrainRegion2  
     ##                  0.6411                   0.1174                   0.0377
 
-### Individual morphology measures, at the cell level
-
-#### e.g., How does each individual morphology measure change with LPS treatment?
-
-The stats_morphologymeasures.cell function fits a linear mixed effects
-model considering MouseID as a repeated measure using the `lmerTest`
-package, for each morphology measure individually within your dataset.
-The `lmerTest` package “provides p-values in type I, II or III anova and
-summary tables for linear mixed models…via Satterthwaite’s degrees of
-freedom method.” You can learn more about the package by reading the
-`lmerTest` [reference
-manual](https://cran.r-project.org/web/packages/lmerTest/lmerTest.pdf)
-
-In this example, we are fitting the linear mixed effects model to our
-log-transformed Iba1-stained dataset to model the values of each
-morphology measure as a factor of Treatment and BrainRegion interactions
-with MouseID as a repeated measure since we are modeling at the
-cell-level, and multiple cells belong to the same animal. In the first
-posthoc correction, we are correcting for multiple comparisons between
-treatments (PBS vs. 2xLPS) across BrainRegions using the Bonferroni
-method - since there are 3 brain regions, we should be correcting across
-3 tests for each morphology measure. In the second posthoc correction,
-we are only considering one test between the two treatments (PBS
-vs. 2xLPS) and considering each measure separately, so there is no
-multiple test correction.
-
-``` r
-# prepare data for downstream analysis
-data <- data_2xLPS_logtransformed %>% 
-  group_by(MouseID, Sex, Treatment) %>% 
-  gather(Measure, Value, "Foreground pixels":"Maximum branch length")
-
-# filter out data you want to run stats on and make sure to make any variables included in model into factors
-stats.input <- data
-stats.input$Treatment <- factor(stats.input$Treatment)
-stats.input$MouseID <- factor(stats.input$MouseID)
-stats.input$BrainRegion <- factor(stats.input$BrainRegion)
-
-# run stats analysis for changes in individual morphology measures
-# you can specify up to two posthoc comparisons (posthoc1 and posthoc2 arguments) - if you only have one set of posthocs to run, specify the same comparison twice for both arguments. you will just get the same results in output[[2]] and output[[3]].
-stats <- stats_morphologymeasures.cell(stats.input %>% filter(Antibody=="Iba1"), 
-                                       "Value ~ Treatment*BrainRegion + (1|MouseID)", 
-                                       "~Treatment|BrainRegion", "~Treatment", "bonferroni")
-
-stats[[1]] # anova
-stats[[2]] # posthoc 1
-stats[[3]] # posthoc 2
-do.call("grid.arrange", c(stats[[4]], ncol=4)) # qqplots to check normality assumptions
-stats[[5]] # summary of model
-```
-
 If you find that any individual morphology measures violate assumptions
 of normality after checking the qqplots contained in
 stats.input\[\[4\]\], you can filter your data for those measures,
@@ -2390,10 +2364,10 @@ colnames(data_fuzzykmeans)
 
 ``` r
 # check cluster features to determine cluster labels
-clusterfeatures(data_fuzzykmeans, start=9, end=35)
+clusterfeatures(data_fuzzykmeans, featurestart=9, featureend=35)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
 
 ``` r
 # update cluster labels
@@ -2442,4 +2416,4 @@ cp %>%
   theme(axis.text.x=element_text(angle=45, vjust=1, hjust=1))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-25-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->

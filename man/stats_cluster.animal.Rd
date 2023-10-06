@@ -9,15 +9,25 @@ stats_cluster.animal(data, model, posthoc1, posthoc2, adjust)
 \arguments{
 \item{data}{is your input data frame}
 
-\item{model}{is your linear mixed model (e.g., Value ~ Cluster\emph{Treatment}Sex + (1|MouseID))}
+\item{model}{is your linear mixed model (e.g., Value ~ Cluster*Treatment + (1|MouseID))}
 
-\item{posthoc1}{is your first set of posthoc comparisons (e.g., considering sex: ~Cluster*Treatment|Sex)}
+\item{posthoc1}{is your first set of posthoc comparisons (e.g., ~Cluster|Treatment)}
 
-\item{posthoc2}{is your second set of posthoc comparisons (e.g., not considering sex: ~Cluster*Treatment)}
+\item{posthoc2}{is your second set of posthoc comparisons (e.g., ~Cluster)}
 
-\item{adjust}{is your method of multiple test correction}
+\item{adjust}{is your method of multiple test correction (from \code{emmeans} package: "tukey","scheffe","sidak","dunnettx","mvt","holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr","none"). See "P-value adjustments" section under ?emmeans::summary.emmGrid for more information.}
 }
 \description{
 Linear mixed model to statistically assess how your experimental variables of interest
-influence cluster percentages, at animal level
+influence cluster percentages, at animal level.
+}
+\details{
+The stats_cluster.animal function fits a generalized linear mixed model on your dataset
+to a beta distribution, which is suitable for values like percentages or probabilities
+that are constrained to a range of 0-1, using the \code{glmmTMB} package. Part of the output
+includes a check of the model fit using the \code{DHARMa} package, which "uses a simulation-based
+approach to create readily interpretable scaled (quantile) residuals for fitted (generalized)
+linear mixed models." The function creates two \code{DHARMa} plots, contained in output[\link{4}].
+You can read more about how to interpret model fit using \code{DHARMa} by reading the
+package \href{https://cran.r-project.org/web/packages/DHARMa/vignettes/DHARMa.html}{vignette}.
 }

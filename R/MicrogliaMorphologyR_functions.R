@@ -118,7 +118,8 @@ outliers_boxplots <- function(data){
     ggplot(aes(x=measure, y=value)) +
     geom_boxplot() +
     geom_jitter(width=0.15)+
-    theme(axis.text.x = element_text(angle = 90))
+    theme(axis.text.x = element_text(angle = 90)) +
+    ggtitle("Range of values for each morphology measure")
 }
 
 #' Exploratory data analysis: outlier detection
@@ -131,7 +132,8 @@ outliers_distributions <- function(data){
   data %>%
     ggplot(aes(x = value)) +
     geom_histogram(bins = 40) +
-    facet_wrap(~measure, scales = "free_x")
+    facet_wrap(~measure, scales = "free_x") +
+    ggtitle("Distributions of morphology measures")
 }
 
 #' Exploratory data analysis: normalization methods
@@ -148,13 +150,13 @@ normalize_logplots <- function(data,x){
     facet_wrap(~measure, scales = "free") +
     #theme(strip.text.x = element_text(size=8)) +
     theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-    #scale_x_continuous(name = "Morphology measure (log(value+1))") +
-    scale_y_continuous(name = "Count")
+    scale_y_continuous(name = "Count") +
+    ggtitle("Distribution of measures after log transforming")
 }
 
 #' Exploratory data analysis: scaled plots
 #'
-#' 'normalize_scaled' allows you to check distributions of features after scaling (e.g., log10(scale(value)))
+#' 'normalize_scaled' allows you to check distributions of features after scaling (e.g., scale(value))
 #'
 #' @param data is your final dataframe which contains gathered data (measure, value) format
 #' @export
@@ -166,7 +168,8 @@ normalize_scaled <- function(data){
     #theme(strip.text.x = element_text(size=8)) +
     theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     scale_x_continuous(name = "Morphology measure (scale(value))") +
-    scale_y_continuous(name = "Count")
+    scale_y_continuous(name = "Count") +
+    ggtitle("Distributions of measures after scaling")
 }
 
 #' Exploratory data analysis: min-max scaled plots
@@ -183,7 +186,8 @@ normalize_minmax <- function(data){
     #theme(strip.text.x = element_text(size=8)) +
     theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     scale_x_continuous(name = "Morphology measure (minmax(value))") +
-    scale_y_continuous(name = "Count")
+    scale_y_continuous(name = "Count") +
+    ggtitle("Distribution of measures after min-max normalizing")
 }
 
 #' Log scale
@@ -234,11 +238,12 @@ transform_minmax <- function(data,start,end){
 
 #' Transform data: Scaling
 #'
-#' 'transform_scale' allows you to scale your dataframe within each morphology measure
+#' 'transform_scale' allows you to center and scale your dataframe within each morphology measure
+#' to calculate z-scores using the `scale` function in R.
 #'
 #' @param data is your input dataframe
-#' @param start is first column number of morphology measures
-#' @param end is last column number of morphology measures
+#' @param start is first column number of data you want to scale
+#' @param end is last column number of data you want to scale
 #' @export
 transform_scale <- function(data,start,end){
   data %>% mutate_at(start:end, scale)
@@ -260,15 +265,15 @@ samplesize <- function(data,...){
 #' 'featurecorrelations' allows you to generate a heatmap depicting significant correlations across features
 #'
 #' @param data is your input data frame
-#' @param start is first column number of morphology measures
-#' @param end is last column number of morphology measures
+#' @param featurestart is first column number of morphology measures
+#' @param featureend is last column number of morphology measures
 #' @param rthresh is cutoff threshold for significant correlation values
 #' @param pthresh is cutoff threshold for significant p-values
 #' @param title is what you want to name your heatmap
 #' @export
-featurecorrelations <- function(data,start,end,rthresh,pthresh,title){
+featurecorrelations <- function(data,featurestart,featureend,rthresh,pthresh,title){
   # correlations with p-values
-  hi <- rcorr(as.matrix(data[,start:end]), type="spearman")
+  hi <- rcorr(as.matrix(data[,featurestart:featureend]), type="spearman")
   mat1 <- hi$r
   filter <- which(abs(mat1)<rthresh)
 
@@ -285,6 +290,11 @@ featurecorrelations <- function(data,start,end,rthresh,pthresh,title){
            fontsize_number=12,
            #fontsize=10, fontsize_row=10, fontsize_col=10,
            main=title)
+
+  #ComplexHeatmap::pheatmap(hi$r, display_numbers = mat2, fontsize_number=12,
+  #                         fontsize=10, fontsize_row=10, fontsize_col=10,
+  #                         legend = TRUE, heatmap_legend_param = list(title = "testing", annotation_name_side = "top"),
+  #                         main=title)
 }
 
 #' Dimensionality reduction using PCA and elbow/scree plot to get variance explained
@@ -292,11 +302,11 @@ featurecorrelations <- function(data,start,end,rthresh,pthresh,title){
 #' 'pcadata_elbow' allows you to perform PCA analysis and update your dataframe
 #'
 #' @param data is your input data frame
-#' @param start is first column number of morphology measures
-#' @param end is last column number of morphology measures
+#' @param featurestart is first column number of morphology measures
+#' @param featureend is last column number of morphology measures
 #' @export
-pcadata_elbow <- function(data, start, end){
-  prin_comp <- prcomp(data[,start:end], scale=TRUE)
+pcadata_elbow <- function(data, featurestart, featureend){
+  prin_comp <- prcomp(data[,featurestart:featureend], scale=TRUE)
   fviz_eig(prin_comp, addlabels=TRUE, main="Variance explained by PCs")
 }
 
@@ -305,13 +315,13 @@ pcadata_elbow <- function(data, start, end){
 #' 'pcadata' allows you to perform PCA analysis and update your dataframe to include PCs of interest
 #'
 #' @param data is your input data frame
-#' @param start is first column number of morphology measures
-#' @param end is last column number of morphology measures
+#' @param featurestart is first column number of morphology measures
+#' @param featureend is last column number of morphology measures
 #' @param pc.start is first PC you want included (e.g., PC1)
 #' @param pc.end is last PC you want included (e.g., PC4)
 #' @export
-pcadata <- function(data, start, end, pc.start, pc.end){
-  prin_comp <- prcomp(data[,start:end], scale=TRUE)
+pcadata <- function(data, featurestart, featureend, pc.start, pc.end){
+  prin_comp <- prcomp(data[,featurestart:featureend], scale=TRUE)
   components <- prin_comp[["x"]]
   components <- data.frame(components)
   pca_data <- cbind(prin_comp$x[,pc.start:pc.end], data)
@@ -406,7 +416,8 @@ pcfeaturecorrelations <- function(pca_data, pc.start, pc.end, feature.start, fea
   bat2[filter] <- ""
 
   pheatmap(bat1, display_numbers = bat2, border_color=NA,
-           fontsize_number=20, fontsize=14, fontsize_row=12, fontsize_col=12,
+           fontsize_number=12,
+           #fontsize=14, fontsize_row=12, fontsize_col=12,
            angle_col=0, main=title)
 }
 
@@ -416,7 +427,7 @@ pcfeaturecorrelations <- function(pca_data, pc.start, pc.end, feature.start, fea
 #'
 #' @param data is your input data frame
 #' @param pc.xaxis is the pc values you want on x-axis (e.g, PC1)
-#' @param pc.yaxis is the pce values you want on y-axis (e.g., PC2)
+#' @param pc.yaxis is the pc values you want on y-axis (e.g., PC2)
 #' @export
 plots_expvariable <- function(data, pc.xaxis, pc.yaxis){
   pc.xaxis <- sym(pc.xaxis)
@@ -461,16 +472,17 @@ clusterplots <- function(data, pc.xaxis, pc.yaxis){
 #' 'clusterfeatures' generates heatmap visualization of average cluster-specific morphology measures relative to other clusters
 #'
 #' @param data is your input data frame
-#' @param start is first column number of morphology measures
-#' @param end is last column number of morphology measures
+#' @param featurestart is first column number of morphology measures
+#' @param featureend is last column number of morphology measures
 #' @export
-clusterfeatures <- function(data, start, end){
-  heatmap <- data %>% group_by(Cluster) %>% summarise(across(start:end, ~ mean(.x)))
+clusterfeatures <- function(data, featurestart, featureend){
+  heatmap <- data %>% group_by(Cluster) %>% summarise(across(featurestart:featureend, ~ mean(.x)))
   #heatmap$`k2$cluster` <- paste0("Cluster ", heatmap$`k2$cluster`)
 
   heatmap <- column_to_rownames(heatmap, var="Cluster")
   pheatmap(t(heatmap), scale="row", cluster_cols=FALSE, cluster_rows=TRUE,
-           border_color=NA, angle_col=45)
+           border_color=NA, angle_col=45,
+           main="Cluster-specific measures")
           #fontsize=12, fontsize_row=12, fontsize_col=12
 }
 
@@ -516,97 +528,17 @@ clusterpercentage_boxplots <- function(data,...){
 #' Stats analysis: individual morphology measures
 #'
 #' Linear mixed model to statistically assess how your experimental variables of interest
-#' influence each morphology measure, at the cell level
+#' influence each morphology measure, at the animal level
+#'
+#' The stats_morphologymeasures.animal function fits a linear model using the `lm` function
+#' for each morphology measure individually within your dataset. Posthocs are run for each morphology measure
+#' individually and bound together into the final dataframe that is output by this function.
 #'
 #' @param data is your input data frame
 #' @param model is your linear mixed model (e.g., Value ~ Treatment*Sex + (1|MouseID))
-#' @param posthoc1 is your posthoc comparisons when considering sex (e.g., ~Treatment|Sex)
-#' @param posthoc2 is your posthoc comparisons when not considering sex (e.g., ~Treatment)
-#' @param adjust is your method of multiple test correction
-#' @export
-stats_morphologymeasures.cell <- function(data,model,posthoc1,posthoc2,adjust){
-
-  y.model <- as.character(model)
-  z.model <- as.character(posthoc1)
-  a.model <- as.character(posthoc2)
-
-  measure <- unique(as.character(data$Measure))
-  log_ggqqplots = list()
-  final.output = list()
-
-  # for writing out results to
-  anova.out <- NULL
-  posthoc.out <- NULL
-  posthoc.out2 <- NULL
-
-  for(m in measure){
-
-    tmp <- data %>% filter(Measure == m)
-    tmp <- as.data.frame(tmp)
-
-    print(m)
-
-    # linear mixed effects model
-    # summary(model) gives you
-    options(contrasts=c("contr.sum","contr.poly"))
-    emm_options(lmerTest.limit=nrow(tmp), pbkrtest.limit=nrow(tmp))
-    model <- lmerTest::lmer(as.formula(paste(y.model)), data=tmp)
-
-    ### Test ANOVA assumptions
-    # visual check of distribution
-    log_ggqqplots[[m]] =
-      ggqqplot(residuals(model)) +
-      labs(title=m)
-
-    # anova
-    #anova = anova(model, test="F", type="III")
-    anova = anova(model)
-    anova$measure <- paste(m)
-
-    # posthocs 1: considering sex
-    ph <- emmeans(model, as.formula(paste(z.model)))
-    ph2 <- contrast(ph, method="pairwise", adjust="none")
-    ph3 <- test(ph2, by=NULL, adjust=adjust)
-    outsum <- as.data.frame(ph3)
-    outsum$measure <- paste(m)
-
-    # posthocs 2: considering sex
-    ph <- emmeans(model, as.formula(paste(a.model)))
-    ph2 <- contrast(ph, method="pairwise", adjust="none")
-    ph3 <- test(ph2, by=NULL, adjust=adjust)
-    outsum2 <- as.data.frame(ph3)
-    outsum2$measure <- paste(m)
-
-    # save everything before looping to next subregion
-    anova.out <- rbind(anova.out,anova)
-    posthoc.out <- rbind(posthoc.out,outsum)
-    posthoc.out2 <- rbind(posthoc.out2,outsum2)
-  }
-
-  anova.out$Significant <- ifelse(anova.out$`Pr(>F)` < 0.05, "significant", "ns")
-  posthoc.out$Significant <- ifelse(posthoc.out$`p.value` < 0.05, "significant", "ns")
-  posthoc.out2$Significant <- ifelse(posthoc.out2$`p.value` < 0.05, "significant", "ns")
-
-  final.output[[1]] = anova.out
-  final.output[[2]] = posthoc.out
-  final.output[[3]] = posthoc.out2
-  #final.output[[4]] = do.call("grid.arrange", c(log_ggqqplots, ncol=8))
-  final.output[[4]] = log_ggqqplots
-  final.output[[5]] = print(model)
-
-  final.output
-}
-
-#' Stats analysis: individual morphology measures
-#'
-#' Linear mixed model to statistically assess how your experimental variables of interest
-#' influence each morphology measure, at the cell level
-#'
-#' @param data is your input data frame
-#' @param model is your linear mixed model (e.g., Value ~ Treatment*Sex + (1|MouseID))
-#' @param posthoc1 is your posthoc comparisons when considering sex (e.g., ~Treatment|Sex)
-#' @param posthoc2 is your posthoc comparisons when not considering sex (e.g., ~Treatment)
-#' @param adjust is your method of multiple test correction
+#' @param posthoc1 is your posthoc comparisons (e.g., when considering sex: ~Treatment|Sex)
+#' @param posthoc2 is your posthoc comparisons (e.g., when not considering sex: ~Treatment)
+#' @param adjust is your method of multiple test correction (from `emmeans` package: "tukey","scheffe","sidak","dunnettx","mvt","holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr","none"). See "P-value adjustments" section under ?emmeans::summary.emmGrid for more information.
 #' @export
 stats_morphologymeasures.animal <- function(data,model,posthoc1,posthoc2,adjust){
 
@@ -685,13 +617,22 @@ stats_morphologymeasures.animal <- function(data,model,posthoc1,posthoc2,adjust)
 #' Stats analysis: cluster-level changes
 #'
 #' Linear mixed model to statistically assess how your experimental variables of interest
-#' influence cluster percentages, at animal level
+#' influence cluster percentages, at animal level.
+#'
+#' The stats_cluster.animal function fits a generalized linear mixed model on your dataset
+#' to a beta distribution, which is suitable for values like percentages or probabilities
+#' that are constrained to a range of 0-1, using the `glmmTMB` package. Part of the output
+#' includes a check of the model fit using the `DHARMa` package, which "uses a simulation-based
+#' approach to create readily interpretable scaled (quantile) residuals for fitted (generalized)
+#' linear mixed models." The function creates two `DHARMa` plots, contained in output[[4]].
+#' You can read more about how to interpret model fit using `DHARMa` by reading the
+#' package [vignette](https://cran.r-project.org/web/packages/DHARMa/vignettes/DHARMa.html).
 #'
 #' @param data is your input data frame
-#' @param model is your linear mixed model (e.g., Value ~ Cluster*Treatment*Sex + (1|MouseID))
-#' @param posthoc1 is your first set of posthoc comparisons (e.g., considering sex: ~Cluster*Treatment|Sex)
-#' @param posthoc2 is your second set of posthoc comparisons (e.g., not considering sex: ~Cluster*Treatment)
-#' @param adjust is your method of multiple test correction
+#' @param model is your linear mixed model (e.g., Value ~ Cluster*Treatment + (1|MouseID))
+#' @param posthoc1 is your first set of posthoc comparisons (e.g., ~Cluster|Treatment)
+#' @param posthoc2 is your second set of posthoc comparisons (e.g., ~Cluster)
+#' @param adjust is your method of multiple test correction (from `emmeans` package: "tukey","scheffe","sidak","dunnettx","mvt","holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr","none"). See "P-value adjustments" section under ?emmeans::summary.emmGrid for more information.
 #' @export
 stats_cluster.animal <- function(data, model, posthoc1, posthoc2, adjust){
 

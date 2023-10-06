@@ -11,7 +11,7 @@ plots_expvariable(data, pc.xaxis, pc.yaxis)
 
 \item{pc.xaxis}{is the pc values you want on x-axis (e.g, PC1)}
 
-\item{pc.yaxis}{is the pce values you want on y-axis (e.g., PC2)}
+\item{pc.yaxis}{is the pc values you want on y-axis (e.g., PC2)}
 }
 \description{
 'plots_expvariable' colors points in pc space by experimental variables

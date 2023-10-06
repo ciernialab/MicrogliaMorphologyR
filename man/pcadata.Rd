@@ -4,14 +4,14 @@
 \alias{pcadata}
 \title{Dimensionality reduction using PCA}
 \usage{
-pcadata(data, start, end, pc.start, pc.end)
+pcadata(data, featurestart, featureend, pc.start, pc.end)
 }
 \arguments{
 \item{data}{is your input data frame}
 
-\item{start}{is first column number of morphology measures}
+\item{featurestart}{is first column number of morphology measures}
 
-\item{end}{is last column number of morphology measures}
+\item{featureend}{is last column number of morphology measures}
 
 \item{pc.start}{is first PC you want included (e.g., PC1)}
 

@@ -59,7 +59,7 @@ data_2xLPS <- MicrogliaMorphologyR::data_2xLPS_mouse
 We start by exploring the morphology features measured by MicrogliaMorphology and how they relate to each other by generating a heatmap of spearman's correlations across the 27 different morphology features. As expected, the features which describe similar aspects of morphology are more highly correlated to each other than to other features which do not. For example, the numbers of end point voxels, junction voxels, triple points, branches, and junctions all explain cell branching complexity and are highly correlated to each other.
 
 ```{r, fig.width=13, fig.height=12.5}
-featurecorrelations(data_2xLPS, start=9, end=35, rthresh=0.8, pthresh=0.05, title="Correlations across features")
+featurecorrelations(data_2xLPS, featurestart=9, featureend=35, rthresh=0.8, pthresh=0.05, title="Correlations across features")
 ```
 
 MicrogliaMorphologyR comes with a number of functions which allow you to explore which features have extreme outliers and how normalizing in various ways changes your feature distributions. This allows you to explore and transform your data in a dataset-appropriate manner for downstream analyses. In later steps, we will be running Principal Components Analysis (PCA) on our transformed data. PCA is a statistical technique which identifies the most significant variables and relationships in your data, and can be used as a pre-processing step to reduce noise and remove irrelevant features to improve the efficiency and accuracy of downstream analysis. PCA assumes that the variables in your dataset follow a normal distribution, and violations of normality can affect the accuracy of PCA results. Thus, it is important to transform your data so that the distributions of the values for each individual morphology measure approximate normality as much as possible. 
@@ -67,7 +67,7 @@ MicrogliaMorphologyR comes with a number of functions which allow you to explore
 The morphology features measured using MicrogliaMorphology are often suitable for PCA after log transformation. Because many of the measures contain zero values (e.g., numbers of junctions, numbers of branches, etc.), we need to add a constant to our data prior to log transforming.
 
 ### exploratory data visualization and data transformation for downstream analyses
-```{r}
+```{r, fig.width=13, fig.height=12.5}
 # gather your numerical morphology data into one column ('measure') which contains the feature name, and another column ('value') which contains measured values
 data_2xLPS_gathered <- data_2xLPS %>% gather(measure, value, 9:ncol(data_2xLPS))
 
@@ -94,8 +94,8 @@ Now, since we have gotten a better feel for our data and how to transform it, we
 
 ## Dimensionality reduction using PCA
 ```{r}
-pcadata_elbow(data_2xLPS_logtransformed, start=9, end=35)
-pca_data <- pcadata(data_2xLPS_logtransformed, start=9, end=35,
+pcadata_elbow(data_2xLPS_logtransformed, featurestart=9, featureend=35)
+pca_data <- pcadata(data_2xLPS_logtransformed, featurestart=9, featureend=35,
                     pc.start=1, pc.end=10)
 str(pca_data)
 ```
@@ -123,6 +123,16 @@ plots_expvariable(gathered_expvariables, "PC1", "PC2")
 
 After performing dimensionality reduction, we can use our PCs as input for downstream clustering methods. In this tutorial, we cluster our cells into morphological classes using k-means clustering, which partitions data points within a given dataset into defined numbers of clusters based on their proximity to the nearest cluster’s centroid. We provide an example at the end of the Github to depict a use case for fuzzy k-means clustering, a soft clustering approach and another option which allows for extended analyses such as characterization of the 'most' ameboid, hypertrophic, rod-like, or ramified cells or characterization of cells with more ambiguous identities that lie between these morphological states. (see 'Fuzzy K-means clustering' section at the end of Github for more details about the method) Because our toolset is highly flexible, it can also be integrated with other clustering approaches such as hierarchical clustering or gaussian mixture models.
 
+When running kmeans clustering, from the number of clusters (K) that you specify to create, the algorithm will randomly select K initial cluster centers. Each other data point's euclidean distance will be calculated from these initial centers so that they are assigned as belonging to the cluster that they are closest to. The centroids for each of the clusters will be updated by calculating the new means of all the points assigned to each cluster. The process of randomly setting initial centers, assigning data points to the clusters, and updating the cluster centroids is iterated until the maximum number of iterations is reached. 
+
+Thus, 2 main dataset-specific parameters that you should specify and troubleshoot for your dataset are: 
+- **iter.max**, the maximum number of iterations allowed, and the number of times kmeans algorithm is run before results are returned. An iter.max between 10-20 is recommended
+- **nstart**, how many random sets should be chosen. An nstart of atleast 25 initial configurations is recommended.
+
+You can read more about kmeans clustering and optimizing these parameters at the following links:
+- https://uc-r.github.io/kmeans_clustering
+- https://andrea-grianti.medium.com/kmeans-parameters-in-rstudio-explained-c493ec5a05df
+
 ### prepare data for clustering
 ```{r}
 ## for k-means clustering: scale PCs 1-3, which together describe ~85% of variability
@@ -139,7 +149,7 @@ fviz_nbclust(sampling, kmeans, method = 'wss', nstart=25, iter.max=50) # 4 clust
 fviz_nbclust(sampling, kmeans, method = 'silhouette', nstart=25, iter.max=50) # 4 clusters
 ```
 
-From using the wss and silhouette methods to check the optimal numbers of clusters for our dataset, it appears that our data would be optimally clustered using k=4. There are many more cluster optimization methods that you can try out to explore your data (insert link). 
+From using the wss and silhouette methods to check the optimal numbers of clusters for our dataset, it appears that our data would be optimally clustered using k=4. There are many more [cluster optimization methods](http://www.sthda.com/english/articles/29-cluster-validation-essentials/96-determiningthe-optimal-number-of-clusters-3-must-know-methods/) that you can try out to explore your data. 
 
 Next, we proceed with the actual clustering. You can cluster using fuzzy k-means or regular k-means at this step. After clustering, we will use some built-in functions within MicrogliaMorphologyR to assess how a parameter of k=4 influences how the clusters are defined by morphology features (and if they make sense according to what we know about microglia morphology). As this step may require some troubleshooting and updating of clustering parameters, you may need to run your k-means function multiple times. If you are planning to use fuzzy k-means, keep in mind that the soft clustering approach is more time-intensive and computationally expensive as it also calculates membership scores to each cluster for every single cell. It might help to use regular k-means as a first pass, verify that your clusters make sense using the functions that follow, and run your fuzzy k-means function using the final parameters that you determine to generate your final dataset for downstream analysis. 
 
@@ -157,8 +167,10 @@ str(pca_kmeans)
 ```{r}
 # cluster and combine with original data
 data_kmeans <- kmeans(kmeans_input, centers=4)
+
+# Here, we are creating a new data frame that contains the first 2 PCs and original dataset, then renaming the data_kmeans$cluster column to simply say "Cluster". You can bind together as many of the PCs as you want. Binding the original, untransformed data is useful if you want to plot the raw values of any individual morphology measures downstream. 
 pca_kmeans <- cbind(pca_data[1:2], data_2xLPS, as.data.frame(data_kmeans$cluster)) %>%
-  rename(Cluster=`data_kmeans$cluster`)
+  rename(Cluster=`data_kmeans$cluster`) 
 str(pca_kmeans)
 ```
 
@@ -171,7 +183,7 @@ plot + scale_colour_viridis_d() # customizeable example: add color scheme of cho
 
 ### Cluster-specific measures on average for each morphology feature, relative to other clusters
 ```{r}
-clusterfeatures(pca_kmeans, start=11, end=37)
+clusterfeatures(pca_kmeans, featurestart=11, featureend=37)
 ```
 
 After comparing the individual features across clusters, we can characterize the clusters as follows:
@@ -295,7 +307,7 @@ stats.testing[[5]] # summary of model
 ```
 
 If you are not interested in running stats for all 27 morphology measures, you can also filter for those that you are interested in (or filter out those that you're not interested in) prior to running the `stats_morphologymeasures.animal` function. In this example, we filter out 4 morphology measures so that we only run this function on the other 23 measures.
-```{r}
+```{r, fig.width=13, fig.height=14}
 # run stats analysis for changes in individual morphology measures
 # you can specify up to two posthoc comparisons (posthoc1 and posthoc2 arguments) - if you only have one set of posthocs to run, specify the same comparison twice for both arguments. you will just get the same results in output[[2]] and output[[3]].
 stats.testing <- stats_morphologymeasures.animal(stats.input %>% 
@@ -315,37 +327,6 @@ do.call("grid.arrange", c(stats.testing[[4]], ncol=4)) # qqplots to check normal
 stats.testing[[5]] # summary of model
 ```
 
-### Individual morphology measures, at the cell level
-#### e.g., How does each individual morphology measure change with LPS treatment?
-
-The stats_morphologymeasures.cell function fits a linear mixed effects model considering MouseID as a repeated measure using the `lmerTest` package, for each morphology measure individually within your dataset. The `lmerTest` package "provides p-values in type I, II or III anova and summary tables for linear mixed models...via Satterthwaite's degrees of freedom method." You can learn more about the package by reading the `lmerTest` [reference manual](https://cran.r-project.org/web/packages/lmerTest/lmerTest.pdf)
-
-In this example, we are fitting the linear mixed effects model to our log-transformed Iba1-stained dataset to model the values of each morphology measure as a factor of Treatment and BrainRegion interactions with MouseID as a repeated measure since we are modeling at the cell-level, and multiple cells belong to the same animal. In the first posthoc correction, we are correcting for multiple comparisons between treatments (PBS vs. 2xLPS) across BrainRegions using the Bonferroni method - since there are 3 brain regions, we should be correcting across 3 tests for each morphology measure. In the second posthoc correction, we are only considering one test between the two treatments (PBS vs. 2xLPS) and considering each measure separately, so there is no multiple test correction.
-
-```{r, fig.width=13, fig.height=14, eval=FALSE}
-# prepare data for downstream analysis
-data <- data_2xLPS_logtransformed %>% 
-  group_by(MouseID, Sex, Treatment) %>% 
-  gather(Measure, Value, "Foreground pixels":"Maximum branch length")
-
-# filter out data you want to run stats on and make sure to make any variables included in model into factors
-stats.input <- data
-stats.input$Treatment <- factor(stats.input$Treatment)
-stats.input$MouseID <- factor(stats.input$MouseID)
-stats.input$BrainRegion <- factor(stats.input$BrainRegion)
-
-# run stats analysis for changes in individual morphology measures
-# you can specify up to two posthoc comparisons (posthoc1 and posthoc2 arguments) - if you only have one set of posthocs to run, specify the same comparison twice for both arguments. you will just get the same results in output[[2]] and output[[3]].
-stats <- stats_morphologymeasures.cell(stats.input %>% filter(Antibody=="Iba1"), 
-                                       "Value ~ Treatment*BrainRegion + (1|MouseID)", 
-                                       "~Treatment|BrainRegion", "~Treatment", "bonferroni")
-
-stats[[1]] # anova
-stats[[2]] # posthoc 1
-stats[[3]] # posthoc 2
-do.call("grid.arrange", c(stats[[4]], ncol=4)) # qqplots to check normality assumptions
-stats[[5]] # summary of model
-```
 If you find that any individual morphology measures violate assumptions of normality after checking the qqplots contained in stats.input[[4]], you can filter your data for those measures, transform your data in the suitable manner (i.e., using MicrogliaMorphologyR functions like `transform_minmax` or `transform_scale` or other data transformations), and rerun the stats for those morphology features using the code above.
 
 ## Fuzzy K-means Clustering
@@ -361,7 +342,7 @@ data_fuzzykmeans <- MicrogliaMorphologyR::data_2xLPS_mouse_fuzzykmeans
 colnames(data_fuzzykmeans)
 
 # check cluster features to determine cluster labels
-clusterfeatures(data_fuzzykmeans, start=9, end=35)
+clusterfeatures(data_fuzzykmeans, featurestart=9, featureend=35)
 
 # update cluster labels
 data_fuzzykmeans <- data_fuzzykmeans %>% mutate(Cluster = 

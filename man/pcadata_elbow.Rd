@@ -4,14 +4,14 @@
 \alias{pcadata_elbow}
 \title{Dimensionality reduction using PCA and elbow/scree plot to get variance explained}
 \usage{
-pcadata_elbow(data, start, end)
+pcadata_elbow(data, featurestart, featureend)
 }
 \arguments{
 \item{data}{is your input data frame}
 
-\item{start}{is first column number of morphology measures}
+\item{featurestart}{is first column number of morphology measures}
 
-\item{end}{is last column number of morphology measures}
+\item{featureend}{is last column number of morphology measures}
 }
 \description{
 'pcadata_elbow' allows you to perform PCA analysis and update your dataframe

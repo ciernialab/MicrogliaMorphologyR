@@ -10,5 +10,5 @@ normalize_scaled(data)
 \item{data}{is your final dataframe which contains gathered data (measure, value) format}
 }
 \description{
-'normalize_scaled' allows you to check distributions of features after scaling (e.g., log10(scale(value)))
+'normalize_scaled' allows you to check distributions of features after scaling (e.g., scale(value))
 }

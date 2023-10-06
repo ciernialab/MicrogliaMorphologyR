@@ -9,10 +9,11 @@ transform_scale(data, start, end)
 \arguments{
 \item{data}{is your input dataframe}
 
-\item{start}{is first column number of morphology measures}
+\item{start}{is first column number of data you want to scale}
 
-\item{end}{is last column number of morphology measures}
+\item{end}{is last column number of data you want to scale}
 }
 \description{
-'transform_scale' allows you to scale your dataframe within each morphology measure
+'transform_scale' allows you to center and scale your dataframe within each morphology measure
+to calculate z-scores using the \code{scale} function in R.
 }

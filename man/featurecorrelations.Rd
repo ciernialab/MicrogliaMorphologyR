@@ -4,14 +4,14 @@
 \alias{featurecorrelations}
 \title{Correlation heatmap across morphology features}
 \usage{
-featurecorrelations(data, start, end, rthresh, pthresh, title)
+featurecorrelations(data, featurestart, featureend, rthresh, pthresh, title)
 }
 \arguments{
 \item{data}{is your input data frame}
 
-\item{start}{is first column number of morphology measures}
+\item{featurestart}{is first column number of morphology measures}
 
-\item{end}{is last column number of morphology measures}
+\item{featureend}{is last column number of morphology measures}
 
 \item{rthresh}{is cutoff threshold for significant correlation values}
 
