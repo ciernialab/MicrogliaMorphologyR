@@ -5,6 +5,7 @@ always_allow_html: true
 ---
 
 ```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
 ```
 
 **Created**: 26 June, 2023 by Jenn Kim  
@@ -15,25 +16,46 @@ MicrogliaMorphologyR is an R package for microglia morphology analysis, that is 
 
 You can read more about any of the MicrogliaMorphologyR functions covered in this tutorial by calling to their respective help pages by running ?function_name in the console. 
 
-#### If you are using this tool, please cite the following publications:
+### If you are using this tool, please cite the following publications:
 - Insert manuscript link
+
+### Microglia morphology
+Microglia exhibit a dynamic range of morphologies that are context-specific and often rapidly changing in response to environmental cues. While microglia more realistically exist along a continuous spectrum of morphology, we can categorize them by their most commonly observed forms to study microglia morphology. Here, we highlight the four most commonly studied morphological classes, but others have also been characterized including hyper-ramified, dystrophic, satellite, etc. MicrogliaMorphologyR can also be used to characterize additional morphologies beyond these four.
+![](./README_files/images/GithubIntro_MicrogliaMorphologies.png)
+  
+* **Ameboid** = round, few processes
+* **Hypertrophic** = thicker, shorter processes with larger soma
+* **Rod-like** = elongated soma with bipolar processes
+* **Ramified** = smaller soma with long, highly branched processes
+
+Here are some recent and relevant reviews that you can read to gain more background on microglia morphology and this project:
+
+* [Microglial morphometric analysis: so many options, so little consistency (Reddaway et al., 2023)](https://www.frontiersin.org/articles/10.3389/fninf.2023.1211188/full)
+* [Microglia states and nomenclature: A field at its crossroads (Paolicelli et al., 2022)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9999291/)
+* [Morphology of Microglia Across Contexts of Health and Disease (Savage et al., 2019)](https://link.springer.com/protocol/10.1007/978-1-4939-9658-2_2)
 
 ## Instructions on how to use MicrogliaMorphologyR
 
-### install and load package
+### Install, load packages, and set seed for reproducibility of results shown
 ```{r, eval=FALSE}
 BiocManager::install('ciernialab/MicrogliaMorphologyR')
 ```
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 devtools::load_all()
 library(MicrogliaMorphologyR)
+library(rstatix)
+library(factoextra)
+library(ppclust)
+```
+
+```{r}
 set.seed(1)
 ```
 
 We will start by loading in your MicrogliaMorphology output (FracLac and SkeletonAnalysis files) and formatting the data using the `metadata_columns` function so that you have a final dataframe which contains your cell-level data, with every row as a single cell and every column as either a metadata descriptor or morphology measure. The `metadata_columns` function relies on each piece of metadata to be separated by a common deliminator such as "_" or "-" in the "Name" column. You can read more about the function by calling to its help page using ?metadata_columns
 
-### load in your fraclac and skeleton data, tidy, and merge into final data frame
+### Load in your fraclac and skeleton data, tidy, and merge into final data frame
 ```{r, eval=FALSE}
 fraclac.dir <- "insert path to fraclac directory"
 skeleton.dir <- "insert path to skeleton analysis directory"
@@ -49,25 +71,28 @@ finaldata <- metadata_columns(data,
 
 For demonstration purposes, we will use one of the datasets that comes packaged with MicrogliaMorphologyR. 'data_2xLPS_mouse' contains morphology data collected from female and male 8 week-old Cx3cr1-eGFP mice, which were given 2 i.p. injections of either PBS vehicle solution or 0.5mg/kg lipopolysaccharides (LPS), spaced 24 hours apart. In this genetic mouse line, Cx3cr1-expressing cells including microglia have an endogenous reporter which makes them green when immunofluorescently imaged. Brains were collected 3 hours after the final injections, and brain sections were immunofluorescently stained and imaged for 2 additional, commonly used microglia markers: P2ry12, and Iba1.
 
-### load in example dataset
+### Load in example dataset
 ```{r}
 data_2xLPS <- MicrogliaMorphologyR::data_2xLPS_mouse
 ```
 
-### generate heatmap of correlations across features
+### Generate heatmap of correlations across features
 
 We start by exploring the morphology features measured by MicrogliaMorphology and how they relate to each other by generating a heatmap of spearman's correlations across the 27 different morphology features. As expected, the features which describe similar aspects of morphology are more highly correlated to each other than to other features which do not. For example, the numbers of end point voxels, junction voxels, triple points, branches, and junctions all explain cell branching complexity and are highly correlated to each other.
 
-```{r, fig.width=13, fig.height=12.5}
-featurecorrelations(data_2xLPS, featurestart=9, featureend=35, rthresh=0.8, pthresh=0.05, title="Correlations across features")
+```{r, fig.width=10.5, fig.height=10}
+featurecorrelations(data_2xLPS, 
+                    featurestart=9, featureend=35, 
+                    rthresh=0.8, pthresh=0.05, 
+                    title="Correlations across features")
 ```
 
 MicrogliaMorphologyR comes with a number of functions which allow you to explore which features have extreme outliers and how normalizing in various ways changes your feature distributions. This allows you to explore and transform your data in a dataset-appropriate manner for downstream analyses. In later steps, we will be running Principal Components Analysis (PCA) on our transformed data. PCA is a statistical technique which identifies the most significant variables and relationships in your data, and can be used as a pre-processing step to reduce noise and remove irrelevant features to improve the efficiency and accuracy of downstream analysis. PCA assumes that the variables in your dataset follow a normal distribution, and violations of normality can affect the accuracy of PCA results. Thus, it is important to transform your data so that the distributions of the values for each individual morphology measure approximate normality as much as possible. 
 
 The morphology features measured using MicrogliaMorphology are often suitable for PCA after log transformation. Because many of the measures contain zero values (e.g., numbers of junctions, numbers of branches, etc.), we need to add a constant to our data prior to log transforming.
 
-### exploratory data visualization and data transformation for downstream analyses
-```{r, fig.width=13, fig.height=12.5}
+### Exploratory data visualization and data transformation for downstream analyses
+```{r, fig.width=10, fig.height=7, warning=FALSE}
 # gather your numerical morphology data into one column ('measure') which contains the feature name, and another column ('value') which contains measured values
 data_2xLPS_gathered <- data_2xLPS %>% gather(measure, value, 9:ncol(data_2xLPS))
 
@@ -81,7 +106,8 @@ normalize_minmax(data_2xLPS_gathered)
 normalize_scaled(data_2xLPS_gathered)
 
 # transform your data in appropriate manner for downstream analyses
-data_2xLPS_logtransformed <- transform_log(data_2xLPS, 1, start=9, end=35) # we will use the logtransformed data as our PCA input
+# we will use the logtransformed data as our PCA input
+data_2xLPS_logtransformed <- transform_log(data_2xLPS, 1, start=9, end=35) 
 data_2xLPS_minmaxtransformed <- transform_minmax(data_2xLPS, start=9, end=35)
 data_2xLPS_scaled <- transform_scale(data_2xLPS, start=9, end=35)
 
@@ -97,21 +123,21 @@ Now, since we have gotten a better feel for our data and how to transform it, we
 pcadata_elbow(data_2xLPS_logtransformed, featurestart=9, featureend=35)
 pca_data <- pcadata(data_2xLPS_logtransformed, featurestart=9, featureend=35,
                     pc.start=1, pc.end=10)
-str(pca_data)
+head(pca_data,3)
 ```
 
-### generate heatmap of correlations between PCs and features
+### Generate heatmap of correlations between PCs and features
 
 Using the `pcfeaturecorrelations` function, we can investigate the relationships of our 27 individual morphology measures to the principle components to examine how each PC is differentially correlated to and described by different sets of morphology features. For example, we can see that PC1 is highly positively correlated to features describing branching complexity and territory span, meaning that individual cells with greater branching complexity or area have higher PC1 scores in our dataset. Similarly, the variability in our dataset represented in PC2 is described by cell shape: 1) *circularity* (circularity, max/min radii from center, span ratio of hull) and 2) *branching homogeneity* (relative variation (CV) from center of mass), and PC3 is described by branch length-related measures. Generally, you will see the same types of features describing the first four PCs after dimensionality reduction, although the directionality of the correlations could be inversed, which is normal as long as the sets of features that are highly correlated (e.g., circularity and branching homogeneity for PC2) are still maintained. 
 
-```{r, fig.width=10, fig.height=8}
+```{r, fig.width=9, fig.height=7}
 pcfeaturecorrelations(pca_data, pc.start=1, pc.end=3, 
                       feature.start=19, feature.end=45, 
                       rthresh=0.75, pthresh=0.05, 
                       title="Correlation between PCs and features")
 ```
 
-### visually explore different sources of variability in dataset
+### Visually explore different sources of variability in dataset
 ```{r, fig.width=13, fig.height=12.5}
 # gather your data by experimental variables (e.g., Treatment, Sex, MouseID, etc.)
 gathered_expvariables <- pca_data %>% gather(variable, value, 11:16) 
@@ -133,7 +159,7 @@ You can read more about kmeans clustering and optimizing these parameters at the
 - https://uc-r.github.io/kmeans_clustering
 - https://andrea-grianti.medium.com/kmeans-parameters-in-rstudio-explained-c493ec5a05df
 
-### prepare data for clustering
+### Prepare data for clustering
 ```{r}
 ## for k-means clustering: scale PCs 1-3, which together describe ~85% of variability
 pca_data_scale <- transform_scale(pca_data, start=1, end=3) # scale pca data as input for k-means clustering
@@ -160,7 +186,6 @@ For the analysis proceeding, we are working with the regular k-means clustering 
 # cluster and combine with original data
 data_kmeans <- fcm(kmeans_input, centers=4, nstart=25)
 pca_kmeans <- cbind(pca_data[1:5], data_kmeans)
-str(pca_kmeans)
 ```
 
 ### Regular k-means (hard clustering)
@@ -171,7 +196,7 @@ data_kmeans <- kmeans(kmeans_input, centers=4)
 # Here, we are creating a new data frame that contains the first 2 PCs and original dataset, then renaming the data_kmeans$cluster column to simply say "Cluster". You can bind together as many of the PCs as you want. Binding the original, untransformed data is useful if you want to plot the raw values of any individual morphology measures downstream. 
 pca_kmeans <- cbind(pca_data[1:2], data_2xLPS, as.data.frame(data_kmeans$cluster)) %>%
   rename(Cluster=`data_kmeans$cluster`) 
-str(pca_kmeans)
+head(pca_kmeans,3)
 ```
 
 ### Plot k-means clusters in PC space
@@ -212,7 +237,7 @@ write.csv(colorbycluster, "filepath/Cxc3cr_Mouse1_FC_ACC_data.csv")
 
 ### Cluster characterization
 
-```{r, fig.width=13, fig.height=12.5}
+```{r, fig.width=11, fig.height=7}
 # calculate cluster percentages across variables of interest
 cp <- clusterpercentage(pca_kmeans, "Cluster", MouseID, Antibody, Treatment, Sex, BrainRegion)
 cp$Treatment <- factor(cp$Treatment, levels=c("PBS","2xLPS"))
@@ -230,7 +255,7 @@ cp %>%
   clusterpercentage_boxplots(Antibody, Treatment) # grouping variables
 ```
 
-```{r, fig.width=13, fig.height=5}
+```{r, fig.width=11, fig.height=4}
 # example graph of data given variables of interest
 cp %>% 
   filter(Antibody=="Iba1") %>%
@@ -276,12 +301,12 @@ stats.testing[[4]] # DHARMa model check
 stats.testing[[5]] # summary of model
 ```
 
-### Individual morphology measures, at the animal level (averaged for each measure)
+### Individual morphology measures, at the animal level (averaged across cells for each animal)
 #### e.g., How does each individual morphology measure change with LPS treatment?
 
 The stats_morphologymeasures.animal function fits a linear model using the `lm` function for each morphology measure individually within your dataset.
 
-In this example, we are fitting the linear model to our Iba1-stained dataset to model the values of each morphology measure as a factor of Treatment and BrainRegion interactions. In the first posthoc correction, we are correcting for multiple comparisons between treatments (PBS vs. 2xLPS) across BrainRegions using the Bonferroni method - since there are 3 brain regions, we should be correcting across 3 tests for each morphology measure. In the second posthoc correction, we are only considering one test between the two treatments (PBS vs. 2xLPS) and considering each measure separately, so there is no multiple test correction.
+In this example, we are fitting the linear model to our Iba1-stained dataset to model the values of each morphology measure as a factor of Treatment and BrainRegion interactions. In the first posthoc correction, we are correcting for multiple comparisons between treatments (PBS vs. 2xLPS) across BrainRegions using the Bonferroni method - since there are 3 brain regions, we should be correcting across 3 tests for each morphology measure. In the second posthoc correction, we are correcting for multiple comparisons between every individual interaction of treatment (PBS or 2xLPS) and brain region (FC, HC, STR) against the others (e.g., 2xLPS FC vs. PBS STR) and should be correcting across 15 tests for each morphology measure. In the second example, we are testing all possible comparisons given the experimental variables in our model, and are thus considering many tests that aren't biologically relevant or useful in our experiment. 
 
 ```{r, fig.width=13, fig.height=14}
 # prepare data for downstream analysis
@@ -297,13 +322,22 @@ stats.input$Treatment <- factor(stats.input$Treatment)
 # run stats analysis for changes in individual morphology measures
 # you can specify up to two posthoc comparisons (posthoc1 and posthoc2 arguments) - if you only have one set of posthocs to run, specify the same comparison twice for both arguments. you will just get the same results in output[[2]] and output[[3]].
 stats.testing <- stats_morphologymeasures.animal(stats.input %>% filter(Antibody=="Iba1"), "Value ~ Treatment*BrainRegion", 
-                                                 "~Treatment|BrainRegion", "~Treatment", "bonferroni")
+                                                 "~Treatment|BrainRegion", "~Treatment*BrainRegion", "bonferroni")
 
-stats.testing[[1]] # anova
-stats.testing[[2]] # posthoc 1
-stats.testing[[3]] # posthoc 2
-do.call("grid.arrange", c(stats.testing[[4]], ncol=4)) # qqplots to check normality assumptions
-stats.testing[[5]] # summary of model
+# anova
+stats.testing[[1]] %>% head(8)
+# posthoc 1
+stats.testing[[2]] %>% head(6)
+# posthoc 2
+stats.testing[[3]] %>% head(6)
+# qqplots to check normality assumptions
+do.call("grid.arrange", c(stats.testing[[4]], ncol=4))
+# levene test
+stats.testing[[5]] %>% head(6)
+# shapiro test
+stats.testing[[6]] %>% head(6)
+# summary of model
+stats.testing[[7]]
 ```
 
 If you are not interested in running stats for all 27 morphology measures, you can also filter for those that you are interested in (or filter out those that you're not interested in) prior to running the `stats_morphologymeasures.animal` function. In this example, we filter out 4 morphology measures so that we only run this function on the other 23 measures.
@@ -317,14 +351,23 @@ stats.testing <- stats_morphologymeasures.animal(stats.input %>%
                                                                           "# of quadruple points",
                                                                           "Height of bounding rectangle")), 
                                                  "Value ~ Treatment*BrainRegion", 
-                                                 "~Treatment|BrainRegion", "~Treatment", "bonferroni")
+                                                 "~Treatment|BrainRegion", "~Treatment*BrainRegion", "bonferroni")
 
 
-stats.testing[[1]] # anova
-stats.testing[[2]] # posthoc 1
-stats.testing[[3]] # posthoc 2
-do.call("grid.arrange", c(stats.testing[[4]], ncol=4)) # qqplots to check normality assumptions
-stats.testing[[5]] # summary of model
+# anova
+stats.testing[[1]] %>% head(8)
+# posthoc 1
+stats.testing[[2]] %>% head(6)
+# posthoc 2
+stats.testing[[3]] %>% head(6)
+# qqplots to check normality assumptions
+do.call("grid.arrange", c(stats.testing[[4]], ncol=4))
+# levene test
+stats.testing[[5]] %>% head(6)
+# shapiro test
+stats.testing[[6]] %>% head(6)
+# summary of model
+stats.testing[[7]]
 ```
 
 If you find that any individual morphology measures violate assumptions of normality after checking the qqplots contained in stats.input[[4]], you can filter your data for those measures, transform your data in the suitable manner (i.e., using MicrogliaMorphologyR functions like `transform_minmax` or `transform_scale` or other data transformations), and rerun the stats for those morphology features using the code above.
@@ -352,15 +395,18 @@ data_fuzzykmeans <- data_fuzzykmeans %>% mutate(Cluster =
                                 Cluster=="4" ~ "Rod-like"))
 ```
 
-#### Example: Characterization of just the high-scoring cells within each cluster (i.e., quintessential 'rod-like', 'ameboid', 'hypertrophic', or 'ramified' cells)
-```{r, fig.width=13, fig.height=5}
-nrow(data_fuzzykmeans) # 43332 cells
+Example: Characterization of just the high-scoring cells within each cluster (i.e., quintessential 'rod-like', 'ameboid', 'hypertrophic', or 'ramified' cells)
+```{r, fig.width=12, fig.height=5}
+nrow(data_fuzzykmeans) # number of cells prior to filtering
+
+# filter for high-scoring cells, defined as >70% membership score in one of the clusters
 data <- data_fuzzykmeans %>% 
   filter(`Cluster 1` > 0.70|
          `Cluster 2` > 0.70|
          `Cluster 3` > 0.70|
          `Cluster 4` > 0.70)
-nrow(data) # 7965 cells
+
+nrow(data) # number of cells after filtering for just the high-scoring cells
 
 # calculate cluster percentages across variables of interest
 cp <- clusterpercentage(data, "Cluster", MouseID, Antibody, Treatment, Sex, BrainRegion)

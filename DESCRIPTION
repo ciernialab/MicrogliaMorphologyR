@@ -13,4 +13,5 @@ Depends:
     R (>= 2.10), tidyverse, Hmisc, pheatmap, factoextra, lmerTest, nlme, SciViews, ggpubr, glmmTMB, DHARMa, ppclust
 LazyData: true
 Imports: 
-    gridExtra
+    gridExtra,
+    rstatix

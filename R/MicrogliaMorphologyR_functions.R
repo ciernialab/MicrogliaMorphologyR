@@ -520,7 +520,8 @@ clusterpercentage_boxplots <- function(data,...){
     geom_point() +
     ggtitle("K-means cluster percentages") +
     labs(fill="Cluster") +
-    theme_minimal(base_size=16) +
+    theme_bw(base_size=14) +
+    theme(axis.text.x=element_text(angle=45, vjust=1, hjust=1)) +
     xlab("Cluster") +
     ylab("Percentage")
 }
@@ -540,6 +541,7 @@ clusterpercentage_boxplots <- function(data,...){
 #' @param posthoc2 is your posthoc comparisons (e.g., when not considering sex: ~Treatment)
 #' @param adjust is your method of multiple test correction (from `emmeans` package: "tukey","scheffe","sidak","dunnettx","mvt","holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr","none"). See "P-value adjustments" section under ?emmeans::summary.emmGrid for more information.
 #' @export
+### function begins here
 stats_morphologymeasures.animal <- function(data,model,posthoc1,posthoc2,adjust){
 
   y.model <- as.character(model)
@@ -554,6 +556,8 @@ stats_morphologymeasures.animal <- function(data,model,posthoc1,posthoc2,adjust)
   anova.out <- NULL
   posthoc.out <- NULL
   posthoc.out2 <- NULL
+  levene_out <- NULL
+  shapiro_out <- NULL
 
   for(m in measure){
 
@@ -578,6 +582,27 @@ stats_morphologymeasures.animal <- function(data,model,posthoc1,posthoc2,adjust)
     anova = car::Anova(model)
     anova$measure <- paste(m)
 
+    # shapiro test for normality of residuals: passes if p>0.05
+    shapiro <- shapiro_test(residuals(model))
+    if(shapiro$p.value > 0.05) {
+      shapiro$pass <- c("pass")
+    } else {
+      shapiro$pass <- c("fail")
+    }
+
+    shapiro$measure <- paste(m)
+
+    # levene test for homogeneity of variances: passes if p>0.05
+    levene <- tmp %>% levene_test(as.formula(paste(y.model)))
+
+    if(levene$p > 0.05) {
+      levene$pass <- c("pass")
+    } else {
+      levene$pass <- c("fail")
+    }
+
+    levene$measure <- paste(m)
+
     #posthocs test 1
     refgrid <- ref.grid(model)
     ph <- emmeans(refgrid, as.formula(paste(z.model)))
@@ -598,6 +623,8 @@ stats_morphologymeasures.animal <- function(data,model,posthoc1,posthoc2,adjust)
     anova.out <- rbind(anova.out,anova)
     posthoc.out <- rbind(posthoc.out,outsum)
     posthoc.out2 <- rbind(posthoc.out2,outsum2)
+    levene_out <- rbind(levene_out, levene)
+    shapiro_out <- rbind(shapiro_out, shapiro)
   }
 
   anova.out$Significant <- ifelse(anova.out$`Pr(>F)` < 0.05, "significant", "ns")
@@ -609,7 +636,9 @@ stats_morphologymeasures.animal <- function(data,model,posthoc1,posthoc2,adjust)
   final.output[[3]] = posthoc.out2
   #final.output[[4]] = do.call("grid.arrange", c(log_ggqqplots, ncol=8))
   final.output[[4]] = log_ggqqplots
-  final.output[[5]] = print(model)
+  final.output[[5]] = as.data.frame(levene_out)
+  final.output[[6]] = as.data.frame(shapiro_out)
+  final.output[[7]] = print(model)
 
   final.output
 }
@@ -712,3 +741,5 @@ cell.level_boxplots <- function(data,group){
     ylab("Value") +
     ggtitle("Individual morphology measure changes at cell level")
 }
+
+
