@@ -44,7 +44,6 @@ BiocManager::install('ciernialab/MicrogliaMorphologyR')
 ```{r, message=FALSE, warning=FALSE}
 devtools::load_all()
 library(MicrogliaMorphologyR)
-library(rstatix)
 library(factoextra)
 library(ppclust)
 ```
@@ -151,13 +150,15 @@ After performing dimensionality reduction, we can use our PCs as input for downs
 
 When running kmeans clustering, from the number of clusters (K) that you specify to create, the algorithm will randomly select K initial cluster centers. Each other data point's euclidean distance will be calculated from these initial centers so that they are assigned as belonging to the cluster that they are closest to. The centroids for each of the clusters will be updated by calculating the new means of all the points assigned to each cluster. The process of randomly setting initial centers, assigning data points to the clusters, and updating the cluster centroids is iterated until the maximum number of iterations is reached. 
 
-Thus, 2 main dataset-specific parameters that you should specify and troubleshoot for your dataset are: 
+Thus, 2 main dataset-specific parameters that you should specify and troubleshoot for your dataset are:
+
 - **iter.max**, the maximum number of iterations allowed, and the number of times kmeans algorithm is run before results are returned. An iter.max between 10-20 is recommended
 - **nstart**, how many random sets should be chosen. An nstart of atleast 25 initial configurations is recommended.
 
 You can read more about kmeans clustering and optimizing these parameters at the following links:
-- https://uc-r.github.io/kmeans_clustering
-- https://andrea-grianti.medium.com/kmeans-parameters-in-rstudio-explained-c493ec5a05df
+
+- [K-means Cluster Analysis](https://uc-r.github.io/kmeans_clustering)
+- [K Means parameters and results (in R Studio) explained](https://andrea-grianti.medium.com/kmeans-parameters-in-rstudio-explained-c493ec5a05df)
 
 ### Prepare data for clustering
 ```{r}

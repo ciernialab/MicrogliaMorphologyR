@@ -2,7 +2,7 @@ MicrogliaMorphologyR
 ================
 
 **Created**: 26 June, 2023 by Jenn Kim  
-**Last updated**: 13 October, 2023
+**Last updated**: 16 October, 2023
 
 ## Welcome to MicrogliaMorphologyR!
 
@@ -64,7 +64,6 @@ BiocManager::install('ciernialab/MicrogliaMorphologyR')
 ``` r
 devtools::load_all()
 library(MicrogliaMorphologyR)
-library(rstatix)
 library(factoextra)
 library(ppclust)
 ```
@@ -407,16 +406,20 @@ assigning data points to the clusters, and updating the cluster
 centroids is iterated until the maximum number of iterations is reached.
 
 Thus, 2 main dataset-specific parameters that you should specify and
-troubleshoot for your dataset are: - **iter.max**, the maximum number of
-iterations allowed, and the number of times kmeans algorithm is run
-before results are returned. An iter.max between 10-20 is recommended -
-**nstart**, how many random sets should be chosen. An nstart of atleast
-25 initial configurations is recommended.
+troubleshoot for your dataset are:
+
+-   **iter.max**, the maximum number of iterations allowed, and the
+    number of times kmeans algorithm is run before results are returned.
+    An iter.max between 10-20 is recommended
+-   **nstart**, how many random sets should be chosen. An nstart of
+    atleast 25 initial configurations is recommended.
 
 You can read more about kmeans clustering and optimizing these
-parameters at the following links: -
-<https://uc-r.github.io/kmeans_clustering> -
-<https://andrea-grianti.medium.com/kmeans-parameters-in-rstudio-explained-c493ec5a05df>
+parameters at the following links:
+
+-   [K-means Cluster Analysis](https://uc-r.github.io/kmeans_clustering)
+-   [K Means parameters and results (in R Studio)
+    explained](https://andrea-grianti.medium.com/kmeans-parameters-in-rstudio-explained-c493ec5a05df)
 
 ### Prepare data for clustering
 
