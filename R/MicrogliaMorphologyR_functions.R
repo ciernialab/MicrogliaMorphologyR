@@ -286,7 +286,7 @@ featurecorrelations <- function(data,featurestart,featureend,rthresh,pthresh,tit
   mat2[filter] <- "" # correlation values that are less than 0.5 (weak correlations)
 
   # make heatmap
-  pheatmap(hi$r, display_numbers = mat2,
+  pheatmap(hi$r, display_numbers = mat2, border_color=NA,
            fontsize_number=12,
            #fontsize=10, fontsize_row=10, fontsize_col=10,
            main=title)
@@ -343,7 +343,8 @@ pcadata <- function(data, featurestart, featureend, pc.start, pc.end){
 #' @param title is what you want to name your heatmap
 #' @export
 pcfeaturecorrelations <- function(pca_data, pc.start, pc.end, feature.start, feature.end, rthresh, pthresh, title){
-
+  pc.start2 <- colnames(pca_data[pc.start])
+  pc.end2 <- colnames(pca_data[pc.end])
   morphologyfeatures <- colnames(pca_data[,feature.start:feature.end])
   PCs <- colnames(pca_data[,pc.start:pc.end])
   master_correlations <- NULL
@@ -404,10 +405,10 @@ pcfeaturecorrelations <- function(pca_data, pc.start, pc.end, feature.start, fea
   rownames(heatmap_PC_pvalues) <- morphologyfeatures
 
   # re-formatting for heatmap to only show significant values
-  bat1 <- as.matrix(heatmap_PC_correlations[,pc.start:pc.end])
+  bat1 <- heatmap_PC_correlations %>% select(pc.start2:pc.end2) %>% as.matrix()
   filter <- which(abs(bat1)<rthresh)
 
-  bat2 <- as.matrix(heatmap_PC_pvalues[,pc.start:pc.end])
+  bat2 <- heatmap_PC_pvalues %>% select(pc.start2:pc.end2) %>% as.matrix()
   bat2 <- round(bat2,3)
 
   bat2[bat2 < pthresh] <- "*" # significant p-values
@@ -441,6 +442,7 @@ plots_expvariable <- function(data, pc.xaxis, pc.yaxis){
       filter(variable==v) %>%
       ggplot(aes(x=!!pc.xaxis, y=!!pc.yaxis, color=value)) +
       geom_point(alpha=1/5) +
+      theme_classic() +
       labs(title=v)
   }
 
@@ -464,7 +466,7 @@ clusterplots <- function(data, pc.xaxis, pc.yaxis){
     stat_ellipse() +
     ggtitle("K-means clusters") +
     labs(color="Cluster") +
-    theme_minimal()
+    theme_classic()
 }
 
 #' Cluster-specific average morphology measures
