@@ -595,15 +595,23 @@ stats_morphologymeasures.animal <- function(data,model,posthoc1,posthoc2,adjust)
     shapiro$measure <- paste(m)
 
     # levene test for homogeneity of variances: passes if p>0.05
-    levene <- tmp %>% levene_test(as.formula(paste(y.model)))
-
-    if(levene$p > 0.05) {
-      levene$pass <- c("pass")
-    } else {
-      levene$pass <- c("fail")
-    }
-
-    levene$measure <- paste(m)
+    tryCatch(
+      {
+        levene <- tmp %>% levene_test(as.formula(paste(y.model)))
+        if (levene$p > 0.05) {
+          levene$pass <- c("pass")
+        }
+        else {
+          levene$pass <- c("fail")
+        }
+        levene$measure <- paste(m)
+        levene_out <- rbind(levene_out, levene)
+      },
+      error=function(e){
+        message('An error occurred with the Levene test: it can only handle interaction terms in model. Function will return an empty dataframe in output[[5]]. All other analyses should run as expected (e.g., Anova, posthocs, Shapiro test, etc.)')
+        print(e)
+      }
+    )
 
     #posthocs test 1
     refgrid <- ref.grid(model)
@@ -625,7 +633,6 @@ stats_morphologymeasures.animal <- function(data,model,posthoc1,posthoc2,adjust)
     anova.out <- rbind(anova.out,anova)
     posthoc.out <- rbind(posthoc.out,outsum)
     posthoc.out2 <- rbind(posthoc.out2,outsum2)
-    levene_out <- rbind(levene_out, levene)
     shapiro_out <- rbind(shapiro_out, shapiro)
   }
 
