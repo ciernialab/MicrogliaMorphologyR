@@ -2,7 +2,7 @@ MicrogliaMorphologyR
 ================
 
 **Created**: 26 June, 2023  
-**Last updated**: 04 November, 2023
+**Last updated**: 05 November, 2023
 
 ## Welcome to MicrogliaMorphologyR!
 
@@ -23,7 +23,14 @@ running ?function_name in the console.
 
 ### If you are using this tool, please cite the following publications:
 
--   Insert manuscript link
+-   [Development of a high-throughput pipeline to characterize microglia
+    morphological states at a single-cell
+    resolution](https://www.biorxiv.org/content/10.1101/2023.11.03.565581v1)
+
+Kim, J., Pavlidis, P., Ciernia, A.V. (2023). Development of a
+high-throughput pipeline to characterize microglia morphological states
+at a single-cell resolution. bioRxiv doi:
+<https://doi.org/10.1101/2023.11.03.565581>.
 
 ### Microglia morphology
 
