@@ -606,6 +606,9 @@ your suspected cluster identities before deeming them ramifed,
 hyper-ramified, rod-like, ameboid, or any other morphological form for
 downstream analysis and interpretation.
 
+Make sure to filter for *only* the cells belonging to the image you want
+to run ColorByCluster on.
+
 #### Formatting data for ColorByCluster input (Color coding in ImageJ)
 
 ``` r

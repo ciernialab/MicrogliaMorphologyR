@@ -224,6 +224,8 @@ After comparing the individual features across clusters, we can characterize the
 
 Using the cluster classes assigned from our analyses using MicrogliaMorphologyR, we can color each cell in the original image by cluster using the MicrogliaMorphology ImageJ macro. In the following example, we are isolating out the Cluster assignments for each microglia in the Cx3cr1-stained ACC subregion image for Mouse 1. You can do this for all of the images you are interested in applying ColorByCluster to. This offers an additional method by which to visually assess and verify your suspected cluster identities before deeming them ramifed, hyper-ramified, rod-like, ameboid, or any other morphological form for downstream analysis and interpretation.
 
+Make sure to filter for *only* the cells belonging to the image you want to run ColorByCluster on.
+
 #### Formatting data for ColorByCluster input (Color coding in ImageJ)
 ```{r}
 # isolate out all the cells for your specific image of interest
