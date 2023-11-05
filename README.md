@@ -61,7 +61,7 @@ background on microglia morphology and this project:
 ### Install, load packages, and set seed for reproducibility of results shown
 
 ``` r
-devtools::install('ciernialab/MicrogliaMorphologyR')
+devtools::install_github('ciernialab/MicrogliaMorphologyR')
 ```
 
 ``` r

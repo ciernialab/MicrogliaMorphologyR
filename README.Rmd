@@ -39,7 +39,7 @@ Here are some recent and relevant reviews that you can read to gain more backgro
 
 ### Install, load packages, and set seed for reproducibility of results shown
 ```{r, eval=FALSE}
-devtools::install('ciernialab/MicrogliaMorphologyR')
+devtools::install_github('ciernialab/MicrogliaMorphologyR')
 ```
 
 ```{r, message=FALSE, warning=FALSE}
