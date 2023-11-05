@@ -2,7 +2,7 @@ MicrogliaMorphologyR
 ================
 
 **Created**: 26 June, 2023 by Jenn Kim  
-**Last updated**: 16 October, 2023
+**Last updated**: 04 November, 2023
 
 ## Welcome to MicrogliaMorphologyR!
 
@@ -10,8 +10,11 @@ MicrogliaMorphologyR is an R package for microglia morphology analysis,
 that is complimentary to ImageJ macro
 [MicrogliaMorphology](https://github.com/ciernialab/MicrogliaMorphology).
 Using MicrogliaMorphologyR, you can perform exploratory data analysis
-and visualization of 27 different morphology features and perform
-dimensionality reduction, clustering, and statistical analysis of your
+and visualization of 27 different morphology features, characterize
+morphological cluster identities, quantify shifts in morphological
+populations, generate heatmap and boxplot visualizations of data in
+flexible ways including at the single-cell level, animal-level, and
+experimental condition-level, and perform statistical analysis of your
 data.
 
 You can read more about any of the MicrogliaMorphologyR functions

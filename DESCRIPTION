@@ -1,10 +1,10 @@
 Package: MicrogliaMorphologyR
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
+Title: R Package For Microglia Morphology Analysis
+Version: 1.0.0
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+    person("Jennifer", "Kim", , "jenn_kim@outlook.com", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0003-2922-1010"))
+Description: MicrogliaMorphologyR is complimentary to ImageJ macro MicrogliaMorphology. You can use MicrogliaMorphologyR to perform exploratory data analysis and visualization of 27 different morphology features, characterize morphological cluster identities, quantify shifts in morphological populations, generate heatmap and boxplot visualizations of data in flexible ways including at the single-cell level, animal-level, and experimental condition-level, and perform statistical analysis of your data.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
