@@ -148,7 +148,6 @@ normalize_logplots <- function(data,x){
     ggplot(aes(x = log(value+x))) +
     geom_histogram(bins = 40) +
     facet_wrap(~measure, scales = "free") +
-    #theme(strip.text.x = element_text(size=8)) +
     theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     scale_y_continuous(name = "Count") +
     ggtitle("Distribution of measures after log transforming")
@@ -165,7 +164,6 @@ normalize_scaled <- function(data){
     ggplot(aes(x = scale(value))) +
     geom_histogram(bins = 40) +
     facet_wrap(~measure, scales = "free") +
-    #theme(strip.text.x = element_text(size=8)) +
     theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     scale_x_continuous(name = "Morphology measure (scale(value))") +
     scale_y_continuous(name = "Count") +
@@ -183,7 +181,6 @@ normalize_minmax <- function(data){
     ggplot(aes(x = minmax(value))) +
     geom_histogram(bins = 40) +
     facet_wrap(~measure, scales = "free") +
-    #theme(strip.text.x = element_text(size=8)) +
     theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
     scale_x_continuous(name = "Morphology measure (minmax(value))") +
     scale_y_continuous(name = "Count") +
@@ -283,18 +280,12 @@ featurecorrelations <- function(data,featurestart,featureend,rthresh,pthresh,tit
   mat2[mat2 < pthresh] <- "*" # significant p-values
   mat2[mat2 > pthresh] <- "" # insignificant p-values
   mat2[is.na(mat2)] <- "" # NAs (should be 27)
-  mat2[filter] <- "" # correlation values that are less than 0.5 (weak correlations)
+  mat2[filter] <- "" # correlation value filter
 
   # make heatmap
   pheatmap(hi$r, display_numbers = mat2, border_color=NA,
            fontsize_number=12,
-           #fontsize=10, fontsize_row=10, fontsize_col=10,
            main=title)
-
-  #ComplexHeatmap::pheatmap(hi$r, display_numbers = mat2, fontsize_number=12,
-  #                         fontsize=10, fontsize_row=10, fontsize_col=10,
-  #                         legend = TRUE, heatmap_legend_param = list(title = "testing", annotation_name_side = "top"),
-  #                         main=title)
 }
 
 #' Dimensionality reduction using PCA and elbow/scree plot to get variance explained
@@ -418,7 +409,6 @@ pcfeaturecorrelations <- function(pca_data, pc.start, pc.end, feature.start, fea
 
   pheatmap(bat1, display_numbers = bat2, border_color=NA,
            fontsize_number=12,
-           #fontsize=14, fontsize_row=12, fontsize_col=12,
            angle_col=0, main=title)
 }
 
@@ -479,13 +469,11 @@ clusterplots <- function(data, pc.xaxis, pc.yaxis){
 #' @export
 clusterfeatures <- function(data, featurestart, featureend){
   heatmap <- data %>% group_by(Cluster) %>% summarise(across(featurestart:featureend, ~ mean(.x)))
-  #heatmap$`k2$cluster` <- paste0("Cluster ", heatmap$`k2$cluster`)
 
   heatmap <- column_to_rownames(heatmap, var="Cluster")
   pheatmap(t(heatmap), scale="row", cluster_cols=FALSE, cluster_rows=TRUE,
            border_color=NA, angle_col=45,
            main="Cluster-specific measures")
-          #fontsize=12, fontsize_row=12, fontsize_col=12
 }
 
 #' What are your morphology cluster percentages across variables of interest?
@@ -643,7 +631,6 @@ stats_morphologymeasures.animal <- function(data,model,posthoc1,posthoc2,adjust)
   final.output[[1]] = as.data.frame(anova.out)
   final.output[[2]] = posthoc.out
   final.output[[3]] = posthoc.out2
-  #final.output[[4]] = do.call("grid.arrange", c(log_ggqqplots, ncol=8))
   final.output[[4]] = log_ggqqplots
   final.output[[5]] = as.data.frame(levene_out)
   final.output[[6]] = as.data.frame(shapiro_out)
@@ -683,8 +670,6 @@ stats_cluster.animal <- function(data, model, posthoc1, posthoc2, adjust){
 
   # linear mixed effects model
   options(contrasts=c("contr.sum","contr.poly"))
-  #model <- lmerTest::lmer(as.formula(paste(y.model)), data=data)
-  #model <- glmmadmb(as.formula(paste(y.model)), data=data, family="beta")
   model <- glmmTMB(as.formula(paste(y.model)), data=data, family=beta_family(link="logit"))
 
   ### Test ANOVA assumptions
@@ -714,18 +699,14 @@ stats_cluster.animal <- function(data, model, posthoc1, posthoc2, adjust){
   posthoc2 <- as.data.frame(ph3)
   posthoc2
 
-  # posthocs not looking within cluster
-  #test(pairs(ph), by=NULL, adjust="dunnet")
 
   # annotate as significant for easy filtering
-  #anova$Significant <- ifelse(anova$`Pr(>F)` < 0.05, "significant", "ns")
   posthoc1$Significant <- ifelse(posthoc1$`p.value` < 0.05, "significant", "ns")
   posthoc2$Significant <- ifelse(posthoc2$`p.value` < 0.05, "significant", "ns")
 
   final.output[[1]] = anova
   final.output[[2]] = posthoc1
   final.output[[3]] = posthoc2
-  #final.output[[4]] = do.call("grid.arrange", c(log_ggqqplots, ncol=8))
   final.output[[4]] = modelcheck
   final.output[[5]] = print(model)
 

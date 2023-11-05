@@ -4,12 +4,12 @@
 \name{MicrogliaMorphologyR-package}
 \alias{MicrogliaMorphologyR}
 \alias{MicrogliaMorphologyR-package}
-\title{MicrogliaMorphologyR: What the Package Does (One Line, Title Case)}
+\title{MicrogliaMorphologyR: R Package For Microglia Morphology Analysis}
 \description{
-What the package does (one paragraph).
+MicrogliaMorphologyR is complimentary to ImageJ macro MicrogliaMorphology. You can use MicrogliaMorphologyR to perform exploratory data analysis and visualization of 27 different morphology features, characterize morphological cluster identities, quantify shifts in morphological populations, generate heatmap and boxplot visualizations of data in flexible ways including at the single-cell level, animal-level, and experimental condition-level, and perform statistical analysis of your data.
 }
 \author{
-\strong{Maintainer}: First Last \email{first.last@example.com} (\href{https://orcid.org/YOUR-ORCID-ID}{ORCID})
+\strong{Maintainer}: Jennifer Kim \email{jenn_kim@outlook.com} (\href{https://orcid.org/0000-0003-2922-1010}{ORCID})
 
 }
 \keyword{internal}

@@ -1,7 +1,7 @@
 MicrogliaMorphologyR
 ================
 
-**Created**: 26 June, 2023 by Jenn Kim  
+**Created**: 26 June, 2023  
 **Last updated**: 04 November, 2023
 
 ## Welcome to MicrogliaMorphologyR!
@@ -56,16 +56,15 @@ background on microglia morphology and this project:
     (Savage et
     al., 2019)](https://link.springer.com/protocol/10.1007/978-1-4939-9658-2_2)
 
-## Instructions on how to use MicrogliaMorphologyR
+# Instructions on how to use MicrogliaMorphologyR
 
 ### Install, load packages, and set seed for reproducibility of results shown
 
 ``` r
-BiocManager::install('ciernialab/MicrogliaMorphologyR')
+devtools::install('ciernialab/MicrogliaMorphologyR')
 ```
 
 ``` r
-devtools::load_all()
 library(MicrogliaMorphologyR)
 library(factoextra)
 library(ppclust)
@@ -91,7 +90,8 @@ using ?metadata_columns
 fraclac.dir <- "insert path to fraclac directory"
 skeleton.dir <- "insert path to skeleton analysis directory"
 
-fraclac <- fraclac_tidying(fraclac.dir)
+# these steps may be very time-intensive, depending on how many cells you are analyzing (i.e., on the order of 1000s of cells). 
+fraclac <- fraclac_tidying(fraclac.dir) 
 skeleton <- skeleton_tidying(skeleton.dir)
 
 data <- merge_data(fraclac, skeleton)
@@ -392,9 +392,10 @@ fuzzy k-means clustering, a soft clustering approach and another option
 which allows for extended analyses such as characterization of the
 ‘most’ ameboid, hypertrophic, rod-like, or ramified cells or
 characterization of cells with more ambiguous identities that lie
-between these morphological states. (see ‘Fuzzy K-means clustering’
-section at the end of Github for more details about the method) Because
-our toolset is highly flexible, it can also be integrated with other
+between these morphological states - see [‘Fuzzy K-means clustering’
+section](https://github.com/ciernialab/MicrogliaMorphologyR#fuzzy-k-means-clustering)
+at the end of Github for more details about the method. Because our
+toolset is highly flexible, it can also be integrated with other
 clustering approaches such as hierarchical clustering or gaussian
 mixture models.
 
@@ -463,8 +464,8 @@ features (and if they make sense according to what we know about
 microglia morphology). As this step may require some troubleshooting and
 updating of clustering parameters, you may need to run your k-means
 function multiple times. If you are planning to use fuzzy k-means, keep
-in mind that the soft clustering approach is more time-intensive and
-computationally expensive as it also calculates membership scores to
+in mind that the **soft clustering approach is more time-intensive and
+computationally expensive** as it also calculates membership scores to
 each cluster for every single cell. It might help to use regular k-means
 as a first pass, verify that your clusters make sense using the
 functions that follow, and run your fuzzy k-means function using the
@@ -473,8 +474,9 @@ downstream analysis.
 
 For the analysis proceeding, we are working with the regular k-means
 clustering output. We provide an example of a use case for fuzzy k-means
-clustering and further description of this approach at the end of the
-Github if you are interested.
+clustering and further description of this approach at the [end of the
+Github](https://github.com/ciernialab/MicrogliaMorphologyR#fuzzy-k-means-clustering)
+if you are interested.
 
 ### Fuzzy k-means (soft clustering)
 
@@ -1357,10 +1359,10 @@ clusterfeatures(data_fuzzykmeans, featurestart=9, featureend=35)
 ``` r
 # update cluster labels
 data_fuzzykmeans <- data_fuzzykmeans %>% mutate(Cluster = 
-                      case_when(Cluster=="1" ~ "Ramified",
-                                Cluster=="2" ~ "Ameboid",
+                      case_when(Cluster=="1" ~ "Ameboid",
+                                Cluster=="2" ~ "Rod-like",
                                 Cluster=="3" ~ "Hypertrophic",
-                                Cluster=="4" ~ "Rod-like"))
+                                Cluster=="4" ~ "Ramified"))
 ```
 
 Example: Characterization of just the high-scoring cells within each
