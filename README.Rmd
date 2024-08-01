@@ -19,7 +19,7 @@ You can read more about any of the MicrogliaMorphologyR functions covered in thi
 ### If you are using this tool, please cite the following publications:
 - [Development of a high-throughput pipeline to characterize microglia morphological states at a single-cell resolution](https://www.biorxiv.org/content/10.1101/2023.11.03.565581v1)
 
-Kim, J., Pavlidis, P., Ciernia, A.V. (2023). Development of a high-throughput pipeline to characterize microglia morphological states at a single-cell resolution. bioRxiv doi: https://doi.org/10.1101/2023.11.03.565581.
+Kim J, Pavlidis P, Ciernia AV. Development of a high-throughput pipeline to characterize microglia morphological states at a single-cell resolution. eNeuro. 2024 Jul 19:ENEURO.0014-24.2024. doi: 10.1523/ENEURO.0014-24.2024. Epub ahead of print. PMID: 39029952.
 
 ### Microglia morphology
 Microglia exhibit a dynamic range of morphologies that are context-specific and often rapidly changing in response to environmental cues. While microglia more realistically exist along a continuous spectrum of morphology, we can categorize them by their most commonly observed forms to study microglia morphology. Here, we highlight the four most commonly studied morphological classes, but others have also been characterized including hyper-ramified, dystrophic, satellite, etc. MicrogliaMorphologyR can also be used to characterize additional morphologies beyond these four.
@@ -116,6 +116,16 @@ data_2xLPS_scaled <- transform_scale(data_2xLPS, start=9, end=35)
 # get sample size of data based on factors of interest
 samplesize(data_2xLPS, MouseID, Antibody)
 samplesize(data_2xLPS, Sex, Treatment, Antibody)
+```
+
+```{r, eval=FALSE}
+# obtain density measures for each image (using Areas.csv file output from MicrogliaMorphology)
+microglianumbers <- samplesize(data_2xLPS, Antibody, MouseID, Sex, Treatment, BrainRegion, Subregion) # list out all variables of interest present in the original image names to obtain numbers of microglia per image
+microglianumbers <- microglianumbers %>% unite("Name", Antibody:Subregion, sep="_", remove=FALSE) # add Name column back in -- make sure that the resulting strings in the Name column match names of your original input .tiff files that you used for MicrogliaMorphology !!
+AreasPath <- "path to Areas.csv file"
+
+Density <- celldensity(AreasPath, microglianumbers)
+Density
 ```
 
 Now, since we have gotten a better feel for our data and how to transform it, we can proceed with PCA for dimensionality reduction and downstream clustering. We can see here that the first 3 PCs describe around ~85% of our data. We can also explore how each PC correlates to the 27 different morphology features to get a better understanding of how each PC describes the variability present in the data. This is useful to inform which to include for downstream clustering steps. 

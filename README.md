@@ -2,7 +2,7 @@ MicrogliaMorphologyR
 ================
 
 **Created**: 26 June, 2023  
-**Last updated**: 05 November, 2023
+**Last updated**: 01 August, 2024
 
 ## Welcome to MicrogliaMorphologyR!
 
@@ -23,14 +23,14 @@ running ?function_name in the console.
 
 ### If you are using this tool, please cite the following publications:
 
--   [Development of a high-throughput pipeline to characterize microglia
-    morphological states at a single-cell
-    resolution](https://www.biorxiv.org/content/10.1101/2023.11.03.565581v1)
+- [Development of a high-throughput pipeline to characterize microglia
+  morphological states at a single-cell
+  resolution](https://www.biorxiv.org/content/10.1101/2023.11.03.565581v1)
 
-Kim, J., Pavlidis, P., Ciernia, A.V. (2023). Development of a
-high-throughput pipeline to characterize microglia morphological states
-at a single-cell resolution. bioRxiv doi:
-<https://doi.org/10.1101/2023.11.03.565581>.
+Kim J, Pavlidis P, Ciernia AV. Development of a high-throughput pipeline
+to characterize microglia morphological states at a single-cell
+resolution. eNeuro. 2024 Jul 19:ENEURO.0014-24.2024. doi:
+10.1523/ENEURO.0014-24.2024. Epub ahead of print. PMID: 39029952.
 
 ### Microglia morphology
 
@@ -45,23 +45,23 @@ MicrogliaMorphologyR can also be used to characterize additional
 morphologies beyond these four.
 ![](./README_files/images/GithubIntro_MicrogliaMorphologies.png)
 
--   **Ameboid** = round, few processes
--   **Hypertrophic** = thicker, shorter processes with larger soma
--   **Rod-like** = elongated soma with bipolar processes
--   **Ramified** = smaller soma with long, highly branched processes
+- **Ameboid** = round, few processes
+- **Hypertrophic** = thicker, shorter processes with larger soma
+- **Rod-like** = elongated soma with bipolar processes
+- **Ramified** = smaller soma with long, highly branched processes
 
 Here are some recent and relevant reviews that you can read to gain more
 background on microglia morphology and this project:
 
--   [Microglial morphometric analysis: so many options, so little
-    consistency (Reddaway et
-    al., 2023)](https://www.frontiersin.org/articles/10.3389/fninf.2023.1211188/full)
--   [Microglia states and nomenclature: A field at its crossroads
-    (Paolicelli et
-    al., 2022)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9999291/)
--   [Morphology of Microglia Across Contexts of Health and Disease
-    (Savage et
-    al., 2019)](https://link.springer.com/protocol/10.1007/978-1-4939-9658-2_2)
+- [Microglial morphometric analysis: so many options, so little
+  consistency (Reddaway et al.,
+  2023)](https://www.frontiersin.org/articles/10.3389/fninf.2023.1211188/full)
+- [Microglia states and nomenclature: A field at its crossroads
+  (Paolicelli et al.,
+  2022)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9999291/)
+- [Morphology of Microglia Across Contexts of Health and Disease (Savage
+  et al.,
+  2019)](https://link.springer.com/protocol/10.1007/978-1-4939-9658-2_2)
 
 # Instructions on how to use MicrogliaMorphologyR
 
@@ -256,10 +256,20 @@ samplesize(data_2xLPS, Sex, Treatment, Antibody)
     ## 11 M     PBS       Iba1      2302
     ## 12 M     PBS       P2ry12    3513
 
+``` r
+# obtain density measures for each image (using Areas.csv file output from MicrogliaMorphology)
+microglianumbers <- samplesize(data_2xLPS, Antibody, MouseID, Sex, Treatment, BrainRegion, Subregion) # list out all variables of interest present in the original image names to obtain numbers of microglia per image
+microglianumbers <- microglianumbers %>% unite("Name", Antibody:Subregion, sep="_", remove=FALSE) # add Name column back in -- make sure that the resulting strings in the Name column match names of your original input .tiff files that you used for MicrogliaMorphology !!
+AreasPath <- "path to Areas.csv file"
+
+Density <- celldensity(AreasPath, microglianumbers)
+Density
+```
+
 Now, since we have gotten a better feel for our data and how to
 transform it, we can proceed with PCA for dimensionality reduction and
 downstream clustering. We can see here that the first 3 PCs describe
-around \~85% of our data. We can also explore how each PC correlates to
+around ~85% of our data. We can also explore how each PC correlates to
 the 27 different morphology features to get a better understanding of
 how each PC describes the variability present in the data. This is
 useful to inform which to include for downstream clustering steps.
@@ -270,7 +280,7 @@ useful to inform which to include for downstream clustering steps.
 pcadata_elbow(data_2xLPS_logtransformed, featurestart=9, featureend=35)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
 ``` r
 pca_data <- pcadata(data_2xLPS_logtransformed, featurestart=9, featureend=35,
@@ -374,7 +384,7 @@ pcfeaturecorrelations(pca_data, pc.start=1, pc.end=3,
                       title="Correlation between PCs and features")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
 ### Visually explore different sources of variability in dataset
 
@@ -385,7 +395,7 @@ gathered_expvariables <- pca_data %>% gather(variable, value, 11:16)
 plots_expvariable(gathered_expvariables, "PC1", "PC2")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
 ## K-means clustering on PCs
 
@@ -419,18 +429,18 @@ centroids is iterated until the maximum number of iterations is reached.
 Thus, 2 main dataset-specific parameters that you should specify and
 troubleshoot for your dataset are:
 
--   **iter.max**, the maximum number of iterations allowed, and the
-    number of times kmeans algorithm is run before results are returned.
-    An iter.max between 10-20 is recommended
--   **nstart**, how many random sets should be chosen. An nstart of
-    atleast 25 initial configurations is recommended.
+- **iter.max**, the maximum number of iterations allowed, and the number
+  of times kmeans algorithm is run before results are returned. An
+  iter.max between 10-20 is recommended
+- **nstart**, how many random sets should be chosen. An nstart of
+  atleast 25 initial configurations is recommended.
 
 You can read more about kmeans clustering and optimizing these
 parameters at the following links:
 
--   [K-means Cluster Analysis](https://uc-r.github.io/kmeans_clustering)
--   [K Means parameters and results (in R Studio)
-    explained](https://andrea-grianti.medium.com/kmeans-parameters-in-rstudio-explained-c493ec5a05df)
+- [K-means Cluster Analysis](https://uc-r.github.io/kmeans_clustering)
+- [K Means parameters and results (in R Studio)
+  explained](https://andrea-grianti.medium.com/kmeans-parameters-in-rstudio-explained-c493ec5a05df)
 
 ### Prepare data for clustering
 
@@ -449,13 +459,13 @@ sampling <- kmeans_input[sample(nrow(kmeans_input), 5000),] #sample 5000 random 
 fviz_nbclust(sampling, kmeans, method = 'wss', nstart=25, iter.max=50) # 4 clusters
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
 ``` r
 fviz_nbclust(sampling, kmeans, method = 'silhouette', nstart=25, iter.max=50) # 4 clusters
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-12-2.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-13-2.png)<!-- -->
 
 From using the wss and silhouette methods to check the optimal numbers
 of clusters for our dataset, it appears that our data would be optimally
@@ -573,13 +583,13 @@ plot <- clusterplots(pca_kmeans, "PC1", "PC2")
 plot
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
 
 ``` r
 plot + scale_colour_viridis_d() # customizeable example: add color scheme of choice 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-15-2.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-16-2.png)<!-- -->
 
 ### Cluster-specific measures on average for each morphology feature, relative to other clusters
 
@@ -587,18 +597,17 @@ plot + scale_colour_viridis_d() # customizeable example: add color scheme of cho
 clusterfeatures(pca_kmeans, featurestart=11, featureend=37)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
 
 After comparing the individual features across clusters, we can
 characterize the clusters as follows:
 
--   Cluster 1 = rod-like (greatest oblongness, lowest circularity)
--   Cluster 2 = ameboid (lowest territory span, high circularity,
-    smallest branch lengths)
--   Cluster 3 = ramified (largest territory span and branching
-    complexity)
--   Cluster 4 = hypertrophic (average territory span, high branch
-    thickness as explained by pixel density in hull)
+- Cluster 1 = rod-like (greatest oblongness, lowest circularity)
+- Cluster 2 = ameboid (lowest territory span, high circularity, smallest
+  branch lengths)
+- Cluster 3 = ramified (largest territory span and branching complexity)
+- Cluster 4 = hypertrophic (average territory span, high branch
+  thickness as explained by pixel density in hull)
 
 ### ColorByCluster
 
@@ -659,7 +668,7 @@ cp %>%
   clusterpercentage_boxplots(Antibody, Treatment) # grouping variables
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
 
 ``` r
 # example graph of data given variables of interest
@@ -676,7 +685,7 @@ cp %>%
   theme(axis.text.x=element_text(angle=45, vjust=1, hjust=1))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
 
 ## Statistical analysis
 
@@ -725,7 +734,7 @@ stats.testing <- stats_cluster.animal(stats.input %>% filter(Antibody=="Iba1"),
                                       "~Treatment|Cluster|BrainRegion", "~Treatment|Cluster", "bonferroni")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
 
     ## NOTE: Results may be misleading due to involvement in interactions
 
@@ -738,7 +747,7 @@ stats.testing <- stats_cluster.animal(stats.input %>% filter(Antibody=="Iba1"),
     ## 
     ## Conditional model:
     ##  Groups  Name        Std.Dev. 
-    ##  MouseID (Intercept) 2.874e-06
+    ##  MouseID (Intercept) 2.609e-06
     ## 
     ## Number of obs: 68 / Conditional model: MouseID, 6
     ## 
@@ -756,13 +765,13 @@ stats.testing <- stats_cluster.animal(stats.input %>% filter(Antibody=="Iba1"),
     ##                     BrainRegion2               Cluster1:Treatment1  
     ##                         0.032280                          0.258393  
     ##              Cluster2:Treatment1               Cluster3:Treatment1  
-    ##                        -0.571028                          0.123271  
+    ##                        -0.571027                          0.123271  
     ##            Cluster1:BrainRegion1             Cluster2:BrainRegion1  
     ##                         0.038133                         -0.026514  
     ##            Cluster3:BrainRegion1             Cluster1:BrainRegion2  
     ##                        -0.093337                         -0.070106  
     ##            Cluster2:BrainRegion2             Cluster3:BrainRegion2  
-    ##                         0.327990                         -0.213648  
+    ##                         0.327989                         -0.213648  
     ##          Treatment1:BrainRegion1           Treatment1:BrainRegion2  
     ##                        -0.026359                          0.016676  
     ## Cluster1:Treatment1:BrainRegion1  Cluster2:Treatment1:BrainRegion1  
@@ -770,7 +779,7 @@ stats.testing <- stats_cluster.animal(stats.input %>% filter(Antibody=="Iba1"),
     ## Cluster3:Treatment1:BrainRegion1  Cluster1:Treatment1:BrainRegion2  
     ##                         0.146770                         -0.041974  
     ## Cluster2:Treatment1:BrainRegion2  Cluster3:Treatment1:BrainRegion2  
-    ##                        -0.074843                          0.057942
+    ##                        -0.074843                          0.057943
 
 ``` r
 stats.testing[[1]] # anova
@@ -783,10 +792,10 @@ stats.testing[[1]] # anova
     ## Cluster                       632.4489  3  < 2.2e-16 ***
     ## Treatment                       1.2604  1     0.2616    
     ## BrainRegion                     0.2084  2     0.9010    
-    ## Cluster:Treatment             271.0010  3  < 2.2e-16 ***
-    ## Cluster:BrainRegion           120.9206  6  < 2.2e-16 ***
+    ## Cluster:Treatment             271.0011  3  < 2.2e-16 ***
+    ## Cluster:BrainRegion           120.9205  6  < 2.2e-16 ***
     ## Treatment:BrainRegion           2.0685  2     0.3555    
-    ## Cluster:Treatment:BrainRegion  38.4144  6  9.321e-07 ***
+    ## Cluster:Treatment:BrainRegion  38.4143  6  9.321e-07 ***
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
@@ -795,18 +804,18 @@ stats.testing[[2]] # posthoc 1
 ```
 
     ##  contrast    Cluster      BrainRegion   estimate         SE  df z.ratio p.value
-    ##  PBS - 2xLPS Ameboid      FC           0.4761810 0.12097423 Inf   3.936  0.0010
-    ##  PBS - 2xLPS Hypertrophic FC          -1.4735270 0.14575418 Inf -10.110  <.0001
-    ##  PBS - 2xLPS Ramified     FC           0.4187652 0.09890623 Inf   4.234  0.0003
-    ##  PBS - 2xLPS Rod-like     FC           0.0933096 0.10739883 Inf   0.869  1.0000
-    ##  PBS - 2xLPS Ameboid      HC           0.3975890 0.13631864 Inf   2.917  0.0425
-    ##  PBS - 2xLPS Hypertrophic HC          -1.3269896 0.14559103 Inf  -9.115  <.0001
-    ##  PBS - 2xLPS Ramified     HC           0.3271790 0.11116900 Inf   2.943  0.0390
-    ##  PBS - 2xLPS Rod-like     HC           0.4612288 0.12234620 Inf   3.770  0.0020
-    ##  PBS - 2xLPS Ameboid      STR          0.4707876 0.12231266 Inf   3.849  0.0014
-    ##  PBS - 2xLPS Hypertrophic STR         -0.8314491 0.15327901 Inf  -5.424  <.0001
-    ##  PBS - 2xLPS Ramified     STR         -0.2121170 0.09521815 Inf  -2.228  0.3108
-    ##  PBS - 2xLPS Rod-like     STR          0.3758423 0.11203993 Inf   3.355  0.0095
+    ##  PBS - 2xLPS Ameboid      FC           0.4761813 0.12097420 Inf   3.936  0.0010
+    ##  PBS - 2xLPS Hypertrophic FC          -1.4735257 0.14575409 Inf -10.110  <.0001
+    ##  PBS - 2xLPS Ramified     FC           0.4187647 0.09890621 Inf   4.234  0.0003
+    ##  PBS - 2xLPS Rod-like     FC           0.0933102 0.10739881 Inf   0.869  1.0000
+    ##  PBS - 2xLPS Ameboid      HC           0.3975890 0.13631860 Inf   2.917  0.0425
+    ##  PBS - 2xLPS Hypertrophic HC          -1.3269892 0.14559101 Inf  -9.114  <.0001
+    ##  PBS - 2xLPS Ramified     HC           0.3271793 0.11116898 Inf   2.943  0.0390
+    ##  PBS - 2xLPS Rod-like     HC           0.4612287 0.12234618 Inf   3.770  0.0020
+    ##  PBS - 2xLPS Ameboid      STR          0.4707877 0.12231262 Inf   3.849  0.0014
+    ##  PBS - 2xLPS Hypertrophic STR         -0.8314496 0.15327898 Inf  -5.424  <.0001
+    ##  PBS - 2xLPS Ramified     STR         -0.2121171 0.09521814 Inf  -2.228  0.3108
+    ##  PBS - 2xLPS Rod-like     STR          0.3758422 0.11203993 Inf   3.355  0.0095
     ##  Significant
     ##  significant
     ##  significant
@@ -829,10 +838,10 @@ stats.testing[[3]] # posthoc 2
 ```
 
     ##  contrast    Cluster        estimate         SE  df z.ratio p.value Significant
-    ##  PBS - 2xLPS Ameboid       0.4481859 0.07316652 Inf   6.126  <.0001 significant
-    ##  PBS - 2xLPS Hypertrophic -1.2106552 0.08561031 Inf -14.141  <.0001 significant
-    ##  PBS - 2xLPS Ramified      0.1779424 0.05888547 Inf   3.022  0.0100 significant
-    ##  PBS - 2xLPS Rod-like      0.3101269 0.06587576 Inf   4.708  <.0001 significant
+    ##  PBS - 2xLPS Ameboid       0.4481860 0.07316649 Inf   6.126  <.0001 significant
+    ##  PBS - 2xLPS Hypertrophic -1.2106548 0.08561028 Inf -14.141  <.0001 significant
+    ##  PBS - 2xLPS Ramified      0.1779423 0.05888546 Inf   3.022  0.0100 significant
+    ##  PBS - 2xLPS Rod-like      0.3101270 0.06587575 Inf   4.708  <.0001 significant
     ## 
     ## Results are averaged over the levels of: BrainRegion 
     ## Results are given on the log odds ratio (not the response) scale. 
@@ -842,7 +851,7 @@ stats.testing[[3]] # posthoc 2
 stats.testing[[4]] # DHARMa model check
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-21-2.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-22-2.png)<!-- -->
 
 ``` r
 stats.testing[[5]] # summary of model
@@ -857,7 +866,7 @@ stats.testing[[5]] # summary of model
     ## 
     ## Conditional model:
     ##  Groups  Name        Std.Dev. 
-    ##  MouseID (Intercept) 2.874e-06
+    ##  MouseID (Intercept) 2.609e-06
     ## 
     ## Number of obs: 68 / Conditional model: MouseID, 6
     ## 
@@ -875,13 +884,13 @@ stats.testing[[5]] # summary of model
     ##                     BrainRegion2               Cluster1:Treatment1  
     ##                         0.032280                          0.258393  
     ##              Cluster2:Treatment1               Cluster3:Treatment1  
-    ##                        -0.571028                          0.123271  
+    ##                        -0.571027                          0.123271  
     ##            Cluster1:BrainRegion1             Cluster2:BrainRegion1  
     ##                         0.038133                         -0.026514  
     ##            Cluster3:BrainRegion1             Cluster1:BrainRegion2  
     ##                        -0.093337                         -0.070106  
     ##            Cluster2:BrainRegion2             Cluster3:BrainRegion2  
-    ##                         0.327990                         -0.213648  
+    ##                         0.327989                         -0.213648  
     ##          Treatment1:BrainRegion1           Treatment1:BrainRegion2  
     ##                        -0.026359                          0.016676  
     ## Cluster1:Treatment1:BrainRegion1  Cluster2:Treatment1:BrainRegion1  
@@ -889,7 +898,7 @@ stats.testing[[5]] # summary of model
     ## Cluster3:Treatment1:BrainRegion1  Cluster1:Treatment1:BrainRegion2  
     ##                         0.146770                         -0.041974  
     ## Cluster2:Treatment1:BrainRegion2  Cluster3:Treatment1:BrainRegion2  
-    ##                        -0.074843                          0.057942
+    ##                        -0.074843                          0.057943
 
 ### Individual morphology measures, at the animal level (averaged across cells for each animal)
 
@@ -1002,51 +1011,47 @@ stats.testing[[1]] %>% head(8)
 stats.testing[[2]] %>% head(6)
 ```
 
-    ##  contrast    BrainRegion estimate       SE df t.ratio p.value
-    ##  2xLPS - PBS FC          244.1962 83.93513 11   2.909  0.0426
-    ##  2xLPS - PBS HC          464.8970 93.84233 11   4.954  0.0013
-    ##  2xLPS - PBS STR         516.7580 83.93513 11   6.157  0.0002
-    ##  2xLPS - PBS FC            0.0730  0.01583 11   4.613  0.0022
-    ##  2xLPS - PBS HC            0.1004  0.01769 11   5.675  0.0004
-    ##  2xLPS - PBS STR           0.0547  0.01583 11   3.456  0.0161
-    ##  measure                                   Significant
-    ##  Foreground pixels                         significant
-    ##  Foreground pixels                         significant
-    ##  Foreground pixels                         significant
-    ##  Density of foreground pixels in hull area significant
-    ##  Density of foreground pixels in hull area significant
-    ##  Density of foreground pixels in hull area significant
-    ## 
-    ## P value adjustment: bonferroni method for 3 tests
+    ##      contrast BrainRegion     estimate          SE df  t.ratio      p.value
+    ## 1 2xLPS - PBS          FC 244.19621196 83.93513466 11 2.909344 0.0426170253
+    ## 2 2xLPS - PBS          HC 464.89704224 93.84233340 11 4.954023 0.0012985925
+    ## 3 2xLPS - PBS         STR 516.75796274 83.93513466 11 6.156635 0.0002142012
+    ## 4 2xLPS - PBS          FC   0.07300851  0.01582574 11 4.613277 0.0022456005
+    ## 5 2xLPS - PBS          HC   0.10040427  0.01769371 11 5.674573 0.0004304675
+    ## 6 2xLPS - PBS         STR   0.05469185  0.01582574 11 3.455880 0.0161161442
+    ##                                     measure Significant
+    ## 1                         Foreground pixels significant
+    ## 2                         Foreground pixels significant
+    ## 3                         Foreground pixels significant
+    ## 4 Density of foreground pixels in hull area significant
+    ## 5 Density of foreground pixels in hull area significant
+    ## 6 Density of foreground pixels in hull area significant
 
 ``` r
 # posthoc 2
 stats.testing[[3]] %>% head(6)
 ```
 
-    ##  contrast              estimate       SE df t.ratio p.value measure          
-    ##  2xLPS FC - PBS FC     244.1962 83.93513 11   2.909  0.2131 Foreground pixels
-    ##  2xLPS FC - 2xLPS HC    37.2602 83.93513 11   0.444  1.0000 Foreground pixels
-    ##  2xLPS FC - PBS HC     502.1572 93.84233 11   5.351  0.0035 Foreground pixels
-    ##  2xLPS FC - 2xLPS STR  -25.7262 83.93513 11  -0.307  1.0000 Foreground pixels
-    ##  2xLPS FC - PBS STR    491.0318 83.93513 11   5.850  0.0017 Foreground pixels
-    ##  PBS FC - 2xLPS HC    -206.9360 83.93513 11  -2.465  0.4706 Foreground pixels
-    ##  Significant
-    ##  ns         
-    ##  ns         
-    ##  significant
-    ##  ns         
-    ##  significant
-    ##  ns         
-    ## 
-    ## P value adjustment: bonferroni method for 15 tests
+    ##               contrast   estimate       SE df    t.ratio     p.value
+    ## 1    2xLPS FC - PBS FC  244.19621 83.93513 11  2.9093444 0.213085126
+    ## 2  2xLPS FC - 2xLPS HC   37.26016 83.93513 11  0.4439162 1.000000000
+    ## 3    2xLPS FC - PBS HC  502.15721 93.84233 11  5.3510733 0.003501430
+    ## 4 2xLPS FC - 2xLPS STR  -25.72618 83.93513 11 -0.3065007 1.000000000
+    ## 5   2xLPS FC - PBS STR  491.03178 83.93513 11  5.8501340 0.001663025
+    ## 6    PBS FC - 2xLPS HC -206.93605 83.93513 11 -2.4654282 0.470625546
+    ##             measure Significant
+    ## 1 Foreground pixels          ns
+    ## 2 Foreground pixels          ns
+    ## 3 Foreground pixels significant
+    ## 4 Foreground pixels          ns
+    ## 5 Foreground pixels significant
+    ## 6 Foreground pixels          ns
 
 ``` r
 # qqplots to check normality assumptions
 do.call("grid.arrange", c(stats.testing[[4]], ncol=4))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
 
 ``` r
 # levene test
@@ -1178,51 +1183,47 @@ stats.testing[[1]] %>% head(8)
 stats.testing[[2]] %>% head(6)
 ```
 
-    ##  contrast    BrainRegion    estimate         SE df t.ratio p.value
-    ##  2xLPS - PBS FC           0.07300851 0.01582574 11   4.613  0.0022
-    ##  2xLPS - PBS HC           0.10040427 0.01769371 11   5.675  0.0004
-    ##  2xLPS - PBS STR          0.05469185 0.01582574 11   3.456  0.0161
-    ##  2xLPS - PBS FC           0.09192749 0.04537221 11   2.026  0.2031
-    ##  2xLPS - PBS HC           0.03246885 0.05072768 11   0.640  1.0000
-    ##  2xLPS - PBS STR         -0.07853956 0.04537221 11  -1.731  0.3341
-    ##  measure                                   Significant
-    ##  Density of foreground pixels in hull area significant
-    ##  Density of foreground pixels in hull area significant
-    ##  Density of foreground pixels in hull area significant
-    ##  Span ratio of hull (major/minor axis)     ns         
-    ##  Span ratio of hull (major/minor axis)     ns         
-    ##  Span ratio of hull (major/minor axis)     ns         
-    ## 
-    ## P value adjustment: bonferroni method for 3 tests
+    ##      contrast BrainRegion    estimate         SE df    t.ratio      p.value
+    ## 1 2xLPS - PBS          FC  0.07300851 0.01582574 11  4.6132766 0.0022456005
+    ## 2 2xLPS - PBS          HC  0.10040427 0.01769371 11  5.6745733 0.0004304675
+    ## 3 2xLPS - PBS         STR  0.05469185 0.01582574 11  3.4558799 0.0161161442
+    ## 4 2xLPS - PBS          FC  0.09192749 0.04537221 11  2.0260747 0.2031182136
+    ## 5 2xLPS - PBS          HC  0.03246885 0.05072768 11  0.6400618 1.0000000000
+    ## 6 2xLPS - PBS         STR -0.07853956 0.04537221 11 -1.7310057 0.3340946601
+    ##                                     measure Significant
+    ## 1 Density of foreground pixels in hull area significant
+    ## 2 Density of foreground pixels in hull area significant
+    ## 3 Density of foreground pixels in hull area significant
+    ## 4     Span ratio of hull (major/minor axis)          ns
+    ## 5     Span ratio of hull (major/minor axis)          ns
+    ## 6     Span ratio of hull (major/minor axis)          ns
 
 ``` r
 # posthoc 2
 stats.testing[[3]] %>% head(6)
 ```
 
-    ##  contrast                estimate         SE df t.ratio p.value
-    ##  2xLPS FC - PBS FC     0.07300851 0.01582574 11   4.613  0.0112
-    ##  2xLPS FC - 2xLPS HC  -0.00476249 0.01582574 11  -0.301  1.0000
-    ##  2xLPS FC - PBS HC     0.09564178 0.01769371 11   5.405  0.0032
-    ##  2xLPS FC - 2xLPS STR  0.04837071 0.01582574 11   3.056  0.1638
-    ##  2xLPS FC - PBS STR    0.10306256 0.01582574 11   6.512  0.0007
-    ##  PBS FC - 2xLPS HC    -0.07777099 0.01582574 11  -4.914  0.0069
-    ##  measure                                   Significant
-    ##  Density of foreground pixels in hull area significant
-    ##  Density of foreground pixels in hull area ns         
-    ##  Density of foreground pixels in hull area significant
-    ##  Density of foreground pixels in hull area ns         
-    ##  Density of foreground pixels in hull area significant
-    ##  Density of foreground pixels in hull area significant
-    ## 
-    ## P value adjustment: bonferroni method for 15 tests
+    ##               contrast     estimate         SE df   t.ratio      p.value
+    ## 1    2xLPS FC - PBS FC  0.073008506 0.01582574 11  4.613277 0.0112280026
+    ## 2  2xLPS FC - 2xLPS HC -0.004762487 0.01582574 11 -0.300933 1.0000000000
+    ## 3    2xLPS FC - PBS HC  0.095641782 0.01769371 11  5.405411 0.0032232825
+    ## 4 2xLPS FC - 2xLPS STR  0.048370714 0.01582574 11  3.056459 0.1638120520
+    ## 5   2xLPS FC - PBS STR  0.103062562 0.01582574 11  6.512339 0.0006530396
+    ## 6    PBS FC - 2xLPS HC -0.077770993 0.01582574 11 -4.914210 0.0069162488
+    ##                                     measure Significant
+    ## 1 Density of foreground pixels in hull area significant
+    ## 2 Density of foreground pixels in hull area          ns
+    ## 3 Density of foreground pixels in hull area significant
+    ## 4 Density of foreground pixels in hull area          ns
+    ## 5 Density of foreground pixels in hull area significant
+    ## 6 Density of foreground pixels in hull area significant
 
 ``` r
 # qqplots to check normality assumptions
 do.call("grid.arrange", c(stats.testing[[4]], ncol=4))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->
 
 ``` r
 # levene test
@@ -1364,7 +1365,7 @@ colnames(data_fuzzykmeans)
 clusterfeatures(data_fuzzykmeans, featurestart=9, featureend=35)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-25-1.png)<!-- -->
 
 ``` r
 # update cluster labels
@@ -1417,4 +1418,4 @@ cp %>%
   theme(axis.text.x=element_text(angle=45, vjust=1, hjust=1))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-25-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-26-1.png)<!-- -->
