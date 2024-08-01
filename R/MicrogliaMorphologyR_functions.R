@@ -269,11 +269,11 @@ celldensity <- function(AreasPath, SamplesizeDF){
   # read in Areas.csv file and rename Label column to ImageName
   areas <- read.csv(AreasPath) %>% 
     dplyr::select(-X) %>% 
-    dplyr::rename(Name = "Label")
+    rename(Name = "Label")
   
   # clean up image names
   areas2 <- areas %>% 
-    dplyr::separate(Name, into=c("Name","trash"), sep=".tif_thresholded") %>% 
+    separate(Name, into=c("Name","trash"), sep=".tif_thresholded") %>% 
     dplyr::select(-trash)
   
   # merge with image-level cell counts and calculate density
