@@ -267,7 +267,7 @@ samplesize <- function(data,...){
 #' @export
 celldensity <- function(AreasPath, SamplesizeDF){
   # read in Areas.csv file and rename Label column to ImageName
-  areas <- read.csv("Areas.csv") %>% 
+  areas <- read.csv(AreasPath) %>% 
     dplyr::select(-X) %>% 
     dplyr::rename(Name = "Label")
   
@@ -277,7 +277,7 @@ celldensity <- function(AreasPath, SamplesizeDF){
     dplyr::select(-trash)
   
   # merge with image-level cell counts and calculate density
-  finaldf <- inner_join(microglianumbers, areas2, by="Name") %>%
+  finaldf <- inner_join(SamplesizeDF, areas2, by="Name") %>%
     mutate(Density=num/Area)
   
   # final dataframe
