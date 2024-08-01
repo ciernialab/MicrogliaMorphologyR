@@ -257,6 +257,33 @@ samplesize <- function(data,...){
   data %>% group_by(...) %>% summarise(num=n())
 }
 
+#' Calculate microglia density
+#'
+#' 'celldensity' loads in your Areas.csv file from MicrogliaMorphology, which contains the areas of your images or 
+#' rois within images, then calculates the density of microglia cells for each image
+#'
+#' @param AreasPath is the path to your Areas.csv file output from MicrogliaMorphology
+#' @param SampleSizeDF is the dataframe of cell numbers that you generated from the 'samplesize' function within MicrogliaMorphologyR
+#' @export
+celldensity <- function(AreasPath, SamplesizeDF){
+  # read in Areas.csv file and rename Label column to ImageName
+  areas <- read.csv("Areas.csv") %>% 
+    dplyr::select(-X) %>% 
+    dplyr::rename(Name = "Label")
+  
+  # clean up image names
+  areas2 <- areas %>% 
+    dplyr::separate(Name, into=c("Name","trash"), sep=".tif_thresholded") %>% 
+    dplyr::select(-trash)
+  
+  # merge with image-level cell counts and calculate density
+  finaldf <- inner_join(microglianumbers, areas2, by="Name") %>%
+    mutate(Density=num/Area)
+  
+  # final dataframe
+  finaldf
+}
+
 #' Correlation heatmap across morphology features
 #'
 #' 'featurecorrelations' allows you to generate a heatmap depicting significant correlations across features
