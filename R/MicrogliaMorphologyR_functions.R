@@ -348,7 +348,6 @@ featurecorrelations_stats <- function(data,featurestart,featureend,rthresh,pthre
   tosave
 }
 
-
 #' Dimensionality reduction using PCA and elbow/scree plot to get variance explained
 #'
 #' 'pcadata_elbow' allows you to perform PCA analysis and update your dataframe
@@ -379,7 +378,6 @@ pcadata <- function(data, featurestart, featureend, pc.start, pc.end){
   pca_data <- cbind(prin_comp$x[,pc.start:pc.end], data)
   pca_data
 }
-
 
 #' What morphology features describe the PCs?
 #'
@@ -471,6 +469,90 @@ pcfeaturecorrelations <- function(pca_data, pc.start, pc.end, feature.start, fea
   pheatmap(bat1, display_numbers = bat2, border_color=NA,
            fontsize_number=12,
            angle_col=0, main=title)
+}
+
+#' Underlying stats for correlation heatmap exploring which morphologies describe the PCs
+#'
+#' This function is complementary to the 'pcfeaturecorrelations' function. 'pcfeaturecorrelations_stats' 
+#' outputs a dataframe containing the correlation and pvalues related to your pcfeaturecorrelations heatmap.
+#'
+#' @param data is your input data frame
+#' @param pc.start is first PC you want included in analysis (e.g., PC1)
+#' @param pc.end is last PC you want included in analysis (e.g., PC4)
+#' @param feature.start is first column number of morphology measures
+#' @param feature.end is last column number of morphology measures
+#' @param rthresh is cutoff threshold for significant correlation values
+#' @param pthresh is cutoff threshold for significant p-values
+#' @export
+pcfeaturecorrelations_stats <- function (pca_data, pc.start, pc.end, feature.start, feature.end, rthresh, pthresh){
+  pc.start2 <- colnames(pca_data[pc.start])
+  pc.end2 <- colnames(pca_data[pc.end])
+  morphologyfeatures <- colnames(pca_data[, feature.start:feature.end])
+  PCs <- colnames(pca_data[, pc.start:pc.end])
+  master_correlations <- NULL
+  master_pvalues <- NULL
+  for (p in PCs) {
+    all_correlations <- NULL
+    all_pvalues <- NULL
+    for (m in morphologyfeatures) {
+      master <- rcorr(as.matrix(pca_data[, c(p, m)]), type = "spearman")
+      correlations <- as.data.frame(master$r)
+      correlations <- rownames_to_column(correlations, 
+                                         "PC")
+      correlations <- correlations %>% dplyr::select("PC", 
+                                                     m) %>% .[1, ]
+      names(correlations)[names(correlations) == m] <- "value"
+      correlations$measure <- paste(m)
+      all_correlations <- rbind(all_correlations, correlations)
+      pvalues <- as.data.frame(master$P)
+      pvalues <- rownames_to_column(pvalues, "PC")
+      pvalues <- pvalues %>% dplyr::select("PC", m) %>% 
+        .[1, ]
+      names(pvalues)[names(pvalues) == m] <- "value"
+      pvalues$measure <- paste(m)
+      all_pvalues <- rbind(all_pvalues, pvalues)
+    }
+    master_correlations <- rbind(master_correlations, all_correlations)
+    master_pvalues <- rbind(master_pvalues, all_pvalues)
+  }
+  master_correlations_PC = list()
+  for (p in PCs) {
+    master_correlations_PC[[p]] = master_correlations %>% 
+      filter(PC == p) %>% dplyr::rename(`:=`(!!p, value)) %>% 
+      select(-PC)
+  }
+  testing <- master_correlations_PC %>% reduce(inner_join, 
+                                               by = "measure", keep = FALSE)
+  heatmap_PC_correlations <- testing[, c(2, 1, 3:ncol(testing))]
+  heatmap_PC_correlations <- heatmap_PC_correlations %>% column_to_rownames(var = "measure")
+  rownames(heatmap_PC_correlations) <- morphologyfeatures
+  master_pvalues_PC = list()
+  for (p in PCs) {
+    master_pvalues_PC[[p]] = master_pvalues %>% filter(PC == 
+                                                         p) %>% dplyr::rename(`:=`(!!p, value)) %>% select(-PC)
+  }
+  testing <- master_pvalues_PC %>% reduce(inner_join, by = "measure", 
+                                          keep = FALSE)
+  heatmap_PC_pvalues <- testing[, c(2, 1, 3:ncol(testing))]
+  heatmap_PC_pvalues <- heatmap_PC_pvalues %>% column_to_rownames(var = "measure")
+  rownames(heatmap_PC_pvalues) <- morphologyfeatures
+  
+  # from here edit
+  # format data for saving stats table
+  correlations <- heatmap_PC_correlations %>% 
+    as.data.frame() %>% 
+    rownames_to_column("measure_a") %>%
+    gather("measure_b", "correlation", c(2:ncol(.)))
+  
+  pvalues <- heatmap_PC_pvalues %>% 
+    as.data.frame() %>% 
+    rownames_to_column("measure_a") %>%
+    gather("measure_b", "pvalues", c(2:ncol(.)))
+  
+  tosave <- merge(correlations, pvalues, by=c("measure_a","measure_b")) %>% as.data.frame()
+  
+  tosave$Significant <- ifelse(abs(tosave$correlation) >= rthresh & tosave$pvalues < pthresh, "significant", "ns")
+  tosave
 }
 
 #' Explore how experimental variables describe data
