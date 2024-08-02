@@ -17,9 +17,9 @@ MicrogliaMorphologyR is an R package for microglia morphology analysis, that is 
 You can read more about any of the MicrogliaMorphologyR functions covered in this tutorial by calling to their respective help pages by running ?function_name in the console. 
 
 ### If you are using this tool, please cite the following publications:
-- [Development of a high-throughput pipeline to characterize microglia morphological states at a single-cell resolution](https://www.biorxiv.org/content/10.1101/2023.11.03.565581v1)
+- [Development of a high-throughput pipeline to characterize microglia morphological states at a single-cell resolution](https://www.eneuro.org/content/11/7/ENEURO.0014-24.2024)
 
-Kim J, Pavlidis P, Ciernia AV. Development of a high-throughput pipeline to characterize microglia morphological states at a single-cell resolution. eNeuro. 2024 Jul 19:ENEURO.0014-24.2024. doi: 10.1523/ENEURO.0014-24.2024. Epub ahead of print. PMID: 39029952.
+Kim J, Pavlidis P, Ciernia AV. Development of a High-Throughput Pipeline to Characterize Microglia Morphological States at a Single-Cell Resolution. eNeuro. 2024 Jul 30;11(7):ENEURO.0014-24.2024. doi: 10.1523/ENEURO.0014-24.2024. PMID: 39029952; PMCID: PMC11289588.
 
 ### Microglia morphology
 Microglia exhibit a dynamic range of morphologies that are context-specific and often rapidly changing in response to environmental cues. While microglia more realistically exist along a continuous spectrum of morphology, we can categorize them by their most commonly observed forms to study microglia morphology. Here, we highlight the four most commonly studied morphological classes, but others have also been characterized including hyper-ramified, dystrophic, satellite, etc. MicrogliaMorphologyR can also be used to characterize additional morphologies beyond these four.
@@ -66,9 +66,7 @@ fraclac <- fraclac_tidying(fraclac.dir)
 skeleton <- skeleton_tidying(skeleton.dir)
 
 data <- merge_data(fraclac, skeleton)
-finaldata <- metadata_columns(data,
-                              c("Antibody","Paper","Cohort","MouseID","Sex","Treatment","BrainRegion","Subregion"),
-                              sep="_")
+finaldata <- metadata_columns(data, c("Antibody","Paper","Cohort","MouseID","Sex","Treatment","BrainRegion","Subregion"), sep="_")
 ```
 
 For demonstration purposes, we will use one of the datasets that comes packaged with MicrogliaMorphologyR. 'data_2xLPS_mouse' contains morphology data collected from female and male 8 week-old Cx3cr1-eGFP mice, which were given 2 i.p. injections of either PBS vehicle solution or 0.5mg/kg lipopolysaccharides (LPS), spaced 24 hours apart. In this genetic mouse line, Cx3cr1-expressing cells including microglia have an endogenous reporter which makes them green when immunofluorescently imaged. Brains were collected 3 hours after the final injections, and brain sections were immunofluorescently stained and imaged for 2 additional, commonly used microglia markers: P2ry12, and Iba1.
@@ -83,10 +81,16 @@ data_2xLPS <- MicrogliaMorphologyR::data_2xLPS_mouse
 We start by exploring the morphology features measured by MicrogliaMorphology and how they relate to each other by generating a heatmap of spearman's correlations across the 27 different morphology features. As expected, the features which describe similar aspects of morphology are more highly correlated to each other than to other features which do not. For example, the numbers of end point voxels, junction voxels, triple points, branches, and junctions all explain cell branching complexity and are highly correlated to each other.
 
 ```{r, fig.width=10.5, fig.height=10}
-featurecorrelations(data_2xLPS, 
-                    featurestart=9, featureend=35, 
-                    rthresh=0.8, pthresh=0.05, 
+featurecorrelations(data_2xLPS,
+                    featurestart=9, featureend=35,
+                    rthresh=0.8, pthresh=0.05,
                     title="Correlations across features")
+
+# to get the underlying stats depicted in the heatmap above
+correlationstats <- featurecorrelations_stats(data_2xLPS,
+                                             featurestart=9, featureend=35,
+                                             rthresh=0.8, pthresh=0.05)
+correlationstats %>% head()
 ```
 
 MicrogliaMorphologyR comes with a number of functions which allow you to explore which features have extreme outliers and how normalizing in various ways changes your feature distributions. This allows you to explore and transform your data in a dataset-appropriate manner for downstream analyses. In later steps, we will be running Principal Components Analysis (PCA) on our transformed data. PCA is a statistical technique which identifies the most significant variables and relationships in your data, and can be used as a pre-processing step to reduce noise and remove irrelevant features to improve the efficiency and accuracy of downstream analysis. PCA assumes that the variables in your dataset follow a normal distribution, and violations of normality can affect the accuracy of PCA results. Thus, it is important to transform your data so that the distributions of the values for each individual morphology measure approximate normality as much as possible. 
@@ -118,14 +122,29 @@ samplesize(data_2xLPS, MouseID, Antibody)
 samplesize(data_2xLPS, Sex, Treatment, Antibody)
 ```
 
-```{r, eval=FALSE}
-# obtain density measures for each image (using Areas.csv file output from MicrogliaMorphology)
-microglianumbers <- samplesize(data_2xLPS, Antibody, MouseID, Sex, Treatment, BrainRegion, Subregion) # list out all variables of interest present in the original image names to obtain numbers of microglia per image
-microglianumbers <- microglianumbers %>% unite("Name", Antibody:Subregion, sep="_", remove=FALSE) # add Name column back in -- make sure that the resulting strings in the Name column match names of your original input .tiff files that you used for MicrogliaMorphology !!
-AreasPath <- "path to Areas.csv file"
+### Obtain density measures for each image (using Areas.csv file output from MicrogliaMorphology)
+```{r}
+# list out all variables of interest present in the original image names to obtain numbers of microglia per image
+microglianumbers <- samplesize(data_2xLPS, Antibody, MouseID, Sex, Treatment, BrainRegion, Subregion) 
+head(microglianumbers, 3)
 
+# add Name column back in -- make sure that the resulting strings in the Name column match the names of your original input .tiff files that you used for MicrogliaMorphology !!
+microglianumbers <- microglianumbers %>% unite("Name", Antibody:Subregion, sep="_", remove=FALSE) 
+head(microglianumbers, 3)
+
+# path to Areas.csv file
+AreasPath <- "./README_files/files/Areas.csv" 
+
+# use celldensity function to calculate density at image-level: values are under the "Density" column
 Density <- celldensity(AreasPath, microglianumbers)
-Density
+Density %>% print(n=5, width=Inf) # to be able to see all the columns in this document
+
+# if you want to group on another variable, and then calculate density
+# e.g., calculating density at the brain region-level rather than the subregion level (which are what the image rois capture in our example dataset)
+Density %>% 
+  group_by(Antibody, MouseID, Sex, Treatment, BrainRegion) %>%
+  summarise(num=sum(num), Area=sum(Area)) %>% # calculate new cell numbers and new areas at the brain region level
+  mutate(Density=num/Area) # calculate new density at the brain region level
 ```
 
 Now, since we have gotten a better feel for our data and how to transform it, we can proceed with PCA for dimensionality reduction and downstream clustering. We can see here that the first 3 PCs describe around ~85% of our data. We can also explore how each PC correlates to the 27 different morphology features to get a better understanding of how each PC describes the variability present in the data. This is useful to inform which to include for downstream clustering steps. 
