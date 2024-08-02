@@ -662,130 +662,103 @@ clusterpercentage_boxplots <- function(data,...){
 #' Stats analysis: individual morphology measures
 #'
 #' Linear mixed model to statistically assess how your experimental variables of interest
-#' influence each morphology measure, at the animal level
+#' influence each morphology measure, at the subject level. output[[1]] contains anova results, output[[2]] and output[[3]] contain
+#' posthoc results, output[[4]] contains qqplots to check normality assumptions, and output[[5]] contains shapiro test results.
 #'
-#' The stats_morphologymeasures.animal function fits a linear model using the `lm` function
+#' The stats_morphologymeasures.animal function fits a linear model using the 'lm' function for fixed effects or 'lmer' function from the `lme4` package for mixed effects
 #' for each morphology measure individually within your dataset. Posthocs are run for each morphology measure
 #' individually and bound together into the final dataframe that is output by this function.
 #'
 #' @param data is your input data frame
-#' @param model is your linear mixed model (e.g., Value ~ Treatment*Sex + (1|MouseID))
+#' @param model is your model (e.g., Value ~ Treatment*Sex + (1|MouseID))
+#' @param type is the type of model you want to fit. "lm" for fixed effects or "lmer" for mixed effects (from the `lme4` package)
 #' @param posthoc1 is your posthoc comparisons (e.g., when considering sex: ~Treatment|Sex)
 #' @param posthoc2 is your posthoc comparisons (e.g., when not considering sex: ~Treatment)
 #' @param adjust is your method of multiple test correction (from `emmeans` package: "tukey","scheffe","sidak","dunnettx","mvt","holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr","none"). See "P-value adjustments" section under ?emmeans::summary.emmGrid for more information.
 #' @export
-### function begins here
-stats_morphologymeasures.animal <- function(data,model,posthoc1,posthoc2,adjust){
-
+stats_morphologymeasures.animal <- function (data, model, type, posthoc1, posthoc2, adjust){
   y.model <- as.character(model)
   z.model <- as.character(posthoc1)
   a.model <- as.character(posthoc2)
-
   measure <- unique(as.character(data$Measure))
   log_ggqqplots = list()
   final.output = list()
-
-  # for writing out results to
   anova.out <- NULL
   posthoc.out <- NULL
   posthoc.out2 <- NULL
   levene_out <- NULL
   shapiro_out <- NULL
-
-  for(m in measure){
-
+  for (m in measure) {
     tmp <- data %>% filter(Measure == m)
     tmp <- as.data.frame(tmp)
-
     print(m)
-
-    # linear mixed effects model
-    # summary(model) gives you
-    options(contrasts=c("contr.sum","contr.poly"))
-    model <- lm(as.formula(paste(y.model)), data=tmp)
-
-    ### Test ANOVA assumptions
-    # visual check of distribution
-    log_ggqqplots[[m]] =
-      ggqqplot(residuals(model)) +
-      labs(title=m)
-
-    # anova
-    #anova = anova(model, test="F", type="III")
+    options(contrasts = c("contr.sum", "contr.poly"))
+    
+    if (type == "lm"){
+      model <- lm(as.formula(paste(y.model)), data = tmp)
+    }
+    if (type == "lmer"){
+      model <- lme4::lmer(as.formula(paste(y.model)), data = tmp)
+    }
+    
+    log_ggqqplots[[m]] = ggqqplot(residuals(model)) + labs(title = m)
+    
     anova = car::Anova(model)
     anova$measure <- paste(m)
-
-    # shapiro test for normality of residuals: passes if p>0.05
+    
     shapiro <- shapiro_test(residuals(model))
-    if(shapiro$p.value > 0.05) {
+    if (shapiro$p.value > 0.05) {
       shapiro$pass <- c("pass")
-    } else {
+    }
+    else {
       shapiro$pass <- c("fail")
     }
-
     shapiro$measure <- paste(m)
-
-    # levene test for homogeneity of variances: passes if p>0.05
-    tryCatch(
-      {
-        levene <- tmp %>% levene_test(as.formula(paste(y.model)))
-        if (levene$p > 0.05) {
-          levene$pass <- c("pass")
-        }
-        else {
-          levene$pass <- c("fail")
-        }
-        levene$measure <- paste(m)
-        levene_out <- rbind(levene_out, levene)
-      },
-      error=function(e){
-        message('An error occurred with the Levene test: it can only handle interaction terms in model. Function will return an empty dataframe in output[[5]]. All other analyses should run as expected (e.g., Anova, posthocs, Shapiro test, etc.)')
-        print(e)
-      }
-    )
-
-    #posthocs test 1
-    refgrid <- ref.grid(model)
-    ph <- emmeans(refgrid, as.formula(paste(z.model)))
-    ph2 <- contrast(ph, method="pairwise", adjust="none")
-    ph3 <- test(ph2, by=NULL, adjust=adjust)
+    
+    ph <- emmeans(model, as.formula(paste(z.model)))
+    ph2 <- contrast(ph, method = "pairwise", adjust = "none")
+    ph3 <- test(ph2, by = NULL, adjust = adjust)
     outsum <- as.data.frame(ph3)
     outsum$measure <- paste(m)
-
-    #posthocs test 2
-    refgrid <- ref.grid(model)
-    ph <- emmeans(refgrid, as.formula(paste(a.model)))
-    ph2 <- contrast(ph, method="pairwise", adjust="none")
-    ph3 <- test(ph2, by=NULL, adjust=adjust)
+    
+    ph <- emmeans(model, as.formula(paste(a.model)))
+    ph2 <- contrast(ph, method = "pairwise", adjust = "none")
+    ph3 <- test(ph2, by = NULL, adjust = adjust)
     outsum2 <- as.data.frame(ph3)
     outsum2$measure <- paste(m)
-
-    # save everything before looping to next subregion
-    anova.out <- rbind(anova.out,anova)
-    posthoc.out <- rbind(posthoc.out,outsum)
-    posthoc.out2 <- rbind(posthoc.out2,outsum2)
+    
+    anova.out <- rbind(anova.out, anova)
+    posthoc.out <- rbind(posthoc.out, outsum)
+    posthoc.out2 <- rbind(posthoc.out2, outsum2)
     shapiro_out <- rbind(shapiro_out, shapiro)
   }
-
-  anova.out$Significant <- ifelse(anova.out$`Pr(>F)` < 0.05, "significant", "ns")
-  posthoc.out$Significant <- ifelse(posthoc.out$`p.value` < 0.05, "significant", "ns")
-  posthoc.out2$Significant <- ifelse(posthoc.out2$`p.value` < 0.05, "significant", "ns")
-
+  
+  if (type == "lm"){
+    anova.out$Significant <- ifelse(anova.out$`Pr(>F)` < 0.05, 
+                                    "significant", "ns")
+  }
+  if (type == "lmer"){
+    anova.out$Significant <- ifelse(anova.out$`Pr(>Chisq)` < 0.05, 
+                                    "significant", "ns")
+  }
+  posthoc.out$Significant <- ifelse(posthoc.out$p.value < 0.05, 
+                                    "significant", "ns")
+  posthoc.out2$Significant <- ifelse(posthoc.out2$p.value < 
+                                       0.05, "significant", "ns")
   final.output[[1]] = as.data.frame(anova.out)
   final.output[[2]] = posthoc.out
   final.output[[3]] = posthoc.out2
   final.output[[4]] = log_ggqqplots
-  final.output[[5]] = as.data.frame(levene_out)
-  final.output[[6]] = as.data.frame(shapiro_out)
-  final.output[[7]] = print(model)
-
+  final.output[[5]] = as.data.frame(shapiro_out)
   final.output
 }
 
 #' Stats analysis: cluster-level changes
 #'
 #' Linear mixed model to statistically assess how your experimental variables of interest
-#' influence cluster percentages, at animal level.
+#' influence cluster percentages, at animal level. output[[1]] contains anova results, output[[2]] and
+#' output[[3]] contain posthoc results, output[[4]] contains model fit checks (read more under Details section), 
+#' and output[[5]] contains information about the model. 
 #'
 #' The stats_cluster.animal function fits a generalized linear mixed model on your dataset
 #' to a beta distribution, which is suitable for values like percentages or probabilities

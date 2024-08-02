@@ -19,7 +19,9 @@ stats_cluster.animal(data, model, posthoc1, posthoc2, adjust)
 }
 \description{
 Linear mixed model to statistically assess how your experimental variables of interest
-influence cluster percentages, at animal level.
+influence cluster percentages, at animal level. output[\link{1}] contains anova results, output[\link{2}] and
+output[\link{3}] contain posthoc results, output[\link{4}] contains model fit checks (read more under Details section),
+and output[\link{5}] contains information about the model.
 }
 \details{
 The stats_cluster.animal function fits a generalized linear mixed model on your dataset

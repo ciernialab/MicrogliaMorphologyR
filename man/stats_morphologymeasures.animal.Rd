@@ -4,12 +4,14 @@
 \alias{stats_morphologymeasures.animal}
 \title{Stats analysis: individual morphology measures}
 \usage{
-stats_morphologymeasures.animal(data, model, posthoc1, posthoc2, adjust)
+stats_morphologymeasures.animal(data, model, type, posthoc1, posthoc2, adjust)
 }
 \arguments{
 \item{data}{is your input data frame}
 
-\item{model}{is your linear mixed model (e.g., Value ~ Treatment*Sex + (1|MouseID))}
+\item{model}{is your model (e.g., Value ~ Treatment*Sex + (1|MouseID))}
+
+\item{type}{is the type of model you want to fit. "lm" for fixed effects or "lmer" for mixed effects (from the \code{lme4} package)}
 
 \item{posthoc1}{is your posthoc comparisons (e.g., when considering sex: ~Treatment|Sex)}
 
@@ -19,10 +21,11 @@ stats_morphologymeasures.animal(data, model, posthoc1, posthoc2, adjust)
 }
 \description{
 Linear mixed model to statistically assess how your experimental variables of interest
-influence each morphology measure, at the animal level
+influence each morphology measure, at the subject level. output[\link{1}] contains anova results, output[\link{2}] and output[\link{3}] contain
+posthoc results, output[\link{4}] contains qqplots to check normality assumptions, and output[\link{5}] contains shapiro test results.
 }
 \details{
-The stats_morphologymeasures.animal function fits a linear model using the \code{lm} function
+The stats_morphologymeasures.animal function fits a linear model using the 'lm' function for fixed effects or 'lmer' function from the \code{lme4} package for mixed effects
 for each morphology measure individually within your dataset. Posthocs are run for each morphology measure
 individually and bound together into the final dataframe that is output by this function.
 }
