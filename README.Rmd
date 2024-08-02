@@ -123,24 +123,27 @@ samplesize(data_2xLPS, Sex, Treatment, Antibody)
 ```
 
 ### Obtain density measures for each image (using Areas.csv file output from MicrogliaMorphology)
+Note: The areas obtained in this file are dataset-specific and will be in the units of your original input images
 ```{r}
 # list out all variables of interest present in the original image names to obtain numbers of microglia per image
 microglianumbers <- samplesize(data_2xLPS, Antibody, MouseID, Sex, Treatment, BrainRegion, Subregion) 
-head(microglianumbers, 3)
+microglianumbers %>% print(n=3, width=Inf)
 
 # add Name column back in -- make sure that the resulting strings in the Name column match the names of your original input .tiff files that you used for MicrogliaMorphology !!
 microglianumbers <- microglianumbers %>% unite("Name", Antibody:Subregion, sep="_", remove=FALSE) 
-head(microglianumbers, 3)
+microglianumbers %>% print(n=3, width=Inf)
 
 # path to Areas.csv file
 AreasPath <- "./README_files/files/Areas.csv" 
 
 # use celldensity function to calculate density at image-level: values are under the "Density" column
 Density <- celldensity(AreasPath, microglianumbers)
-Density %>% print(n=5, width=Inf) # to be able to see all the columns in this document
+Density %>% print(n=5, width=Inf)
+```
 
-# if you want to group on another variable, and then calculate density
-# e.g., calculating density at the brain region-level rather than the subregion level (which are what the image rois capture in our example dataset)
+##### if you want to group on another variable, and then recalculate calculate density
+e.g., calculating density at the brain region-level rather than the subregion level (which are what the image rois capture in our example dataset)
+```{r}
 Density %>% 
   group_by(Antibody, MouseID, Sex, Treatment, BrainRegion) %>%
   summarise(num=sum(num), Area=sum(Area)) %>% # calculate new cell numbers and new areas at the brain region level
@@ -166,6 +169,12 @@ pcfeaturecorrelations(pca_data, pc.start=1, pc.end=3,
                       feature.start=19, feature.end=45, 
                       rthresh=0.75, pthresh=0.05, 
                       title="Correlation between PCs and features")
+
+# to get the underlying stats depicted in the heatmap above
+correlationstats <- pcfeaturecorrelations_stats(pca_data, pc.start=1, pc.end=3,
+                                                feature.start=19, feature.end=45,
+                                                rthresh=0.75, pthresh=0.05)
+correlationstats %>% head()
 ```
 
 ### Visually explore different sources of variability in dataset
@@ -318,16 +327,17 @@ In this example, we are fitting the generalized linear mixed model to our Iba1-s
 
 ```{r}
 # prepare percentages dataset for downstream analysis
-stats.input <- cp 
+stats.input <- cp
 stats.input$MouseID <- factor(stats.input$MouseID)
 stats.input$Cluster <- factor(stats.input$Cluster)
 stats.input$Treatment <- factor(stats.input$Treatment)
 
 # run stats analysis for changes in cluster percentages, at the animal level
 # you can specify up to two posthoc comparisons (posthoc1 and posthoc2 arguments) - if you only have one set of posthocs to run, specify the same comparison twice for both arguments. you will just get the same results in output[[2]] and output[[3]].
-stats.testing <- stats_cluster.animal(stats.input %>% filter(Antibody=="Iba1"), 
-                                      "percentage ~ Cluster*Treatment*BrainRegion + (1|MouseID)", 
-                                      "~Treatment|Cluster|BrainRegion", "~Treatment|Cluster", "bonferroni")
+stats.testing <- stats_cluster.animal(data = stats.input %>% filter(Antibody=="Iba1"), 
+                                      model = "percentage ~ Cluster*Treatment*BrainRegion + (1|MouseID)", 
+                                      posthoc1 = "~Treatment|Cluster|BrainRegion", 
+                                      posthoc2 = "~Treatment|Cluster", adjust = "bonferroni")
 
 stats.testing[[1]] # anova
 stats.testing[[2]] # posthoc 1
@@ -356,8 +366,10 @@ stats.input$Treatment <- factor(stats.input$Treatment)
 
 # run stats analysis for changes in individual morphology measures
 # you can specify up to two posthoc comparisons (posthoc1 and posthoc2 arguments) - if you only have one set of posthocs to run, specify the same comparison twice for both arguments. you will just get the same results in output[[2]] and output[[3]].
-stats.testing <- stats_morphologymeasures.animal(stats.input %>% filter(Antibody=="Iba1"), "Value ~ Treatment*BrainRegion", 
-                                                 "~Treatment|BrainRegion", "~Treatment*BrainRegion", "bonferroni")
+stats.testing <- stats_morphologymeasures.animal(data = stats.input %>% filter(Antibody=="Iba1"), 
+                                                 model = "Value ~ Treatment*BrainRegion", type="lm",
+                                                 posthoc1 = "~Treatment|BrainRegion", 
+                                                 posthoc2 = "~Treatment*BrainRegion", adjust = "bonferroni")
 
 # anova
 stats.testing[[1]] %>% head(8)
@@ -367,26 +379,23 @@ stats.testing[[2]] %>% head(6)
 stats.testing[[3]] %>% head(6)
 # qqplots to check normality assumptions
 do.call("grid.arrange", c(stats.testing[[4]], ncol=4))
-# levene test
-stats.testing[[5]] %>% head(6)
 # shapiro test
-stats.testing[[6]] %>% head(6)
-# summary of model
-stats.testing[[7]]
+stats.testing[[5]] %>% head(6)
 ```
 
 If you are not interested in running stats for all 27 morphology measures, you can also filter for those that you are interested in (or filter out those that you're not interested in) prior to running the `stats_morphologymeasures.animal` function. In this example, we filter out 4 morphology measures so that we only run this function on the other 23 measures.
 ```{r, fig.width=13, fig.height=14}
 # run stats analysis for changes in individual morphology measures
 # you can specify up to two posthoc comparisons (posthoc1 and posthoc2 arguments) - if you only have one set of posthocs to run, specify the same comparison twice for both arguments. you will just get the same results in output[[2]] and output[[3]].
-stats.testing <- stats_morphologymeasures.animal(stats.input %>% 
+stats.testing <- stats_morphologymeasures.animal(data = stats.input %>% 
                                                    filter(Antibody=="Iba1") %>%
                                                    filter(!Measure %in% c("Foreground pixels",
                                                                           "Average branch length",
                                                                           "# of quadruple points",
                                                                           "Height of bounding rectangle")), 
-                                                 "Value ~ Treatment*BrainRegion", 
-                                                 "~Treatment|BrainRegion", "~Treatment*BrainRegion", "bonferroni")
+                                                 model = "Value ~ Treatment*BrainRegion", type = "lm",
+                                                 posthoc1 = "~Treatment|BrainRegion", 
+                                                 posthoc2 = "~Treatment*BrainRegion", adjust ="bonferroni")
 
 
 # anova
@@ -397,12 +406,8 @@ stats.testing[[2]] %>% head(6)
 stats.testing[[3]] %>% head(6)
 # qqplots to check normality assumptions
 do.call("grid.arrange", c(stats.testing[[4]], ncol=4))
-# levene test
-stats.testing[[5]] %>% head(6)
 # shapiro test
-stats.testing[[6]] %>% head(6)
-# summary of model
-stats.testing[[7]]
+stats.testing[[5]] %>% head(6)
 ```
 
 If you find that any individual morphology measures violate assumptions of normality after checking the qqplots contained in stats.input[[4]], you can filter your data for those measures, transform your data in the suitable manner (i.e., using MicrogliaMorphologyR functions like `transform_minmax` or `transform_scale` or other data transformations), and rerun the stats for those morphology features using the code above.

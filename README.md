@@ -272,33 +272,43 @@ samplesize(data_2xLPS, Sex, Treatment, Antibody)
 
 ### Obtain density measures for each image (using Areas.csv file output from MicrogliaMorphology)
 
+Note: The areas obtained in this file are dataset-specific and will be
+in the units of your original input images
+
 ``` r
 # list out all variables of interest present in the original image names to obtain numbers of microglia per image
 microglianumbers <- samplesize(data_2xLPS, Antibody, MouseID, Sex, Treatment, BrainRegion, Subregion) 
-head(microglianumbers, 3)
+microglianumbers %>% print(n=3, width=Inf)
 ```
 
-    ## # A tibble: 3 × 7
-    ## # Groups:   Antibody, MouseID, Sex, Treatment, BrainRegion [1]
+    ## # A tibble: 148 × 7
+    ## # Groups:   Antibody, MouseID, Sex, Treatment, BrainRegion [51]
     ##   Antibody MouseID Sex   Treatment BrainRegion Subregion   num
     ##   <chr>    <chr>   <chr> <chr>     <chr>       <chr>     <int>
     ## 1 Cx3cr1   1       F     2xLPS     FC          ACC          93
     ## 2 Cx3cr1   1       F     2xLPS     FC          IL          161
     ## 3 Cx3cr1   1       F     2xLPS     FC          PL          112
+    ## # ℹ 145 more rows
 
 ``` r
 # add Name column back in -- make sure that the resulting strings in the Name column match the names of your original input .tiff files that you used for MicrogliaMorphology !!
 microglianumbers <- microglianumbers %>% unite("Name", Antibody:Subregion, sep="_", remove=FALSE) 
-head(microglianumbers, 3)
+microglianumbers %>% print(n=3, width=Inf)
 ```
 
-    ## # A tibble: 3 × 8
-    ## # Groups:   Antibody, MouseID, Sex, Treatment, BrainRegion [1]
-    ##   Name              Antibody MouseID Sex   Treatment BrainRegion Subregion   num
-    ##   <chr>             <chr>    <chr>   <chr> <chr>     <chr>       <chr>     <int>
-    ## 1 Cx3cr1_1_F_2xLPS… Cx3cr1   1       F     2xLPS     FC          ACC          93
-    ## 2 Cx3cr1_1_F_2xLPS… Cx3cr1   1       F     2xLPS     FC          IL          161
-    ## 3 Cx3cr1_1_F_2xLPS… Cx3cr1   1       F     2xLPS     FC          PL          112
+    ## # A tibble: 148 × 8
+    ## # Groups:   Antibody, MouseID, Sex, Treatment, BrainRegion [51]
+    ##   Name                    Antibody MouseID Sex   Treatment BrainRegion Subregion
+    ##   <chr>                   <chr>    <chr>   <chr> <chr>     <chr>       <chr>    
+    ## 1 Cx3cr1_1_F_2xLPS_FC_ACC Cx3cr1   1       F     2xLPS     FC          ACC      
+    ## 2 Cx3cr1_1_F_2xLPS_FC_IL  Cx3cr1   1       F     2xLPS     FC          IL       
+    ## 3 Cx3cr1_1_F_2xLPS_FC_PL  Cx3cr1   1       F     2xLPS     FC          PL       
+    ##     num
+    ##   <int>
+    ## 1    93
+    ## 2   161
+    ## 3   112
+    ## # ℹ 145 more rows
 
 ``` r
 # path to Areas.csv file
@@ -306,7 +316,7 @@ AreasPath <- "./README_files/files/Areas.csv"
 
 # use celldensity function to calculate density at image-level: values are under the "Density" column
 Density <- celldensity(AreasPath, microglianumbers)
-Density %>% print(n=5, width=Inf) # to be able to see all the columns in this document
+Density %>% print(n=5, width=Inf)
 ```
 
     ## # A tibble: 148 × 10
@@ -327,9 +337,13 @@ Density %>% print(n=5, width=Inf) # to be able to see all the columns in this do
     ## 5    43  172581. 0.000249
     ## # ℹ 143 more rows
 
+##### if you want to group on another variable, and then recalculate calculate density
+
+e.g., calculating density at the brain region-level rather than the
+subregion level (which are what the image rois capture in our example
+dataset)
+
 ``` r
-# if you want to group on another variable, and then calculate density
-# e.g., calculating density at the brain region-level rather than the subregion level (which are what the image rois capture in our example dataset)
 Density %>% 
   group_by(Antibody, MouseID, Sex, Treatment, BrainRegion) %>%
   summarise(num=sum(num), Area=sum(Area)) %>% # calculate new cell numbers and new areas at the brain region level
@@ -369,7 +383,7 @@ useful to inform which to include for downstream clustering steps.
 pcadata_elbow(data_2xLPS_logtransformed, featurestart=9, featureend=35)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
 ``` r
 pca_data <- pcadata(data_2xLPS_logtransformed, featurestart=9, featureend=35,
@@ -473,7 +487,23 @@ pcfeaturecorrelations(pca_data, pc.start=1, pc.end=3,
                       title="Correlation between PCs and features")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+
+``` r
+# to get the underlying stats depicted in the heatmap above
+correlationstats <- pcfeaturecorrelations_stats(pca_data, pc.start=1, pc.end=3,
+                                                feature.start=19, feature.end=45,
+                                                rthresh=0.75, pthresh=0.05)
+correlationstats %>% head()
+```
+
+    ##               measure_a measure_b correlation pvalues Significant
+    ## 1         # of branches       PC1   0.9202371       0 significant
+    ## 2         # of branches       PC2   0.1922737       0          ns
+    ## 3         # of branches       PC3  -0.2115683       0          ns
+    ## 4 # of end point voxels       PC1   0.9063301       0 significant
+    ## 5 # of end point voxels       PC2   0.1644570       0          ns
+    ## 6 # of end point voxels       PC3  -0.1465995       0          ns
 
 ### Visually explore different sources of variability in dataset
 
@@ -484,7 +514,7 @@ gathered_expvariables <- pca_data %>% gather(variable, value, 11:16)
 plots_expvariable(gathered_expvariables, "PC1", "PC2")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
 
 ## K-means clustering on PCs
 
@@ -548,13 +578,13 @@ sampling <- kmeans_input[sample(nrow(kmeans_input), 5000),] #sample 5000 random 
 fviz_nbclust(sampling, kmeans, method = 'wss', nstart=25, iter.max=50) # 4 clusters
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
 ``` r
 fviz_nbclust(sampling, kmeans, method = 'silhouette', nstart=25, iter.max=50) # 4 clusters
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-13-2.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-14-2.png)<!-- -->
 
 From using the wss and silhouette methods to check the optimal numbers
 of clusters for our dataset, it appears that our data would be optimally
@@ -672,13 +702,13 @@ plot <- clusterplots(pca_kmeans, "PC1", "PC2")
 plot
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
 
 ``` r
 plot + scale_colour_viridis_d() # customizeable example: add color scheme of choice 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-16-2.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-17-2.png)<!-- -->
 
 ### Cluster-specific measures on average for each morphology feature, relative to other clusters
 
@@ -686,7 +716,7 @@ plot + scale_colour_viridis_d() # customizeable example: add color scheme of cho
 clusterfeatures(pca_kmeans, featurestart=11, featureend=37)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
 
 After comparing the individual features across clusters, we can
 characterize the clusters as follows:
@@ -758,7 +788,7 @@ cp %>%
   clusterpercentage_boxplots(Antibody, Treatment) # grouping variables
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
 
 ``` r
 # example graph of data given variables of interest
@@ -775,7 +805,7 @@ cp %>%
   theme(axis.text.x=element_text(angle=45, vjust=1, hjust=1))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
 
 ## Statistical analysis
 
@@ -812,19 +842,20 @@ clusters, we should be correcting across 4 tests.
 
 ``` r
 # prepare percentages dataset for downstream analysis
-stats.input <- cp 
+stats.input <- cp
 stats.input$MouseID <- factor(stats.input$MouseID)
 stats.input$Cluster <- factor(stats.input$Cluster)
 stats.input$Treatment <- factor(stats.input$Treatment)
 
 # run stats analysis for changes in cluster percentages, at the animal level
 # you can specify up to two posthoc comparisons (posthoc1 and posthoc2 arguments) - if you only have one set of posthocs to run, specify the same comparison twice for both arguments. you will just get the same results in output[[2]] and output[[3]].
-stats.testing <- stats_cluster.animal(stats.input %>% filter(Antibody=="Iba1"), 
-                                      "percentage ~ Cluster*Treatment*BrainRegion + (1|MouseID)", 
-                                      "~Treatment|Cluster|BrainRegion", "~Treatment|Cluster", "bonferroni")
+stats.testing <- stats_cluster.animal(data = stats.input %>% filter(Antibody=="Iba1"), 
+                                      model = "percentage ~ Cluster*Treatment*BrainRegion + (1|MouseID)", 
+                                      posthoc1 = "~Treatment|Cluster|BrainRegion", 
+                                      posthoc2 = "~Treatment|Cluster", adjust = "bonferroni")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
 
     ## NOTE: Results may be misleading due to involvement in interactions
 
@@ -941,7 +972,7 @@ stats.testing[[3]] # posthoc 2
 stats.testing[[4]] # DHARMa model check
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-22-2.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-23-2.png)<!-- -->
 
 ``` r
 stats.testing[[5]] # summary of model
@@ -1031,8 +1062,10 @@ stats.input$Treatment <- factor(stats.input$Treatment)
 
 # run stats analysis for changes in individual morphology measures
 # you can specify up to two posthoc comparisons (posthoc1 and posthoc2 arguments) - if you only have one set of posthocs to run, specify the same comparison twice for both arguments. you will just get the same results in output[[2]] and output[[3]].
-stats.testing <- stats_morphologymeasures.animal(stats.input %>% filter(Antibody=="Iba1"), "Value ~ Treatment*BrainRegion", 
-                                                 "~Treatment|BrainRegion", "~Treatment*BrainRegion", "bonferroni")
+stats.testing <- stats_morphologymeasures.animal(data = stats.input %>% filter(Antibody=="Iba1"), 
+                                                 model = "Value ~ Treatment*BrainRegion", type="lm",
+                                                 posthoc1 = "~Treatment|BrainRegion", 
+                                                 posthoc2 = "~Treatment*BrainRegion", adjust = "bonferroni")
 ```
 
     ## [1] "Foreground pixels"
@@ -1062,15 +1095,6 @@ stats.testing <- stats_morphologymeasures.animal(stats.input %>% filter(Antibody
     ## [1] "# of triple points"
     ## [1] "# of quadruple points"
     ## [1] "Maximum branch length"
-    ## 
-    ## Call:
-    ## lm(formula = as.formula(paste(y.model)), data = tmp)
-    ## 
-    ## Coefficients:
-    ##             (Intercept)               Treatment1             BrainRegion1  
-    ##                 18.8678                   0.6961                  -0.2791  
-    ##            BrainRegion2  Treatment1:BrainRegion1  Treatment1:BrainRegion2  
-    ##                  0.6411                   0.1174                   0.0377
 
 ``` r
 # anova
@@ -1145,24 +1169,11 @@ stats.testing[[3]] %>% head(6)
 do.call("grid.arrange", c(stats.testing[[4]], ncol=4))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
-
-``` r
-# levene test
-stats.testing[[5]] %>% head(6)
-```
-
-    ##   df1 df2 statistic         p pass                                   measure
-    ## 1   5  11 0.4029226 0.8369999 pass                         Foreground pixels
-    ## 2   5  11 0.6880727 0.6426416 pass Density of foreground pixels in hull area
-    ## 3   5  11 0.8523349 0.5412758 pass     Span ratio of hull (major/minor axis)
-    ## 4   5  11 0.2031292 0.9543914 pass                  Maximum span across hull
-    ## 5   5  11 0.5405251 0.7423404 pass                                      Area
-    ## 6   5  11 0.3230325 0.8888273 pass                                 Perimeter
+![](README_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->
 
 ``` r
 # shapiro test
-stats.testing[[6]] %>% head(6)
+stats.testing[[5]] %>% head(6)
 ```
 
     ##           variable statistic   p.value pass
@@ -1180,21 +1191,6 @@ stats.testing[[6]] %>% head(6)
     ## 5                                      Area
     ## 6                                 Perimeter
 
-``` r
-# summary of model
-stats.testing[[7]]
-```
-
-    ## 
-    ## Call:
-    ## lm(formula = as.formula(paste(y.model)), data = tmp)
-    ## 
-    ## Coefficients:
-    ##             (Intercept)               Treatment1             BrainRegion1  
-    ##                 18.8678                   0.6961                  -0.2791  
-    ##            BrainRegion2  Treatment1:BrainRegion1  Treatment1:BrainRegion2  
-    ##                  0.6411                   0.1174                   0.0377
-
 If you are not interested in running stats for all 27 morphology
 measures, you can also filter for those that you are interested in (or
 filter out those that you’re not interested in) prior to running the
@@ -1205,14 +1201,15 @@ out 4 morphology measures so that we only run this function on the other
 ``` r
 # run stats analysis for changes in individual morphology measures
 # you can specify up to two posthoc comparisons (posthoc1 and posthoc2 arguments) - if you only have one set of posthocs to run, specify the same comparison twice for both arguments. you will just get the same results in output[[2]] and output[[3]].
-stats.testing <- stats_morphologymeasures.animal(stats.input %>% 
+stats.testing <- stats_morphologymeasures.animal(data = stats.input %>% 
                                                    filter(Antibody=="Iba1") %>%
                                                    filter(!Measure %in% c("Foreground pixels",
                                                                           "Average branch length",
                                                                           "# of quadruple points",
                                                                           "Height of bounding rectangle")), 
-                                                 "Value ~ Treatment*BrainRegion", 
-                                                 "~Treatment|BrainRegion", "~Treatment*BrainRegion", "bonferroni")
+                                                 model = "Value ~ Treatment*BrainRegion", type = "lm",
+                                                 posthoc1 = "~Treatment|BrainRegion", 
+                                                 posthoc2 = "~Treatment*BrainRegion", adjust ="bonferroni")
 ```
 
     ## [1] "Density of foreground pixels in hull area"
@@ -1238,15 +1235,6 @@ stats.testing <- stats_morphologymeasures.animal(stats.input %>%
     ## [1] "# of slab voxels"
     ## [1] "# of triple points"
     ## [1] "Maximum branch length"
-    ## 
-    ## Call:
-    ## lm(formula = as.formula(paste(y.model)), data = tmp)
-    ## 
-    ## Coefficients:
-    ##             (Intercept)               Treatment1             BrainRegion1  
-    ##                 18.8678                   0.6961                  -0.2791  
-    ##            BrainRegion2  Treatment1:BrainRegion1  Treatment1:BrainRegion2  
-    ##                  0.6411                   0.1174                   0.0377
 
 ``` r
 # anova
@@ -1321,24 +1309,11 @@ stats.testing[[3]] %>% head(6)
 do.call("grid.arrange", c(stats.testing[[4]], ncol=4))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->
-
-``` r
-# levene test
-stats.testing[[5]] %>% head(6)
-```
-
-    ##   df1 df2 statistic         p pass                                   measure
-    ## 1   5  11 0.6880727 0.6426416 pass Density of foreground pixels in hull area
-    ## 2   5  11 0.8523349 0.5412758 pass     Span ratio of hull (major/minor axis)
-    ## 3   5  11 0.2031292 0.9543914 pass                  Maximum span across hull
-    ## 4   5  11 0.5405251 0.7423404 pass                                      Area
-    ## 5   5  11 0.3230325 0.8888273 pass                                 Perimeter
-    ## 6   5  11 1.2992753 0.3321559 pass                               Circularity
+![](README_files/figure-gfm/unnamed-chunk-25-1.png)<!-- -->
 
 ``` r
 # shapiro test
-stats.testing[[6]] %>% head(6)
+stats.testing[[5]] %>% head(6)
 ```
 
     ##           variable statistic    p.value pass
@@ -1355,21 +1330,6 @@ stats.testing[[6]] %>% head(6)
     ## 4                                      Area
     ## 5                                 Perimeter
     ## 6                               Circularity
-
-``` r
-# summary of model
-stats.testing[[7]]
-```
-
-    ## 
-    ## Call:
-    ## lm(formula = as.formula(paste(y.model)), data = tmp)
-    ## 
-    ## Coefficients:
-    ##             (Intercept)               Treatment1             BrainRegion1  
-    ##                 18.8678                   0.6961                  -0.2791  
-    ##            BrainRegion2  Treatment1:BrainRegion1  Treatment1:BrainRegion2  
-    ##                  0.6411                   0.1174                   0.0377
 
 If you find that any individual morphology measures violate assumptions
 of normality after checking the qqplots contained in
@@ -1463,7 +1423,7 @@ colnames(data_fuzzykmeans)
 clusterfeatures(data_fuzzykmeans, featurestart=9, featureend=35)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-25-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-26-1.png)<!-- -->
 
 ``` r
 # update cluster labels
@@ -1516,4 +1476,4 @@ cp %>%
   theme(axis.text.x=element_text(angle=45, vjust=1, hjust=1))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-26-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-27-1.png)<!-- -->
