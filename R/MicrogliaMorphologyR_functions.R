@@ -300,20 +300,54 @@ featurecorrelations <- function(data,featurestart,featureend,rthresh,pthresh,tit
   hi <- rcorr(as.matrix(data[,featurestart:featureend]), type="spearman")
   mat1 <- hi$r
   filter <- which(abs(mat1)<rthresh)
-
+  
   mat2 <- hi$P
   mat2 <- round(mat2,3)
-
+  
   mat2[mat2 < pthresh] <- "*" # significant p-values
   mat2[mat2 > pthresh] <- "" # insignificant p-values
   mat2[is.na(mat2)] <- "" # NAs (should be 27)
   mat2[filter] <- "" # correlation value filter
-
+  
   # make heatmap
   pheatmap(hi$r, display_numbers = mat2, border_color=NA,
            fontsize_number=12,
            main=title)
 }
+
+#' Underlying stats for correlation heatmap across morphology features
+#'
+#' This function is complementary to the 'featurecorrelations' function. 'featurecorrelations_stats' 
+#' outputs a dataframe containing the correlation and pvalues related to your featurecorrelations heatmap.
+#'
+#' @param data is your input data frame
+#' @param featurestart is first column number of morphology measures
+#' @param featureend is last column number of morphology measures
+#' @param rthresh is cutoff threshold for significant correlation values
+#' @param pthresh is cutoff threshold for significant p-values
+#' @export
+featurecorrelations_stats <- function(data,featurestart,featureend,rthresh,pthresh){
+  
+  # correlations with p-values
+  hi <- rcorr(as.matrix(data[,featurestart:featureend]), type="spearman")
+  
+  # format data for saving stats table
+  correlations <- hi$r %>% 
+    as.data.frame() %>% 
+    rownames_to_column("measure_a") %>%
+    gather("measure_b", "correlation", c(2:ncol(.)))
+  
+  pvalues <- hi$P %>% 
+    as.data.frame() %>% 
+    rownames_to_column("measure_a") %>%
+    gather("measure_b", "pvalues", c(2:ncol(.)))
+  
+  tosave <- merge(correlations, pvalues, by=c("measure_a","measure_b")) %>% as.data.frame()
+  
+  tosave$Significant <- ifelse(abs(tosave$correlation) >= rthresh & tosave$pvalues < pthresh, "significant", "ns")
+  tosave
+}
+
 
 #' Dimensionality reduction using PCA and elbow/scree plot to get variance explained
 #'
