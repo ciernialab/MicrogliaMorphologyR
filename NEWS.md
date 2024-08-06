@@ -6,7 +6,7 @@
 # MicrogliaMorphologyR 1.1
 
 * Updated package with eNeuro publication. August 2024.
-* [Link to github release]()
+* [Link to github release](https://github.com/ciernialab/MicrogliaMorphologyR/releases/tag/v1.1)
 
 ## Major changes
 * Created github pages website and moved tutorial to dedicated section
