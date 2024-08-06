@@ -3,7 +3,7 @@ pkgdown: 2.1.0
 pkgdown_sha: ~
 articles:
   articles/MicrogliaMorphologyR: MicrogliaMorphologyR.html
-last_built: 2024-08-06T22:40Z
+last_built: 2024-08-06T22:44Z
 urls:
   reference: https://ciernialab.github.io/MicrogliaMorphologyR/reference
   article: https://ciernialab.github.io/MicrogliaMorphologyR/articles
