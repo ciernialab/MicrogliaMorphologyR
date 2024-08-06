@@ -31,6 +31,7 @@
       <ul class="navbar-nav me-auto">
 <li class="active nav-item"><a class="nav-link" href="../articles/MicrogliaMorphologyR.html">Get started</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><form class="form-inline" role="search">
@@ -1095,12 +1096,14 @@ the other 23 measures.</p>
 <div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># run stats analysis for changes in individual morphology measures</span></span>
 <span><span class="co"># you can specify up to two posthoc comparisons (posthoc1 and posthoc2 arguments) - if you only have one set of posthocs to run, specify the same comparison twice for both arguments. you will just get the same results in output[[2]] and output[[3]].</span></span>
-<span><span class="va">stats.testing</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/stats_morphologymeasures.animal.html">stats_morphologymeasures.animal</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">stats.input</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>                                                   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">Antibody</span><span class="op">==</span><span class="st">"Iba1"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>                                                   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="va">Measure</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Foreground pixels"</span>,</span>
-<span>                                                                          <span class="st">"Average branch length"</span>,</span>
-<span>                                                                          <span class="st">"# of quadruple points"</span>,</span>
-<span>                                                                          <span class="st">"Height of bounding rectangle"</span><span class="op">)</span><span class="op">)</span>, </span>
+<span></span>
+<span><span class="va">stats.input_filtered</span> <span class="op">&lt;-</span> <span class="va">stats.input</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">Antibody</span><span class="op">==</span><span class="st">"Iba1"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="va">Measure</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Foreground pixels"</span>,</span>
+<span>                         <span class="st">"Average branch length"</span>,</span>
+<span>                         <span class="st">"# of quadruple points"</span>,</span>
+<span>                         <span class="st">"Height of bounding rectangle"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">stats.testing</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/stats_morphologymeasures.animal.html">stats_morphologymeasures.animal</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">stats.input_filtered</span>,</span>
 <span>                                                 model <span class="op">=</span> <span class="st">"Value ~ Treatment*BrainRegion"</span>, type <span class="op">=</span> <span class="st">"lm"</span>,</span>
 <span>                                                 posthoc1 <span class="op">=</span> <span class="st">"~Treatment|BrainRegion"</span>, </span>
 <span>                                                 posthoc2 <span class="op">=</span> <span class="st">"~Treatment*BrainRegion"</span>, adjust <span class="op">=</span><span class="st">"bonferroni"</span><span class="op">)</span></span>
@@ -1127,7 +1130,6 @@ the other 23 measures.</p>
 <span><span class="co">#&gt; [1] "# of slab voxels"</span></span>
 <span><span class="co">#&gt; [1] "# of triple points"</span></span>
 <span><span class="co">#&gt; [1] "Maximum branch length"</span></span>
-<span></span>
 <span></span>
 <span><span class="co"># anova</span></span>
 <span><span class="va">stats.testing</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">8</span><span class="op">)</span></span>
