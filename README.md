@@ -38,6 +38,13 @@ install.packages("devtools")
 devtools::install_github('ciernialab/MicrogliaMorphologyR')
 ```
 
+## How to use MicrogliaMorphologyR
+
+Visit the [package
+website](https://ciernialab.github.io/MicrogliaMorphologyR/articles/MicrogliaMorphologyR.html)
+for a tutorial on how to use MicrogliaMorphologyR using an example
+dataset that comes with the package.
+
 ## Microglia morphology
 
 Microglia exhibit a dynamic range of morphologies that are
