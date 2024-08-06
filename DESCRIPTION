@@ -2,7 +2,7 @@ Package: MicrogliaMorphologyR
 Title: R Package For Microglia Morphology Analysis
 Version: 1.0
 Authors@R: c(
-    person("Jennifer", "Kim", role = c("aut", "cre"),
+    person("Jennifer", "Kim", ,"jenn_kim@outlook.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-2922-1010")),
     person("Paul", "Pavlidis", role = "aut",
            comment = c(ORCID = "0000-0002-0426-5028")),
