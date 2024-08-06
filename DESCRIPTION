@@ -14,3 +14,4 @@ Depends:
 LazyData: true
 Imports:
 URL: https://ciernialab.github.io/MicrogliaMorphologyR/
+Config/Needs/website: rmarkdown
