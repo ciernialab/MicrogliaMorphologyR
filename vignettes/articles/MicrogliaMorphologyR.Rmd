@@ -109,7 +109,7 @@ Density <- celldensity(AreasPath, microglianumbers)
 Density %>% print(n=5, width=Inf)
 ```
 
-##### if you want to group on another variable, and then recalculate calculate density
+##### if you want to group on another variable, and then recalculate density
 e.g., calculating density at the brain region-level rather than the subregion level (which are what the image rois capture in our example dataset)
 ```{r}
 Density %>% 

@@ -35,7 +35,7 @@ data.
 install.packages("devtools")
 
 # install MicrogliaMorphologyR using devtools
-devtools::install_github('ciernialab/MicrogliaMorphologyR')
+devtools::install_github('ciernialab/MicrogliaMorphologyR', force=TRUE)
 ```
 
 ## How to use MicrogliaMorphologyR
