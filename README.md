@@ -2,7 +2,7 @@ MicrogliaMorphologyR
 ================
 
 **Created**: 26 June, 2023  
-**Last updated**: 02 August, 2024
+**Last updated**: 06 August, 2024
 
 ## Welcome to MicrogliaMorphologyR!
 
@@ -43,7 +43,7 @@ four most commonly studied morphological classes, but others have also
 been characterized including hyper-ramified, dystrophic, satellite, etc.
 MicrogliaMorphologyR can also be used to characterize additional
 morphologies beyond these four.
-![](./README_files/images/GithubIntro_MicrogliaMorphologies.png)
+![](./man/figures/GithubIntro_MicrogliaMorphologies.png)
 
 -   **Ameboid** = round, few processes
 -   **Hypertrophic** = thicker, shorter processes with larger soma
@@ -140,7 +140,7 @@ featurecorrelations(data_2xLPS,
                     title="Correlations across features")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+![](./man/figures/unnamed-chunk-6-1.png)<!-- -->
 
 ``` r
 # to get the underlying stats depicted in the heatmap above
@@ -188,32 +188,32 @@ data_2xLPS_gathered <- data_2xLPS %>% gather(measure, value, 9:ncol(data_2xLPS))
 outliers_boxplots(data_2xLPS_gathered)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![](./man/figures/unnamed-chunk-7-1.png)<!-- -->
 
 ``` r
 outliers_distributions(data_2xLPS_gathered)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-7-2.png)<!-- -->
+![](./man/figures/unnamed-chunk-7-2.png)<!-- -->
 
 ``` r
 # checking different normalization features
 normalize_logplots(data_2xLPS_gathered,1)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-7-3.png)<!-- -->
+![](./man/figures/unnamed-chunk-7-3.png)<!-- -->
 
 ``` r
 normalize_minmax(data_2xLPS_gathered)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-7-4.png)<!-- -->
+![](./man/figures/unnamed-chunk-7-4.png)<!-- -->
 
 ``` r
 normalize_scaled(data_2xLPS_gathered)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-7-5.png)<!-- -->
+![](./man/figures/unnamed-chunk-7-5.png)<!-- -->
 
 ``` r
 # transform your data in appropriate manner for downstream analyses
@@ -383,7 +383,7 @@ useful to inform which to include for downstream clustering steps.
 pcadata_elbow(data_2xLPS_logtransformed, featurestart=9, featureend=35)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+![](./man/figures/unnamed-chunk-10-1.png)<!-- -->
 
 ``` r
 pca_data <- pcadata(data_2xLPS_logtransformed, featurestart=9, featureend=35,
@@ -487,7 +487,7 @@ pcfeaturecorrelations(pca_data, pc.start=1, pc.end=3,
                       title="Correlation between PCs and features")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+![](./man/figures/unnamed-chunk-11-1.png)<!-- -->
 
 ``` r
 # to get the underlying stats depicted in the heatmap above
@@ -514,7 +514,7 @@ gathered_expvariables <- pca_data %>% gather(variable, value, 11:16)
 plots_expvariable(gathered_expvariables, "PC1", "PC2")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+![](./man/figures/unnamed-chunk-12-1.png)<!-- -->
 
 ## K-means clustering on PCs
 
@@ -578,13 +578,13 @@ sampling <- kmeans_input[sample(nrow(kmeans_input), 5000),] #sample 5000 random 
 fviz_nbclust(sampling, kmeans, method = 'wss', nstart=25, iter.max=50) # 4 clusters
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+![](./man/figures/unnamed-chunk-14-1.png)<!-- -->
 
 ``` r
 fviz_nbclust(sampling, kmeans, method = 'silhouette', nstart=25, iter.max=50) # 4 clusters
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-14-2.png)<!-- -->
+![](./man/figures/unnamed-chunk-14-2.png)<!-- -->
 
 From using the wss and silhouette methods to check the optimal numbers
 of clusters for our dataset, it appears that our data would be optimally
@@ -702,13 +702,13 @@ plot <- clusterplots(pca_kmeans, "PC1", "PC2")
 plot
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+![](./man/figures/unnamed-chunk-17-1.png)<!-- -->
 
 ``` r
 plot + scale_colour_viridis_d() # customizeable example: add color scheme of choice 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-17-2.png)<!-- -->
+![](./man/figures/unnamed-chunk-17-2.png)<!-- -->
 
 ### Cluster-specific measures on average for each morphology feature, relative to other clusters
 
@@ -716,7 +716,7 @@ plot + scale_colour_viridis_d() # customizeable example: add color scheme of cho
 clusterfeatures(pca_kmeans, featurestart=11, featureend=37)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+![](./man/figures/unnamed-chunk-18-1.png)<!-- -->
 
 After comparing the individual features across clusters, we can
 characterize the clusters as follows:
@@ -788,7 +788,7 @@ cp %>%
   clusterpercentage_boxplots(Antibody, Treatment) # grouping variables
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
+![](./man/figures/unnamed-chunk-21-1.png)<!-- -->
 
 ``` r
 # example graph of data given variables of interest
@@ -805,7 +805,7 @@ cp %>%
   theme(axis.text.x=element_text(angle=45, vjust=1, hjust=1))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
+![](./man/figures/unnamed-chunk-22-1.png)<!-- -->
 
 ## Statistical analysis
 
@@ -855,7 +855,7 @@ stats.testing <- stats_cluster.animal(data = stats.input %>% filter(Antibody=="I
                                       posthoc2 = "~Treatment|Cluster", adjust = "bonferroni")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
+![](./man/figures/unnamed-chunk-23-1.png)<!-- -->
 
     ## NOTE: Results may be misleading due to involvement in interactions
 
@@ -972,7 +972,7 @@ stats.testing[[3]] # posthoc 2
 stats.testing[[4]] # DHARMa model check
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-23-2.png)<!-- -->
+![](./man/figures/unnamed-chunk-23-2.png)<!-- -->
 
 ``` r
 stats.testing[[5]] # summary of model
@@ -1169,7 +1169,7 @@ stats.testing[[3]] %>% head(6)
 do.call("grid.arrange", c(stats.testing[[4]], ncol=4))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->
+![](./man/figures/unnamed-chunk-24-1.png)<!-- -->
 
 ``` r
 # shapiro test
@@ -1309,7 +1309,7 @@ stats.testing[[3]] %>% head(6)
 do.call("grid.arrange", c(stats.testing[[4]], ncol=4))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-25-1.png)<!-- -->
+![](./man/figures/unnamed-chunk-25-1.png)<!-- -->
 
 ``` r
 # shapiro test
@@ -1423,7 +1423,7 @@ colnames(data_fuzzykmeans)
 clusterfeatures(data_fuzzykmeans, featurestart=9, featureend=35)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-26-1.png)<!-- -->
+![](./man/figures/unnamed-chunk-26-1.png)<!-- -->
 
 ``` r
 # update cluster labels
@@ -1476,4 +1476,4 @@ cp %>%
   theme(axis.text.x=element_text(angle=45, vjust=1, hjust=1))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-27-1.png)<!-- -->
+![](./man/figures/unnamed-chunk-27-1.png)<!-- -->

@@ -5,7 +5,7 @@ always_allow_html: true
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, fig.path='./man/figures/')
 ```
 
 **Created**: 26 June, 2023  
@@ -23,7 +23,7 @@ Kim J, Pavlidis P, Ciernia AV. Development of a High-Throughput Pipeline to Char
 
 ### Microglia morphology
 Microglia exhibit a dynamic range of morphologies that are context-specific and often rapidly changing in response to environmental cues. While microglia more realistically exist along a continuous spectrum of morphology, we can categorize them by their most commonly observed forms to study microglia morphology. Here, we highlight the four most commonly studied morphological classes, but others have also been characterized including hyper-ramified, dystrophic, satellite, etc. MicrogliaMorphologyR can also be used to characterize additional morphologies beyond these four.
-![](./README_files/images/GithubIntro_MicrogliaMorphologies.png)
+![](./man/figures/GithubIntro_MicrogliaMorphologies.png)
   
 * **Ameboid** = round, few processes
 * **Hypertrophic** = thicker, shorter processes with larger soma
