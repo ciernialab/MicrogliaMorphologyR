@@ -18,7 +18,7 @@ A data frame with 43,332 rows and 43 columns:
 \item{ID}{Individual Cell ID}
 \item{UniqueID}{Unique descriptor for each cell in dataset}
 \item{27 morphology features: Columns 9-35}{Foreground pixels, Density of foreground pixels in hull area, Span ratio of hull: major/minor axis, Maximum span across hull, Area, Perimeter, Circularity, Width of bounding rectangle, Height of bounding rectangle, Maximum radius from hull's center of mass, Max/min radii from hull's center of mass, Relative variation in radii from hull's center of mass, Mean radius, Diameter of bounding circle, Maximum radius from circle's center of mass, Max/min radii from circle's center of mass, Relative variation in radii from circle's center of mass, Mean radius from circle's center of mass, # of branches, # of junctions, # of end point voxels, # of junction voxels, # of slab voxels, Average branch length # of triple points, # of quadruple points, Maximum branch length}
-\item{PC 1-3 loadings: Columns 36-38}{PC1, PC2, PC3}
+\item{PC 1-3 scores: Columns 36-38}{PC1, PC2, PC3}
 \item{Fuzzy k-means cluster membership scores: Columns 39-42}{Cluster 1, Cluster 2, Cluster 3, Cluster 4}
 \item{Hard clustering assignment: Cluster}{1, 2, 3, 4}
 ...

@@ -355,16 +355,17 @@ If you are not interested in running stats for all 27 morphology measures, you c
 ```{r, fig.width=13, fig.height=14}
 # run stats analysis for changes in individual morphology measures
 # you can specify up to two posthoc comparisons (posthoc1 and posthoc2 arguments) - if you only have one set of posthocs to run, specify the same comparison twice for both arguments. you will just get the same results in output[[2]] and output[[3]].
-stats.testing <- stats_morphologymeasures.animal(data = stats.input %>% 
-                                                   filter(Antibody=="Iba1") %>%
-                                                   filter(!Measure %in% c("Foreground pixels",
-                                                                          "Average branch length",
-                                                                          "# of quadruple points",
-                                                                          "Height of bounding rectangle")), 
+
+stats.input_filtered <- stats.input %>%
+  filter(Antibody=="Iba1") %>%
+  filter(!Measure %in% c("Foreground pixels",
+                         "Average branch length",
+                         "# of quadruple points",
+                         "Height of bounding rectangle"))
+stats.testing <- stats_morphologymeasures.animal(data = stats.input_filtered,
                                                  model = "Value ~ Treatment*BrainRegion", type = "lm",
                                                  posthoc1 = "~Treatment|BrainRegion", 
                                                  posthoc2 = "~Treatment*BrainRegion", adjust ="bonferroni")
-
 
 # anova
 stats.testing[[1]] %>% head(8)

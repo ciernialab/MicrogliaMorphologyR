@@ -7,7 +7,7 @@
 \format{
 \subsection{\code{data_1xLPS_mouse}}{
 
-A data frame with 15,293 rows and 34 columns:
+A data frame with 15,293 rows and 33 columns:
 \describe{
 \item{Antibody}{Iba1}
 \item{MouseID}{1_F, 1_M, 2_F, 2_M, 3_F, 4_F, 4_M, 5_M}

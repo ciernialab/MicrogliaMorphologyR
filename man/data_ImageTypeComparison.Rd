@@ -3,7 +3,7 @@
 \docType{data}
 \name{data_ImageTypeComparison}
 \alias{data_ImageTypeComparison}
-\title{2xLPS mouse dataset from frontal cortex, striatum, and hippocampal subregions}
+\title{ImageTypeComparisons mouse dataset}
 \format{
 \subsection{\code{data_ImageTypeComparison}}{
 
@@ -22,6 +22,6 @@ A data frame with 60 rows and 13 columns:
 data_ImageTypeComparison
 }
 \description{
-2xLPS mouse dataset from frontal cortex, striatum, and hippocampal subregions
+Data used for image type comparisons in Figure 2 of publication for MicrogliaMorphologyR package (Kim et al., 2024)
 }
 \keyword{datasets}
