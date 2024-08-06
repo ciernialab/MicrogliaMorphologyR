@@ -18,5 +18,11 @@ Useful links:
 \author{
 \strong{Maintainer}: Jennifer Kim \email{jenn_kim@outlook.com} (\href{https://orcid.org/0000-0003-2922-1010}{ORCID})
 
+Authors:
+\itemize{
+  \item Paul Pavlidis (\href{https://orcid.org/0000-0002-0426-5028}{ORCID})
+  \item Annie Vogel Ciernia (\href{https://orcid.org/0000-0002-3406-3806}{ORCID})
+}
+
 }
 \keyword{internal}

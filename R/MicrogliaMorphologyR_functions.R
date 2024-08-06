@@ -208,7 +208,7 @@ logscale <- function(x,y){
 #' @param end is last column number of morphology measures
 #' @export
 transform_log <- function(data,x,start,end){
-  data %>% mutate_at(start:end, funs(logscale(.,x)))
+  data %>% mutate_at(start:end, list(~logscale(.,x)))
 }
 
 #' Min-max scaling
