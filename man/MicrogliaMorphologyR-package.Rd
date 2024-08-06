@@ -8,6 +8,13 @@
 \description{
 MicrogliaMorphologyR is complimentary to ImageJ macro MicrogliaMorphology. You can use MicrogliaMorphologyR to perform exploratory data analysis and visualization of 27 different morphology features, characterize morphological cluster identities, quantify shifts in morphological populations, generate heatmap and boxplot visualizations of data in flexible ways including at the single-cell level, animal-level, and experimental condition-level, and perform statistical analysis of your data.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://ciernialab.github.io/MicrogliaMorphologyR/}
+}
+
+}
 \author{
 \strong{Maintainer}: Jennifer Kim \email{jenn_kim@outlook.com} (\href{https://orcid.org/0000-0003-2922-1010}{ORCID})
 

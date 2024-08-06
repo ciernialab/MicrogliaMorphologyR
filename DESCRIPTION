@@ -10,7 +10,7 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Depends: 
-    R (>= 3.5.0), tidyverse, emmeans, Hmisc, pheatmap, factoextra, lmerTest, lsmeans, SciViews, ggpubr, glmmTMB, DHARMa, rstatix, gridExtra
+    R (>= 3.5.0), tidyverse, emmeans, Hmisc, pheatmap, factoextra, lmerTest, lsmeans, SciViews, ggpubr, glmmTMB, DHARMa, rstatix, gridExtra, ppclust
 LazyData: true
 Imports:
 URL: https://ciernialab.github.io/MicrogliaMorphologyR/
