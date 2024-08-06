@@ -56,6 +56,7 @@ four most commonly studied morphological classes, but others have also
 been characterized including hyper-ramified, dystrophic, satellite, etc.
 MicrogliaMorphologyR can also be used to characterize additional
 morphologies beyond these four.
+
 ![](./man/figures/GithubIntro_MicrogliaMorphologies.png)
 
 -   **Ameboid** = round, few processes

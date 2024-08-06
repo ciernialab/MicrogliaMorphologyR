@@ -31,6 +31,7 @@ Visit the [package website](https://ciernialab.github.io/MicrogliaMorphologyR/ar
 
 ## Microglia morphology
 Microglia exhibit a dynamic range of morphologies that are context-specific and often rapidly changing in response to environmental cues. While microglia more realistically exist along a continuous spectrum of morphology, we can categorize them by their most commonly observed forms to study microglia morphology. Here, we highlight the four most commonly studied morphological classes, but others have also been characterized including hyper-ramified, dystrophic, satellite, etc. MicrogliaMorphologyR can also be used to characterize additional morphologies beyond these four.
+
 ![](./man/figures/GithubIntro_MicrogliaMorphologies.png)
   
 * **Ameboid** = round, few processes

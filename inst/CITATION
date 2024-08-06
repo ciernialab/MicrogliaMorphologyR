@@ -1,0 +1,11 @@
+bibentry(
+  bibtype  = "Article",
+  title    = "Development of a High-Throughput Pipeline to Characterize Microglia Morphological States at a Single-Cell Resolution",
+  author   = "Jennifer Kim, Paul Pavlidis, Annie Vogel Ciernia",
+  journal  = "eNeuro",
+  year     = "2024",
+  volume   = "11",
+  number   = "7",
+  pages    = "ENEURO.0014-24.2024",
+  doi      = "10.1523/ENEURO.0014-24.2024"
+)
