@@ -273,7 +273,7 @@ celldensity <- function(AreasPath, SamplesizeDF){
   
   # clean up image names
   areas2 <- areas %>% 
-    separate(Name, into=c("Name","trash"), sep=".tif_thresholded") %>% 
+    separate(Name, into=c("Name","trash"), sep="\\.tif") %>% 
     dplyr::select(-trash)
   
   # merge with image-level cell counts and calculate density
