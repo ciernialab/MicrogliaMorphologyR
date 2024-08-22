@@ -631,7 +631,7 @@ clusterpercentage <- function(data, clustercol,...){
   clustercol <- sym(clustercol)
   data %>%
     group_by(..., !!clustercol) %>%
-    count() %>%
+    dplyr::count() %>%
     group_by(...) %>%
     mutate(percentage = n/sum(n))
 }
