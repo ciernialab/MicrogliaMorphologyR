@@ -10,7 +10,7 @@ fraclac_tidying <- function(dir){
   y <- FracLac1 %>%
     separate(1, into=c("Name","trash"), sep="tif_thresholdedtif_") %>%
     separate(trash, into=c("ID","trash1"), sep="tif") %>%
-    select(-trash1)
+    dplyr::select(-trash1)
   y
 }
 
@@ -36,7 +36,7 @@ skeleton_tidying <- function(dir){
 
   y <- finaldf2 %>%
     separate(Name, into=c("Name","trash"), sep=".tif_thresholded.tif_") %>%
-    separate(trash, into=c("ID","junk2"), sep=".tif_results") %>% select(-junk2) %>%
+    separate(trash, into=c("ID","junk2"), sep=".tif_results") %>% dplyr::select(-junk2) %>%
     unite("UniqueID",c("Name","ID"),sep="_",remove=FALSE)
   y
 }
@@ -52,7 +52,7 @@ skeleton_tidying <- function(dir){
 merge_data <- function(fraclac, skeleton){
   data <- inner_join(fraclac, skeleton, by=c("Name","ID"))
 
-  data <- data %>% select(-c(TOTAL.PIXELS,
+  data <- data %>% dplyr::select(-c(TOTAL.PIXELS,
                              Hull.s.Centre.of.Mass,
                              Method.Used.to.Calculate.Circle,
                              Hull.s.Centre.of.Mass,
@@ -430,10 +430,10 @@ pcfeaturecorrelations <- function(pca_data, pc.start, pc.end, feature.start, fea
   master_correlations_PC = list()
   for (p in PCs){
     master_correlations_PC[[p]] =
-      master_correlations %>% filter(PC==p) %>% dplyr::rename(!!p :=value) %>% select(-PC)
+      master_correlations %>% filter(PC==p) %>% dplyr::rename(!!p :=value) %>% dplyr::select(-PC)
   }
 
-  testing <- master_correlations_PC %>% reduce(inner_join, by="measure", keep=FALSE)
+  testing <- master_correlations_PC %>% purrr::reduce(inner_join, by="measure", keep=FALSE)
 
   heatmap_PC_correlations <- testing[,c(2,1,3:ncol(testing))]
   heatmap_PC_correlations <- heatmap_PC_correlations %>% column_to_rownames(var="measure")
@@ -444,10 +444,10 @@ pcfeaturecorrelations <- function(pca_data, pc.start, pc.end, feature.start, fea
   master_pvalues_PC = list()
   for (p in PCs){
     master_pvalues_PC[[p]] =
-      master_pvalues %>% filter(PC==p) %>% dplyr::rename(!!p :=value) %>% select(-PC)
+      master_pvalues %>% filter(PC==p) %>% dplyr::rename(!!p :=value) %>% dplyr::select(-PC)
   }
 
-  testing <- master_pvalues_PC %>% reduce(inner_join, by="measure", keep=FALSE)
+  testing <- master_pvalues_PC %>% purrr::reduce(inner_join, by="measure", keep=FALSE)
 
   heatmap_PC_pvalues <- testing[,c(2,1,3:ncol(testing))]
   heatmap_PC_pvalues <- heatmap_PC_pvalues %>% column_to_rownames(var="measure")
@@ -455,10 +455,10 @@ pcfeaturecorrelations <- function(pca_data, pc.start, pc.end, feature.start, fea
   rownames(heatmap_PC_pvalues) <- morphologyfeatures
 
   # re-formatting for heatmap to only show significant values
-  bat1 <- heatmap_PC_correlations %>% select(pc.start2:pc.end2) %>% as.matrix()
+  bat1 <- heatmap_PC_correlations %>% dplyr::select(pc.start2:pc.end2) %>% as.matrix()
   filter <- which(abs(bat1)<rthresh)
 
-  bat2 <- heatmap_PC_pvalues %>% select(pc.start2:pc.end2) %>% as.matrix()
+  bat2 <- heatmap_PC_pvalues %>% dplyr::select(pc.start2:pc.end2) %>% as.matrix()
   bat2 <- round(bat2,3)
 
   bat2[bat2 < pthresh] <- "*" # significant p-values
@@ -519,9 +519,9 @@ pcfeaturecorrelations_stats <- function (pca_data, pc.start, pc.end, feature.sta
   for (p in PCs) {
     master_correlations_PC[[p]] = master_correlations %>% 
       filter(PC == p) %>% dplyr::rename(`:=`(!!p, value)) %>% 
-      select(-PC)
+      dplyr::select(-PC)
   }
-  testing <- master_correlations_PC %>% reduce(inner_join, 
+  testing <- master_correlations_PC %>% purrr::reduce(inner_join, 
                                                by = "measure", keep = FALSE)
   heatmap_PC_correlations <- testing[, c(2, 1, 3:ncol(testing))]
   heatmap_PC_correlations <- heatmap_PC_correlations %>% column_to_rownames(var = "measure")
@@ -529,9 +529,9 @@ pcfeaturecorrelations_stats <- function (pca_data, pc.start, pc.end, feature.sta
   master_pvalues_PC = list()
   for (p in PCs) {
     master_pvalues_PC[[p]] = master_pvalues %>% filter(PC == 
-                                                         p) %>% dplyr::rename(`:=`(!!p, value)) %>% select(-PC)
+                                                         p) %>% dplyr::rename(`:=`(!!p, value)) %>% dplyr::select(-PC)
   }
-  testing <- master_pvalues_PC %>% reduce(inner_join, by = "measure", 
+  testing <- master_pvalues_PC %>% purrr::reduce(inner_join, by = "measure", 
                                           keep = FALSE)
   heatmap_PC_pvalues <- testing[, c(2, 1, 3:ncol(testing))]
   heatmap_PC_pvalues <- heatmap_PC_pvalues %>% column_to_rownames(var = "measure")
