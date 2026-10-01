@@ -40,7 +40,7 @@ install.packages("devtools")
 devtools::install_github('ciernialab/MicrogliaMorphologyR')
 ```
 
-## How to use MicrogliaMorphologyR
+## How to use MicrogliaMorphologyR with MicrogliaMorphology ImageJ pipeline1 output:
 
 Visit the [package
 website](https://ciernialab.github.io/MicrogliaMorphologyR/articles/MicrogliaMorphologyR.html)
