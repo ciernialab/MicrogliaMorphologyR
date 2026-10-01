@@ -7,9 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>How to use MicrogliaMorphologyR • MicrogliaMorphologyR</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
-<link href="../deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="How to use MicrogliaMorphologyR">
 </head>
 <body>
@@ -31,6 +31,12 @@
       <ul class="navbar-nav me-auto">
 <li class="active nav-item"><a class="nav-link" href="../articles/MicrogliaMorphologyR.html">Get started</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+<li><a class="dropdown-item" href="../articles/MicrogliaMorphologyPipeline2.html">MicrogliaMorphology Pipeline 2</a></li>
+  </ul>
+</li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
@@ -72,7 +78,7 @@ here<a class="anchor" aria-label="anchor" href="#load-packages-and-set-seed-for-
 </h3>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ciernialab.github.io/MicrogliaMorphologyR/">MicrogliaMorphologyR</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.sthda.com/english/rpkgs/factoextra" class="external-link">factoextra</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/kassambara/factoextra" class="external-link">factoextra</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">ppclust</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></code></pre></div>
@@ -133,7 +139,7 @@ branching complexity and are highly correlated to each other.</p>
 <span>                    featurestart<span class="op">=</span><span class="fl">9</span>, featureend<span class="op">=</span><span class="fl">35</span>,</span>
 <span>                    rthresh<span class="op">=</span><span class="fl">0.8</span>, pthresh<span class="op">=</span><span class="fl">0.05</span>,</span>
 <span>                    title<span class="op">=</span><span class="st">"Correlations across features"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="MicrogliaMorphologyR_files/figure-html/unnamed-chunk-6-1.png" width="1008"></p>
+<p><img src="MicrogliaMorphologyR_files/figure-html/unnamed-chunk-6-1.png" class="r-plt" alt="" width="1008"></p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># to get the underlying stats depicted in the heatmap above</span></span>
 <span><span class="va">correlationstats</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/featurecorrelations_stats.html">featurecorrelations_stats</a></span><span class="op">(</span><span class="va">data_2xLPS</span>,</span>
@@ -178,21 +184,21 @@ downstream analyses<a class="anchor" aria-label="anchor" href="#exploratory-data
 <span></span>
 <span><span class="co"># check for outliers</span></span>
 <span><span class="fu"><a href="../reference/outliers_boxplots.html">outliers_boxplots</a></span><span class="op">(</span><span class="va">data_2xLPS_gathered</span><span class="op">)</span></span></code></pre></div>
-<p><img src="MicrogliaMorphologyR_files/figure-html/unnamed-chunk-7-1.png" width="960"></p>
+<p><img src="MicrogliaMorphologyR_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="" width="960"></p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/outliers_distributions.html">outliers_distributions</a></span><span class="op">(</span><span class="va">data_2xLPS_gathered</span><span class="op">)</span></span></code></pre></div>
-<p><img src="MicrogliaMorphologyR_files/figure-html/unnamed-chunk-7-2.png" width="960"></p>
+<p><img src="MicrogliaMorphologyR_files/figure-html/unnamed-chunk-7-2.png" class="r-plt" alt="" width="960"></p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># checking different normalization features</span></span>
 <span><span class="fu"><a href="../reference/normalize_logplots.html">normalize_logplots</a></span><span class="op">(</span><span class="va">data_2xLPS_gathered</span>,<span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<p><img src="MicrogliaMorphologyR_files/figure-html/unnamed-chunk-7-3.png" width="960"></p>
+<p><img src="MicrogliaMorphologyR_files/figure-html/unnamed-chunk-7-3.png" class="r-plt" alt="" width="960"></p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/normalize_minmax.html">normalize_minmax</a></span><span class="op">(</span><span class="va">data_2xLPS_gathered</span><span class="op">)</span></span></code></pre></div>
-<p><img src="MicrogliaMorphologyR_files/figure-html/unnamed-chunk-7-4.png" width="960"></p>
+<p><img src="MicrogliaMorphologyR_files/figure-html/unnamed-chunk-7-4.png" class="r-plt" alt="" width="960"></p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/normalize_scaled.html">normalize_scaled</a></span><span class="op">(</span><span class="va">data_2xLPS_gathered</span><span class="op">)</span></span></code></pre></div>
-<p><img src="MicrogliaMorphologyR_files/figure-html/unnamed-chunk-7-5.png" width="960"></p>
+<p><img src="MicrogliaMorphologyR_files/figure-html/unnamed-chunk-7-5.png" class="r-plt" alt="" width="960"></p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># transform your data in appropriate manner for downstream analyses</span></span>
@@ -263,7 +269,7 @@ be in the units of your original input images</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># ℹ 145 more rows</span></span></span>
 <span></span>
 <span><span class="co"># add Name column back in -- make sure that the resulting strings in the Name column match the names of your original input .tiff files that you used for MicrogliaMorphology !!</span></span>
-<span><span class="va">microglianumbers</span> <span class="op">&lt;-</span> <span class="va">microglianumbers</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">unite</span><span class="op">(</span><span class="st">"Name"</span>, <span class="va">Antibody</span><span class="op">:</span><span class="va">Subregion</span>, sep<span class="op">=</span><span class="st">"_"</span>, remove<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span> </span>
+<span><span class="va">microglianumbers</span> <span class="op">&lt;-</span> <span class="va">microglianumbers</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://tidyr.tidyverse.org/reference/unite.html" class="external-link">unite</a></span><span class="op">(</span><span class="st">"Name"</span>, <span class="va">Antibody</span><span class="op">:</span><span class="va">Subregion</span>, sep<span class="op">=</span><span class="st">"_"</span>, remove<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span> </span>
 <span><span class="va">microglianumbers</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span>n<span class="op">=</span><span class="fl">3</span>, width<span class="op">=</span><span class="cn">Inf</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 148 × 8</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Groups:   Antibody, MouseID, Sex, Treatment, BrainRegion [51]</span></span></span>
@@ -314,10 +320,15 @@ dataset)</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Density</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">Antibody</span>, <span class="va">MouseID</span>, <span class="va">Sex</span>, <span class="va">Treatment</span>, <span class="va">BrainRegion</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu">summarise</span><span class="op">(</span>num<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">num</span><span class="op">)</span>, Area<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">Area</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="co"># calculate new cell numbers and new areas at the brain region level</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>num<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">num</span><span class="op">)</span>, Area<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">Area</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="co"># calculate new cell numbers and new areas at the brain region level</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Density<span class="op">=</span><span class="va">num</span><span class="op">/</span><span class="va">Area</span><span class="op">)</span> <span class="co"># calculate new density at the brain region level</span></span>
-<span><span class="co">#&gt; `summarise()` has grouped output by 'Antibody', 'MouseID', 'Sex', 'Treatment'.</span></span>
-<span><span class="co">#&gt; You can override using the `.groups` argument.</span></span>
+<span><span class="co">#&gt; `summarise()` has regrouped the output.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Summaries were computed grouped by <span style="color: #0000BB;">Antibody</span>, <span style="color: #0000BB;">MouseID</span>, <span style="color: #0000BB;">Sex</span>, <span style="color: #0000BB;">Treatment</span>, and</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">BrainRegion</span>.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Output is grouped by <span style="color: #0000BB;">Antibody</span>, <span style="color: #0000BB;">MouseID</span>, <span style="color: #0000BB;">Sex</span>, and <span style="color: #0000BB;">Treatment</span>.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Use `summarise(.groups = "drop_last")` to silence this message.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Use `summarise(.by = c(Antibody, MouseID, Sex, Treatment, BrainRegion))` for</span></span>
+<span><span class="co">#&gt;   per-operation grouping (`?dplyr::dplyr_by`) instead.</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 51 × 8</span></span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># Groups:   Antibody, MouseID, Sex, Treatment [18]</span></span></span>
 <span><span class="co">#&gt;    Antibody MouseID Sex   Treatment BrainRegion   num     Area  Density</span></span>
@@ -348,7 +359,7 @@ useful to inform which to include for downstream clustering steps.</p>
 </h2>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/pcadata_elbow.html">pcadata_elbow</a></span><span class="op">(</span><span class="va">data_2xLPS_logtransformed</span>, featurestart<span class="op">=</span><span class="fl">9</span>, featureend<span class="op">=</span><span class="fl">35</span><span class="op">)</span></span></code></pre></div>
-<p><img src="MicrogliaMorphologyR_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
+<p><img src="MicrogliaMorphologyR_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="" width="700"></p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pca_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pcadata.html">pcadata</a></span><span class="op">(</span><span class="va">data_2xLPS_logtransformed</span>, featurestart<span class="op">=</span><span class="fl">9</span>, featureend<span class="op">=</span><span class="fl">35</span>,</span>
 <span>                    pc.start<span class="op">=</span><span class="fl">1</span>, pc.end<span class="op">=</span><span class="fl">10</span><span class="op">)</span></span>
@@ -446,7 +457,7 @@ circularity and branching homogeneity for PC2) are still maintained.</p>
 <span>                      feature.start<span class="op">=</span><span class="fl">19</span>, feature.end<span class="op">=</span><span class="fl">45</span>, </span>
 <span>                      rthresh<span class="op">=</span><span class="fl">0.75</span>, pthresh<span class="op">=</span><span class="fl">0.05</span>, </span>
 <span>                      title<span class="op">=</span><span class="st">"Correlation between PCs and features"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="MicrogliaMorphologyR_files/figure-html/unnamed-chunk-11-1.png" width="864"></p>
+<p><img src="MicrogliaMorphologyR_files/figure-html/unnamed-chunk-11-1.png" class="r-plt" alt="" width="864"></p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># to get the underlying stats depicted in the heatmap above</span></span>
@@ -470,7 +481,7 @@ circularity and branching homogeneity for PC2) are still maintained.</p>
 <span><span class="va">gathered_expvariables</span> <span class="op">&lt;-</span> <span class="va">pca_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://tidyr.tidyverse.org/reference/gather.html" class="external-link">gather</a></span><span class="op">(</span><span class="va">variable</span>, <span class="va">value</span>, <span class="fl">11</span><span class="op">:</span><span class="fl">16</span><span class="op">)</span> </span>
 <span></span>
 <span><span class="fu"><a href="../reference/plots_expvariable.html">plots_expvariable</a></span><span class="op">(</span><span class="va">gathered_expvariables</span>, <span class="st">"PC1"</span>, <span class="st">"PC2"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="MicrogliaMorphologyR_files/figure-html/unnamed-chunk-12-1.png" width="1248"></p>
+<p><img src="MicrogliaMorphologyR_files/figure-html/unnamed-chunk-12-1.png" class="r-plt" alt="" width="1248"></p>
 </div>
 </div>
 <div class="section level2">
@@ -535,11 +546,11 @@ Means parameters and results (in R Studio) explained</a></li>
 <code class="sourceCode R"><span><span class="co"># check for optimal number of clusters using wss and silhouette methods</span></span>
 <span><span class="va">sampling</span> <span class="op">&lt;-</span> <span class="va">kmeans_input</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">kmeans_input</span><span class="op">)</span>, <span class="fl">5000</span><span class="op">)</span>,<span class="op">]</span> <span class="co">#sample 5000 random rows for cluster optimization</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/factoextra/man/fviz_nbclust.html" class="external-link">fviz_nbclust</a></span><span class="op">(</span><span class="va">sampling</span>, <span class="va">kmeans</span>, method <span class="op">=</span> <span class="st">'wss'</span>, nstart<span class="op">=</span><span class="fl">25</span>, iter.max<span class="op">=</span><span class="fl">50</span><span class="op">)</span> <span class="co"># 4 clusters</span></span></code></pre></div>
-<p><img src="MicrogliaMorphologyR_files/figure-html/unnamed-chunk-14-1.png" width="700"></p>
+<span><span class="fu"><a href="https://rpkgs.datanovia.com/factoextra/reference/fviz_nbclust.html" class="external-link">fviz_nbclust</a></span><span class="op">(</span><span class="va">sampling</span>, <span class="va">kmeans</span>, method <span class="op">=</span> <span class="st">'wss'</span>, nstart<span class="op">=</span><span class="fl">25</span>, iter.max<span class="op">=</span><span class="fl">50</span><span class="op">)</span> <span class="co"># 4 clusters</span></span></code></pre></div>
+<p><img src="MicrogliaMorphologyR_files/figure-html/unnamed-chunk-14-1.png" class="r-plt" alt="" width="700"></p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/factoextra/man/fviz_nbclust.html" class="external-link">fviz_nbclust</a></span><span class="op">(</span><span class="va">sampling</span>, <span class="va">kmeans</span>, method <span class="op">=</span> <span class="st">'silhouette'</span>, nstart<span class="op">=</span><span class="fl">25</span>, iter.max<span class="op">=</span><span class="fl">50</span><span class="op">)</span> <span class="co"># 4 clusters</span></span></code></pre></div>
-<p><img src="MicrogliaMorphologyR_files/figure-html/unnamed-chunk-14-2.png" width="700"></p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rpkgs.datanovia.com/factoextra/reference/fviz_nbclust.html" class="external-link">fviz_nbclust</a></span><span class="op">(</span><span class="va">sampling</span>, <span class="va">kmeans</span>, method <span class="op">=</span> <span class="st">'silhouette'</span>, nstart<span class="op">=</span><span class="fl">25</span>, iter.max<span class="op">=</span><span class="fl">50</span><span class="op">)</span> <span class="co"># 4 clusters</span></span></code></pre></div>
+<p><img src="MicrogliaMorphologyR_files/figure-html/unnamed-chunk-14-2.png" class="r-plt" alt="" width="700"></p>
 <p>From using the wss and silhouette methods to check the optimal
 numbers of clusters for our dataset, it appears that our data would be
 optimally clustered using k=4. There are many more <a href="http://www.sthda.com/english/articles/29-cluster-validation-essentials/96-determiningthe-optimal-number-of-clusters-3-must-know-methods/" class="external-link">cluster
@@ -581,7 +592,7 @@ of the tutorial</a> if you are interested.</p>
 <span></span>
 <span><span class="co"># Here, we are creating a new data frame that contains the first 2 PCs and original dataset, then renaming the data_kmeans$cluster column to simply say "Cluster". You can bind together as many of the PCs as you want. Binding the original, untransformed data is useful if you want to plot the raw values of any individual morphology measures downstream. </span></span>
 <span><span class="va">pca_kmeans</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">pca_data</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span>, <span class="va">data_2xLPS</span>, <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">data_kmeans</span><span class="op">$</span><span class="va">cluster</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu">rename</span><span class="op">(</span>Cluster<span class="op">=</span><span class="va">`data_kmeans$cluster`</span><span class="op">)</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>Cluster<span class="op">=</span><span class="va">`data_kmeans$cluster`</span><span class="op">)</span> </span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">pca_kmeans</span>,<span class="fl">3</span><span class="op">)</span></span>
 <span><span class="co">#&gt;           PC1       PC2 Antibody MouseID Sex Treatment BrainRegion Subregion</span></span>
 <span><span class="co">#&gt; 1 -3.40837468 0.6764322   Cx3cr1       1   F     2xLPS          FC       ACC</span></span>
@@ -640,9 +651,9 @@ of the tutorial</a> if you are interested.</p>
 <span><span class="co">#&gt; 2                 6.722                  5                     1</span></span>
 <span><span class="co">#&gt; 3                 7.173                 10                     1</span></span>
 <span><span class="co">#&gt;   Maximum branch length Cluster</span></span>
-<span><span class="co">#&gt; 1                29.236       4</span></span>
-<span><span class="co">#&gt; 2                15.093       2</span></span>
-<span><span class="co">#&gt; 3                21.261       3</span></span></code></pre></div>
+<span><span class="co">#&gt; 1                29.236       1</span></span>
+<span><span class="co">#&gt; 2                15.093       3</span></span>
+<span><span class="co">#&gt; 3                21.261       2</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="plot-k-means-clusters-in-pc-space">Plot k-means clusters in PC space<a class="anchor" aria-label="anchor" href="#plot-k-means-clusters-in-pc-space"></a>
@@ -650,10 +661,10 @@ of the tutorial</a> if you are interested.</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/clusterplots.html">clusterplots</a></span><span class="op">(</span><span class="va">pca_kmeans</span>, <span class="st">"PC1"</span>, <span class="st">"PC2"</span><span class="op">)</span></span>
 <span><span class="va">plot</span></span></code></pre></div>
-<p><img src="MicrogliaMorphologyR_files/figure-html/unnamed-chunk-17-1.png" width="700"></p>
+<p><img src="MicrogliaMorphologyR_files/figure-html/unnamed-chunk-17-1.png" class="r-plt" alt="" width="700"></p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plot</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_colour_viridis_d</a></span><span class="op">(</span><span class="op">)</span> <span class="co"># customizeable example: add color scheme of choice </span></span></code></pre></div>
-<p><img src="MicrogliaMorphologyR_files/figure-html/unnamed-chunk-17-2.png" width="700"></p>
+<p><img src="MicrogliaMorphologyR_files/figure-html/unnamed-chunk-17-2.png" class="r-plt" alt="" width="700"></p>
 </div>
 <div class="section level3">
 <h3 id="cluster-specific-measures-on-average-for-each-morphology-feature-relative-to-other-clusters">Cluster-specific measures on average for each morphology feature,
@@ -661,7 +672,7 @@ relative to other clusters<a class="anchor" aria-label="anchor" href="#cluster-s
 </h3>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/clusterfeatures.html">clusterfeatures</a></span><span class="op">(</span><span class="va">pca_kmeans</span>, featurestart<span class="op">=</span><span class="fl">11</span>, featureend<span class="op">=</span><span class="fl">37</span><span class="op">)</span></span></code></pre></div>
-<p><img src="MicrogliaMorphologyR_files/figure-html/unnamed-chunk-18-1.png" width="700"></p>
+<p><img src="MicrogliaMorphologyR_files/figure-html/unnamed-chunk-18-1.png" class="r-plt" alt="" width="700"></p>
 <p>After comparing the individual features across clusters, we can
 characterize the clusters as follows:</p>
 <ul>
@@ -699,12 +710,12 @@ ImageJ)<a class="anchor" aria-label="anchor" href="#formatting-data-for-colorbyc
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">Antibody</span><span class="op">==</span><span class="st">"Cx3cr1"</span>,<span class="va">MouseID</span><span class="op">==</span><span class="st">"1"</span>, <span class="va">BrainRegion</span><span class="op">==</span><span class="st">"FC"</span>, <span class="va">Subregion</span><span class="op">==</span><span class="st">"ACC"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">Cluster</span>, <span class="va">ID</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">colorbycluster</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   Cluster          ID</span></span>
-<span><span class="co">#&gt; 1       4 00002-01053</span></span>
-<span><span class="co">#&gt; 2       2 00009-01153</span></span>
-<span><span class="co">#&gt; 3       3 00015-01224</span></span>
-<span><span class="co">#&gt; 4       4 00016-01229</span></span>
-<span><span class="co">#&gt; 5       4 00039-01394</span></span>
-<span><span class="co">#&gt; 6       4 00044-01397</span></span></code></pre></div>
+<span><span class="co">#&gt; 1       1 00002-01053</span></span>
+<span><span class="co">#&gt; 2       3 00009-01153</span></span>
+<span><span class="co">#&gt; 3       2 00015-01224</span></span>
+<span><span class="co">#&gt; 4       1 00016-01229</span></span>
+<span><span class="co">#&gt; 5       1 00039-01394</span></span>
+<span><span class="co">#&gt; 6       1 00044-01397</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="save--csv-file-to-feed-into-colorbycluster-function-in-microgliamorphology-imagej-macro">Save .csv file to feed into ColorByCluster function in
@@ -724,7 +735,7 @@ MicrogliaMorphology ImageJ macro<a class="anchor" aria-label="anchor" href="#sav
 <span></span>
 <span><span class="co"># update cluster labels</span></span>
 <span><span class="va">cp</span> <span class="op">&lt;-</span> <span class="va">cp</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Cluster <span class="op">=</span> </span>
-<span>                      <span class="fu">case_when</span><span class="op">(</span><span class="va">Cluster</span><span class="op">==</span><span class="st">"1"</span> <span class="op">~</span> <span class="st">"Rod-like"</span>,</span>
+<span>                      <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when</a></span><span class="op">(</span><span class="va">Cluster</span><span class="op">==</span><span class="st">"1"</span> <span class="op">~</span> <span class="st">"Rod-like"</span>,</span>
 <span>                                <span class="va">Cluster</span><span class="op">==</span><span class="st">"2"</span> <span class="op">~</span> <span class="st">"Ameboid"</span>,</span>
 <span>                                <span class="va">Cluster</span><span class="op">==</span><span class="st">"3"</span> <span class="op">~</span> <span class="st">"Ramified"</span>,</span>
 <span>                                <span class="va">Cluster</span><span class="op">==</span><span class="st">"4"</span> <span class="op">~</span> <span class="st">"Hypertrophic"</span><span class="op">)</span><span class="op">)</span></span>
@@ -733,7 +744,7 @@ MicrogliaMorphology ImageJ macro<a class="anchor" aria-label="anchor" href="#sav
 <span><span class="va">cp</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">BrainRegion</span><span class="op">==</span><span class="st">"STR"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="co"># in this example, we filter for our brain region of interest</span></span>
 <span>  <span class="fu"><a href="../reference/clusterpercentage_boxplots.html">clusterpercentage_boxplots</a></span><span class="op">(</span><span class="va">Antibody</span>, <span class="va">Treatment</span><span class="op">)</span> <span class="co"># grouping variables</span></span></code></pre></div>
-<p><img src="MicrogliaMorphologyR_files/figure-html/unnamed-chunk-21-1.png" width="1056"></p>
+<p><img src="MicrogliaMorphologyR_files/figure-html/unnamed-chunk-21-1.png" class="r-plt" alt="" width="1056"></p>
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># example graph of data given variables of interest</span></span>
 <span><span class="va">cp</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
@@ -747,7 +758,7 @@ MicrogliaMorphology ImageJ macro<a class="anchor" aria-label="anchor" href="#sav
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>fill<span class="op">=</span><span class="st">"Treatment"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span>base_size<span class="op">=</span><span class="fl">14</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.text.x<span class="op">=</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>angle<span class="op">=</span><span class="fl">45</span>, vjust<span class="op">=</span><span class="fl">1</span>, hjust<span class="op">=</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="MicrogliaMorphologyR_files/figure-html/unnamed-chunk-22-1.png" width="1056"></p>
+<p><img src="MicrogliaMorphologyR_files/figure-html/unnamed-chunk-22-1.png" class="r-plt" alt="" width="1056"></p>
 </div>
 </div>
 <div class="section level2">
@@ -798,18 +809,18 @@ clusters, we should be correcting across 4 tests.</p>
 <span>                                      model <span class="op">=</span> <span class="st">"percentage ~ Cluster*Treatment*BrainRegion + (1|MouseID)"</span>, </span>
 <span>                                      posthoc1 <span class="op">=</span> <span class="st">"~Treatment|Cluster|BrainRegion"</span>, </span>
 <span>                                      posthoc2 <span class="op">=</span> <span class="st">"~Treatment|Cluster"</span>, adjust <span class="op">=</span> <span class="st">"bonferroni"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="MicrogliaMorphologyR_files/figure-html/unnamed-chunk-23-1.png" width="700"></p>
+<p><img src="MicrogliaMorphologyR_files/figure-html/unnamed-chunk-23-1.png" class="r-plt" alt="" width="700"></p>
 <pre><code><span><span class="co">#&gt; NOTE: Results may be misleading due to involvement in interactions</span></span>
 <span><span class="co">#&gt; Formula:          </span></span>
 <span><span class="co">#&gt; percentage ~ Cluster * Treatment * BrainRegion + (1 | MouseID)</span></span>
 <span><span class="co">#&gt; Data: data</span></span>
-<span><span class="co">#&gt;       AIC       BIC    logLik  df.resid </span></span>
-<span><span class="co">#&gt; -264.2217 -206.5145  158.1109        42 </span></span>
+<span><span class="co">#&gt;       AIC       BIC    logLik -2*log(L)  df.resid </span></span>
+<span><span class="co">#&gt; -264.2217 -206.5145  158.1109 -316.2217        42 </span></span>
 <span><span class="co">#&gt; Random-effects (co)variances:</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Conditional model:</span></span>
-<span><span class="co">#&gt;  Groups  Name        Std.Dev.</span></span>
-<span><span class="co">#&gt;  MouseID (Intercept) 2.66e-06</span></span>
+<span><span class="co">#&gt;  Groups  Name        Std.Dev. </span></span>
+<span><span class="co">#&gt;  MouseID (Intercept) 2.484e-06</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Number of obs: 68 / Conditional model: MouseID, 6</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -819,29 +830,29 @@ clusters, we should be correcting across 4 tests.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Conditional model:</span></span>
 <span><span class="co">#&gt;                      (Intercept)                          Cluster1  </span></span>
-<span><span class="co">#&gt;                        -1.190535                         -0.280517  </span></span>
+<span><span class="co">#&gt;                        -1.190535                          0.729137  </span></span>
 <span><span class="co">#&gt;                         Cluster2                          Cluster3  </span></span>
-<span><span class="co">#&gt;                        -0.530336                          0.729137  </span></span>
+<span><span class="co">#&gt;                         0.081716                         -0.280517  </span></span>
 <span><span class="co">#&gt;                       Treatment1                      BrainRegion1  </span></span>
 <span><span class="co">#&gt;                        -0.034300                         -0.001085  </span></span>
 <span><span class="co">#&gt;                     BrainRegion2               Cluster1:Treatment1  </span></span>
-<span><span class="co">#&gt;                         0.032280                          0.258393  </span></span>
+<span><span class="co">#&gt;                         0.032280                          0.123271  </span></span>
 <span><span class="co">#&gt;              Cluster2:Treatment1               Cluster3:Treatment1  </span></span>
-<span><span class="co">#&gt;                        -0.571027                          0.123271  </span></span>
+<span><span class="co">#&gt;                         0.189363                          0.258393  </span></span>
 <span><span class="co">#&gt;            Cluster1:BrainRegion1             Cluster2:BrainRegion1  </span></span>
-<span><span class="co">#&gt;                         0.038133                         -0.026514  </span></span>
+<span><span class="co">#&gt;                        -0.093337                          0.081718  </span></span>
 <span><span class="co">#&gt;            Cluster3:BrainRegion1             Cluster1:BrainRegion2  </span></span>
-<span><span class="co">#&gt;                        -0.093337                         -0.070106  </span></span>
+<span><span class="co">#&gt;                         0.038133                         -0.213648  </span></span>
 <span><span class="co">#&gt;            Cluster2:BrainRegion2             Cluster3:BrainRegion2  </span></span>
-<span><span class="co">#&gt;                         0.327990                         -0.213648  </span></span>
+<span><span class="co">#&gt;                        -0.044236                         -0.070106  </span></span>
 <span><span class="co">#&gt;          Treatment1:BrainRegion1           Treatment1:BrainRegion2  </span></span>
 <span><span class="co">#&gt;                        -0.026359                          0.016676  </span></span>
 <span><span class="co">#&gt; Cluster1:Treatment1:BrainRegion1  Cluster2:Treatment1:BrainRegion1  </span></span>
-<span><span class="co">#&gt;                         0.040356                         -0.105077  </span></span>
+<span><span class="co">#&gt;                         0.146770                         -0.082049  </span></span>
 <span><span class="co">#&gt; Cluster3:Treatment1:BrainRegion1  Cluster1:Treatment1:BrainRegion2  </span></span>
-<span><span class="co">#&gt;                         0.146770                         -0.041974  </span></span>
+<span><span class="co">#&gt;                         0.040356                          0.057942  </span></span>
 <span><span class="co">#&gt; Cluster2:Treatment1:BrainRegion2  Cluster3:Treatment1:BrainRegion2  </span></span>
-<span><span class="co">#&gt;                        -0.074843                          0.057942</span></span>
+<span><span class="co">#&gt;                         0.058875                         -0.041974</span></span>
 <span></span>
 <span><span class="va">stats.testing</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="co"># anova</span></span>
 <span><span class="co">#&gt; Analysis of Deviance Table (Type II Wald chisquare tests)</span></span>
@@ -851,30 +862,28 @@ clusters, we should be correcting across 4 tests.</p>
 <span><span class="co">#&gt; Cluster                       632.4490  3  &lt; 2.2e-16 ***</span></span>
 <span><span class="co">#&gt; Treatment                       1.2604  1     0.2616    </span></span>
 <span><span class="co">#&gt; BrainRegion                     0.2084  2     0.9010    </span></span>
-<span><span class="co">#&gt; Cluster:Treatment             271.0010  3  &lt; 2.2e-16 ***</span></span>
-<span><span class="co">#&gt; Cluster:BrainRegion           120.9206  6  &lt; 2.2e-16 ***</span></span>
+<span><span class="co">#&gt; Cluster:Treatment             271.0011  3  &lt; 2.2e-16 ***</span></span>
+<span><span class="co">#&gt; Cluster:BrainRegion           120.9205  6  &lt; 2.2e-16 ***</span></span>
 <span><span class="co">#&gt; Treatment:BrainRegion           2.0685  2     0.3555    </span></span>
-<span><span class="co">#&gt; Cluster:Treatment:BrainRegion  38.4144  6  9.321e-07 ***</span></span>
+<span><span class="co">#&gt; Cluster:Treatment:BrainRegion  38.4143  6  9.322e-07 ***</span></span>
 <span><span class="co">#&gt; ---</span></span>
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
 <span><span class="va">stats.testing</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span> <span class="co"># posthoc 1</span></span>
 <span><span class="co">#&gt;  contrast    Cluster      BrainRegion   estimate         SE  df z.ratio p.value</span></span>
-<span><span class="co">#&gt;  PBS - 2xLPS Ameboid      FC           0.4761807 0.12097420 Inf   3.936  0.0010</span></span>
-<span><span class="co">#&gt;  PBS - 2xLPS Hypertrophic FC          -1.4735259 0.14575411 Inf -10.110  &lt;.0001</span></span>
-<span><span class="co">#&gt;  PBS - 2xLPS Ramified     FC           0.4187653 0.09890622 Inf   4.234  0.0003</span></span>
-<span><span class="co">#&gt;  PBS - 2xLPS Rod-like     FC           0.0933095 0.10739882 Inf   0.869  1.0000</span></span>
-<span><span class="co">#&gt;  PBS - 2xLPS Ameboid      HC           0.3975891 0.13631860 Inf   2.917  0.0425</span></span>
-<span><span class="co">#&gt;  PBS - 2xLPS Hypertrophic HC          -1.3269892 0.14559100 Inf  -9.114  &lt;.0001</span></span>
-<span><span class="co">#&gt;  PBS - 2xLPS Ramified     HC           0.3271791 0.11116899 Inf   2.943  0.0390</span></span>
-<span><span class="co">#&gt;  PBS - 2xLPS Rod-like     HC           0.4612293 0.12234620 Inf   3.770  0.0020</span></span>
-<span><span class="co">#&gt;  PBS - 2xLPS Ameboid      STR          0.4707880 0.12231265 Inf   3.849  0.0014</span></span>
-<span><span class="co">#&gt;  PBS - 2xLPS Hypertrophic STR         -0.8314493 0.15327901 Inf  -5.424  &lt;.0001</span></span>
-<span><span class="co">#&gt;  PBS - 2xLPS Ramified     STR         -0.2121166 0.09521815 Inf  -2.228  0.3108</span></span>
-<span><span class="co">#&gt;  PBS - 2xLPS Rod-like     STR          0.3758423 0.11203994 Inf   3.355  0.0095</span></span>
+<span><span class="co">#&gt;  PBS - 2xLPS Ameboid      FC           0.4187647 0.09890620 Inf   4.234  0.0003</span></span>
+<span><span class="co">#&gt;  PBS - 2xLPS Hypertrophic FC           0.0933101 0.10739881 Inf   0.869  1.0000</span></span>
+<span><span class="co">#&gt;  PBS - 2xLPS Ramified     FC           0.4761813 0.12097418 Inf   3.936  0.0010</span></span>
+<span><span class="co">#&gt;  PBS - 2xLPS Rod-like     FC          -1.4735268 0.14575415 Inf -10.110 &lt;0.0001</span></span>
+<span><span class="co">#&gt;  PBS - 2xLPS Ameboid      HC           0.3271782 0.11116897 Inf   2.943  0.0390</span></span>
+<span><span class="co">#&gt;  PBS - 2xLPS Hypertrophic HC           0.4612292 0.12234617 Inf   3.770  0.0020</span></span>
+<span><span class="co">#&gt;  PBS - 2xLPS Ramified     HC           0.3975892 0.13631857 Inf   2.917  0.0425</span></span>
+<span><span class="co">#&gt;  PBS - 2xLPS Rod-like     HC          -1.3269888 0.14559095 Inf  -9.114 &lt;0.0001</span></span>
+<span><span class="co">#&gt;  PBS - 2xLPS Ameboid      STR         -0.2121162 0.09521813 Inf  -2.228  0.3108</span></span>
+<span><span class="co">#&gt;  PBS - 2xLPS Hypertrophic STR          0.3758412 0.11203992 Inf   3.355  0.0095</span></span>
+<span><span class="co">#&gt;  PBS - 2xLPS Ramified     STR          0.4707882 0.12231262 Inf   3.849  0.0014</span></span>
+<span><span class="co">#&gt;  PBS - 2xLPS Rod-like     STR         -0.8314495 0.15327898 Inf  -5.424 &lt;0.0001</span></span>
 <span><span class="co">#&gt;  Significant</span></span>
 <span><span class="co">#&gt;  significant</span></span>
-<span><span class="co">#&gt;  significant</span></span>
-<span><span class="co">#&gt;  significant</span></span>
 <span><span class="co">#&gt;  ns         </span></span>
 <span><span class="co">#&gt;  significant</span></span>
 <span><span class="co">#&gt;  significant</span></span>
@@ -883,34 +892,36 @@ clusters, we should be correcting across 4 tests.</p>
 <span><span class="co">#&gt;  significant</span></span>
 <span><span class="co">#&gt;  significant</span></span>
 <span><span class="co">#&gt;  ns         </span></span>
+<span><span class="co">#&gt;  significant</span></span>
+<span><span class="co">#&gt;  significant</span></span>
 <span><span class="co">#&gt;  significant</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Results are given on the log odds ratio (not the response) scale. </span></span>
 <span><span class="co">#&gt; P value adjustment: bonferroni method for 12 tests</span></span>
 <span><span class="va">stats.testing</span><span class="op">[[</span><span class="fl">3</span><span class="op">]</span><span class="op">]</span> <span class="co"># posthoc 2</span></span>
 <span><span class="co">#&gt;  contrast    Cluster        estimate         SE  df z.ratio p.value Significant</span></span>
-<span><span class="co">#&gt;  PBS - 2xLPS Ameboid       0.4481859 0.07316650 Inf   6.126  &lt;.0001 significant</span></span>
-<span><span class="co">#&gt;  PBS - 2xLPS Hypertrophic -1.2106548 0.08561029 Inf -14.141  &lt;.0001 significant</span></span>
-<span><span class="co">#&gt;  PBS - 2xLPS Ramified      0.1779426 0.05888547 Inf   3.022  0.0100 significant</span></span>
-<span><span class="co">#&gt;  PBS - 2xLPS Rod-like      0.3101270 0.06587576 Inf   4.708  &lt;.0001 significant</span></span>
+<span><span class="co">#&gt;  PBS - 2xLPS Ameboid       0.1779422 0.05888545 Inf   3.022  0.0100 significant</span></span>
+<span><span class="co">#&gt;  PBS - 2xLPS Hypertrophic  0.3101269 0.06587575 Inf   4.708 &lt;0.0001 significant</span></span>
+<span><span class="co">#&gt;  PBS - 2xLPS Ramified      0.4481862 0.07316649 Inf   6.126 &lt;0.0001 significant</span></span>
+<span><span class="co">#&gt;  PBS - 2xLPS Rod-like     -1.2106550 0.08561028 Inf -14.141 &lt;0.0001 significant</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Results are averaged over the levels of: BrainRegion </span></span>
 <span><span class="co">#&gt; Results are given on the log odds ratio (not the response) scale. </span></span>
 <span><span class="co">#&gt; P value adjustment: bonferroni method for 4 tests</span></span>
 <span><span class="va">stats.testing</span><span class="op">[[</span><span class="fl">4</span><span class="op">]</span><span class="op">]</span> <span class="co"># DHARMa model check</span></span></code></pre>
-<p><img src="MicrogliaMorphologyR_files/figure-html/unnamed-chunk-23-2.png" width="700"></p>
+<p><img src="MicrogliaMorphologyR_files/figure-html/unnamed-chunk-23-2.png" class="r-plt" alt="" width="700"></p>
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">stats.testing</span><span class="op">[[</span><span class="fl">5</span><span class="op">]</span><span class="op">]</span> <span class="co"># summary of model</span></span>
 <span><span class="co">#&gt; Formula:          </span></span>
 <span><span class="co">#&gt; percentage ~ Cluster * Treatment * BrainRegion + (1 | MouseID)</span></span>
 <span><span class="co">#&gt; Data: data</span></span>
-<span><span class="co">#&gt;       AIC       BIC    logLik  df.resid </span></span>
-<span><span class="co">#&gt; -264.2217 -206.5145  158.1109        42 </span></span>
+<span><span class="co">#&gt;       AIC       BIC    logLik -2*log(L)  df.resid </span></span>
+<span><span class="co">#&gt; -264.2217 -206.5145  158.1109 -316.2217        42 </span></span>
 <span><span class="co">#&gt; Random-effects (co)variances:</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Conditional model:</span></span>
-<span><span class="co">#&gt;  Groups  Name        Std.Dev.</span></span>
-<span><span class="co">#&gt;  MouseID (Intercept) 2.66e-06</span></span>
+<span><span class="co">#&gt;  Groups  Name        Std.Dev. </span></span>
+<span><span class="co">#&gt;  MouseID (Intercept) 2.484e-06</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Number of obs: 68 / Conditional model: MouseID, 6</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -920,29 +931,29 @@ clusters, we should be correcting across 4 tests.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Conditional model:</span></span>
 <span><span class="co">#&gt;                      (Intercept)                          Cluster1  </span></span>
-<span><span class="co">#&gt;                        -1.190535                         -0.280517  </span></span>
+<span><span class="co">#&gt;                        -1.190535                          0.729137  </span></span>
 <span><span class="co">#&gt;                         Cluster2                          Cluster3  </span></span>
-<span><span class="co">#&gt;                        -0.530336                          0.729137  </span></span>
+<span><span class="co">#&gt;                         0.081716                         -0.280517  </span></span>
 <span><span class="co">#&gt;                       Treatment1                      BrainRegion1  </span></span>
 <span><span class="co">#&gt;                        -0.034300                         -0.001085  </span></span>
 <span><span class="co">#&gt;                     BrainRegion2               Cluster1:Treatment1  </span></span>
-<span><span class="co">#&gt;                         0.032280                          0.258393  </span></span>
+<span><span class="co">#&gt;                         0.032280                          0.123271  </span></span>
 <span><span class="co">#&gt;              Cluster2:Treatment1               Cluster3:Treatment1  </span></span>
-<span><span class="co">#&gt;                        -0.571027                          0.123271  </span></span>
+<span><span class="co">#&gt;                         0.189363                          0.258393  </span></span>
 <span><span class="co">#&gt;            Cluster1:BrainRegion1             Cluster2:BrainRegion1  </span></span>
-<span><span class="co">#&gt;                         0.038133                         -0.026514  </span></span>
+<span><span class="co">#&gt;                        -0.093337                          0.081718  </span></span>
 <span><span class="co">#&gt;            Cluster3:BrainRegion1             Cluster1:BrainRegion2  </span></span>
-<span><span class="co">#&gt;                        -0.093337                         -0.070106  </span></span>
+<span><span class="co">#&gt;                         0.038133                         -0.213648  </span></span>
 <span><span class="co">#&gt;            Cluster2:BrainRegion2             Cluster3:BrainRegion2  </span></span>
-<span><span class="co">#&gt;                         0.327990                         -0.213648  </span></span>
+<span><span class="co">#&gt;                        -0.044236                         -0.070106  </span></span>
 <span><span class="co">#&gt;          Treatment1:BrainRegion1           Treatment1:BrainRegion2  </span></span>
 <span><span class="co">#&gt;                        -0.026359                          0.016676  </span></span>
 <span><span class="co">#&gt; Cluster1:Treatment1:BrainRegion1  Cluster2:Treatment1:BrainRegion1  </span></span>
-<span><span class="co">#&gt;                         0.040356                         -0.105077  </span></span>
+<span><span class="co">#&gt;                         0.146770                         -0.082049  </span></span>
 <span><span class="co">#&gt; Cluster3:Treatment1:BrainRegion1  Cluster1:Treatment1:BrainRegion2  </span></span>
-<span><span class="co">#&gt;                         0.146770                         -0.041974  </span></span>
+<span><span class="co">#&gt;                         0.040356                          0.057942  </span></span>
 <span><span class="co">#&gt; Cluster2:Treatment1:BrainRegion2  Cluster3:Treatment1:BrainRegion2  </span></span>
-<span><span class="co">#&gt;                        -0.074843                          0.057942</span></span></code></pre></div>
+<span><span class="co">#&gt;                         0.058875                         -0.041974</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level3">
@@ -974,10 +985,15 @@ useful in our experiment.</p>
 <code class="sourceCode R"><span><span class="co"># prepare data for downstream analysis</span></span>
 <span><span class="va">data</span> <span class="op">&lt;-</span> <span class="va">data_2xLPS</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">MouseID</span>, <span class="va">Sex</span>, <span class="va">Treatment</span>, <span class="va">BrainRegion</span>, <span class="va">Antibody</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu">summarise</span><span class="op">(</span><span class="fu">across</span><span class="op">(</span><span class="st">"Foreground pixels"</span><span class="op">:</span><span class="st">"Maximum branch length"</span>, <span class="op">~</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">.x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across</a></span><span class="op">(</span><span class="st">"Foreground pixels"</span><span class="op">:</span><span class="st">"Maximum branch length"</span>, <span class="op">~</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">.x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/gather.html" class="external-link">gather</a></span><span class="op">(</span><span class="va">Measure</span>, <span class="va">Value</span>, <span class="st">"Foreground pixels"</span><span class="op">:</span><span class="st">"Maximum branch length"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; `summarise()` has grouped output by 'MouseID', 'Sex', 'Treatment',</span></span>
-<span><span class="co">#&gt; 'BrainRegion'. You can override using the `.groups` argument.</span></span>
+<span><span class="co">#&gt; `summarise()` has regrouped the output.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Summaries were computed grouped by <span style="color: #0000BB;">MouseID</span>, <span style="color: #0000BB;">Sex</span>, <span style="color: #0000BB;">Treatment</span>, <span style="color: #0000BB;">BrainRegion</span>, and</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB;">Antibody</span>.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Output is grouped by <span style="color: #0000BB;">MouseID</span>, <span style="color: #0000BB;">Sex</span>, <span style="color: #0000BB;">Treatment</span>, and <span style="color: #0000BB;">BrainRegion</span>.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Use `summarise(.groups = "drop_last")` to silence this message.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Use `summarise(.by = c(MouseID, Sex, Treatment, BrainRegion, Antibody))` for</span></span>
+<span><span class="co">#&gt;   per-operation grouping (`?dplyr::dplyr_by`) instead.</span></span>
 <span></span>
 <span><span class="co"># filter out data you want to run stats on and make sure to make any variables included in model into factors</span></span>
 <span><span class="va">stats.input</span> <span class="op">&lt;-</span> <span class="va">data</span> </span>
@@ -1071,7 +1087,7 @@ useful in our experiment.</p>
 <span><span class="co">#&gt; 6 Foreground pixels          ns</span></span>
 <span><span class="co"># qqplots to check normality assumptions</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="st">"grid.arrange"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">stats.testing</span><span class="op">[[</span><span class="fl">4</span><span class="op">]</span><span class="op">]</span>, ncol<span class="op">=</span><span class="fl">4</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="MicrogliaMorphologyR_files/figure-html/unnamed-chunk-24-1.png" width="1248"></p>
+<p><img src="MicrogliaMorphologyR_files/figure-html/unnamed-chunk-24-1.png" class="r-plt" alt="" width="1248"></p>
 <div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># shapiro test</span></span>
 <span><span class="va">stats.testing</span><span class="op">[[</span><span class="fl">5</span><span class="op">]</span><span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">6</span><span class="op">)</span></span>
@@ -1187,7 +1203,7 @@ the other 23 measures.</p>
 <span><span class="co">#&gt; 6 Density of foreground pixels in hull area significant</span></span>
 <span><span class="co"># qqplots to check normality assumptions</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="st">"grid.arrange"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">stats.testing</span><span class="op">[[</span><span class="fl">4</span><span class="op">]</span><span class="op">]</span>, ncol<span class="op">=</span><span class="fl">4</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="MicrogliaMorphologyR_files/figure-html/unnamed-chunk-25-1.png" width="1248"></p>
+<p><img src="MicrogliaMorphologyR_files/figure-html/unnamed-chunk-25-1.png" class="r-plt" alt="" width="1248"></p>
 <div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># shapiro test</span></span>
 <span><span class="va">stats.testing</span><span class="op">[[</span><span class="fl">5</span><span class="op">]</span><span class="op">]</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">6</span><span class="op">)</span></span>
@@ -1294,12 +1310,12 @@ is time-intensive and computationally-expensive.</p>
 <span></span>
 <span><span class="co"># check cluster features to determine cluster labels</span></span>
 <span><span class="fu"><a href="../reference/clusterfeatures.html">clusterfeatures</a></span><span class="op">(</span><span class="va">data_fuzzykmeans</span>, featurestart<span class="op">=</span><span class="fl">9</span>, featureend<span class="op">=</span><span class="fl">35</span><span class="op">)</span></span></code></pre></div>
-<p><img src="MicrogliaMorphologyR_files/figure-html/unnamed-chunk-26-1.png" width="700"></p>
+<p><img src="MicrogliaMorphologyR_files/figure-html/unnamed-chunk-26-1.png" class="r-plt" alt="" width="700"></p>
 <div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># update cluster labels</span></span>
 <span><span class="va">data_fuzzykmeans</span> <span class="op">&lt;-</span> <span class="va">data_fuzzykmeans</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Cluster <span class="op">=</span> </span>
-<span>                      <span class="fu">case_when</span><span class="op">(</span><span class="va">Cluster</span><span class="op">==</span><span class="st">"1"</span> <span class="op">~</span> <span class="st">"Ameboid"</span>,</span>
+<span>                      <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when</a></span><span class="op">(</span><span class="va">Cluster</span><span class="op">==</span><span class="st">"1"</span> <span class="op">~</span> <span class="st">"Ameboid"</span>,</span>
 <span>                                <span class="va">Cluster</span><span class="op">==</span><span class="st">"2"</span> <span class="op">~</span> <span class="st">"Rod-like"</span>,</span>
 <span>                                <span class="va">Cluster</span><span class="op">==</span><span class="st">"3"</span> <span class="op">~</span> <span class="st">"Hypertrophic"</span>,</span>
 <span>                                <span class="va">Cluster</span><span class="op">==</span><span class="st">"4"</span> <span class="op">~</span> <span class="st">"Ramified"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
@@ -1336,7 +1352,7 @@ cluster (i.e., quintessential ‘rod-like’, ‘ameboid’, ‘hypertrophic’,
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>fill<span class="op">=</span><span class="st">"Treatment"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span>base_size<span class="op">=</span><span class="fl">14</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.text.x<span class="op">=</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>angle<span class="op">=</span><span class="fl">45</span>, vjust<span class="op">=</span><span class="fl">1</span>, hjust<span class="op">=</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="MicrogliaMorphologyR_files/figure-html/unnamed-chunk-27-1.png" width="1152"></p>
+<p><img src="MicrogliaMorphologyR_files/figure-html/unnamed-chunk-27-1.png" class="r-plt" alt="" width="1152"></p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
@@ -1350,7 +1366,7 @@ cluster (i.e., quintessential ‘rod-like’, ‘ameboid’, ‘hypertrophic’,
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>

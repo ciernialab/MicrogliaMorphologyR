@@ -1,9 +1,10 @@
-pandoc: 3.1.11
-pkgdown: 2.1.0
+pandoc: 3.8.3
+pkgdown: 2.2.1
 pkgdown_sha: ~
 articles:
+  MicrogliaMorphologyPipeline2: MicrogliaMorphologyPipeline2.html
   articles/MicrogliaMorphologyR: MicrogliaMorphologyR.html
-last_built: 2024-08-22T19:38Z
+last_built: 2026-10-01T20:35Z
 urls:
   reference: https://ciernialab.github.io/MicrogliaMorphologyR/reference
   article: https://ciernialab.github.io/MicrogliaMorphologyR/articles

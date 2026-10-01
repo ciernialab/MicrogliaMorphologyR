@@ -1,0 +1,166 @@
+# MicrogliaMorphologyR
+
+**Created**: 26 June, 2023  
+**Last updated**: 06 August, 2024
+
+## Welcome to MicrogliaMorphologyR!
+
+MicrogliaMorphologyR is an R package for microglia morphology analysis,
+that is complimentary to ImageJ macro
+[MicrogliaMorphology](https://github.com/ciernialab/MicrogliaMorphology).
+Using MicrogliaMorphologyR, you can perform exploratory data analysis
+and visualization of 27 different morphology features, characterize
+morphological cluster identities, quantify shifts in morphological
+populations, generate heatmap and boxplot visualizations of data in
+flexible ways including at the single-cell level, animal-level, and
+experimental condition-level, and perform statistical analysis of your
+data.
+
+### If you are using this tool, please cite the following publication:
+
+- [Development of a high-throughput pipeline to characterize microglia
+  morphological states at a single-cell
+  resolution](https://www.eneuro.org/content/11/7/ENEURO.0014-24.2024)
+
+> Kim J, Pavlidis P, Ciernia AV. Development of a High-Throughput
+> Pipeline to Characterize Microglia Morphological States at a
+> Single-Cell Resolution. eNeuro. 2024 Jul 30;11(7):ENEURO.0014-24.2024.
+> doi: 10.1523/ENEURO.0014-24.2024. PMID: 39029952; PMCID: PMC11289588.
+
+## How to install MicrogliaMorphologyR
+
+``` r
+
+# install devtools package and make sure you have the latest version
+install.packages("devtools")
+
+# install MicrogliaMorphologyR using devtools
+devtools::install_github('ciernialab/MicrogliaMorphologyR')
+```
+
+## How to use MicrogliaMorphologyR
+
+Visit the [package
+website](https://ciernialab.github.io/MicrogliaMorphologyR/articles/MicrogliaMorphologyR.html)
+for a tutorial on how to use MicrogliaMorphologyR using an example
+dataset that comes with the package.
+
+## Microglia morphology
+
+Microglia exhibit a dynamic range of morphologies that are
+context-specific and often rapidly changing in response to environmental
+cues. While microglia more realistically exist along a continuous
+spectrum of morphology, we can categorize them by their most commonly
+observed forms to study microglia morphology. Here, we highlight the
+four most commonly studied morphological classes, but others have also
+been characterized including hyper-ramified, dystrophic, satellite, etc.
+MicrogliaMorphologyR can also be used to characterize additional
+morphologies beyond these four.
+
+![](./reference/figures/GithubIntro_MicrogliaMorphologies.png)
+
+- **Ameboid** = round, few processes
+- **Hypertrophic** = thicker, shorter processes with larger soma
+- **Rod-like** = elongated soma with bipolar processes
+- **Ramified** = smaller soma with long, highly branched processes
+
+Here are some recent and relevant reviews that you can read to gain more
+background on microglia morphology and this project:
+
+- [Microglial morphometric analysis: so many options, so little
+  consistency (Reddaway et al.,
+  2023)](https://www.frontiersin.org/articles/10.3389/fninf.2023.1211188/full)
+- [Microglia states and nomenclature: A field at its crossroads
+  (Paolicelli et al.,
+  2022)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9999291/)
+- [Morphology of Microglia Across Contexts of Health and Disease (Savage
+  et al.,
+  2019)](https://link.springer.com/protocol/10.1007/978-1-4939-9658-2_2)
+
+# Package index
+
+## All functions
+
+- [`cell.level_boxplots()`](https://ciernialab.github.io/MicrogliaMorphologyR/reference/cell.level_boxplots.md)
+  : Data visualization: individual morphology measures
+- [`celldensity()`](https://ciernialab.github.io/MicrogliaMorphologyR/reference/celldensity.md)
+  : Calculate microglia density
+- [`clusterfeatures()`](https://ciernialab.github.io/MicrogliaMorphologyR/reference/clusterfeatures.md)
+  : Cluster-specific average morphology measures
+- [`clusterpercentage()`](https://ciernialab.github.io/MicrogliaMorphologyR/reference/clusterpercentage.md)
+  : What are your morphology cluster percentages across variables of
+  interest?
+- [`clusterpercentage_boxplots()`](https://ciernialab.github.io/MicrogliaMorphologyR/reference/clusterpercentage_boxplots.md)
+  : How do morphology cluster percentages vary across variables of
+  interest?
+- [`clusterplots()`](https://ciernialab.github.io/MicrogliaMorphologyR/reference/clusterplots.md)
+  : Plot to show morphology clusters in PC space
+- [`data_1xLPS_mouse`](https://ciernialab.github.io/MicrogliaMorphologyR/reference/data_1xLPS_mouse.md)
+  : 1xLPS mouse dataset
+- [`data_2xLPS_mouse`](https://ciernialab.github.io/MicrogliaMorphologyR/reference/data_2xLPS_mouse.md)
+  : 2xLPS mouse dataset
+- [`data_2xLPS_mouse_fuzzykmeans`](https://ciernialab.github.io/MicrogliaMorphologyR/reference/data_2xLPS_mouse_fuzzykmeans.md)
+  : 2xLPS fuzzy k-means soft clustering dataset
+- [`data_ImageTypeComparison`](https://ciernialab.github.io/MicrogliaMorphologyR/reference/data_ImageTypeComparison.md)
+  : ImageTypeComparisons mouse dataset
+- [`featurecorrelations()`](https://ciernialab.github.io/MicrogliaMorphologyR/reference/featurecorrelations.md)
+  : Correlation heatmap across morphology features
+- [`featurecorrelations_stats()`](https://ciernialab.github.io/MicrogliaMorphologyR/reference/featurecorrelations_stats.md)
+  : Underlying stats for correlation heatmap across morphology features
+- [`fraclac_tidying()`](https://ciernialab.github.io/MicrogliaMorphologyR/reference/fraclac_tidying.md)
+  : Tidy up your FracLac output
+- [`logscale()`](https://ciernialab.github.io/MicrogliaMorphologyR/reference/logscale.md)
+  : Log scale
+- [`merge_data()`](https://ciernialab.github.io/MicrogliaMorphologyR/reference/merge_data.md)
+  : Merge FracLac and AnalyzeSkeleton results together into one final
+  cell-level data frame
+- [`metadata_columns()`](https://ciernialab.github.io/MicrogliaMorphologyR/reference/metadata_columns.md)
+  : Tidy up metadata
+- [`minmax()`](https://ciernialab.github.io/MicrogliaMorphologyR/reference/minmax.md)
+  : Min-max scaling
+- [`normalize_logplots()`](https://ciernialab.github.io/MicrogliaMorphologyR/reference/normalize_logplots.md)
+  : Exploratory data analysis: normalization methods
+- [`normalize_minmax()`](https://ciernialab.github.io/MicrogliaMorphologyR/reference/normalize_minmax.md)
+  : Exploratory data analysis: min-max scaled plots
+- [`normalize_scaled()`](https://ciernialab.github.io/MicrogliaMorphologyR/reference/normalize_scaled.md)
+  : Exploratory data analysis: scaled plots
+- [`outliers_boxplots()`](https://ciernialab.github.io/MicrogliaMorphologyR/reference/outliers_boxplots.md)
+  : Exploratory data analysis: outlier detection
+- [`outliers_distributions()`](https://ciernialab.github.io/MicrogliaMorphologyR/reference/outliers_distributions.md)
+  : Exploratory data analysis: outlier detection
+- [`pcadata()`](https://ciernialab.github.io/MicrogliaMorphologyR/reference/pcadata.md)
+  : Dimensionality reduction using PCA
+- [`pcadata_elbow()`](https://ciernialab.github.io/MicrogliaMorphologyR/reference/pcadata_elbow.md)
+  : Dimensionality reduction using PCA and elbow/scree plot to get
+  variance explained
+- [`pcfeaturecorrelations()`](https://ciernialab.github.io/MicrogliaMorphologyR/reference/pcfeaturecorrelations.md)
+  : What morphology features describe the PCs?
+- [`pcfeaturecorrelations_stats()`](https://ciernialab.github.io/MicrogliaMorphologyR/reference/pcfeaturecorrelations_stats.md)
+  : Underlying stats for correlation heatmap exploring which
+  morphologies describe the PCs
+- [`plots_expvariable()`](https://ciernialab.github.io/MicrogliaMorphologyR/reference/plots_expvariable.md)
+  : Explore how experimental variables describe data
+- [`samplesize()`](https://ciernialab.github.io/MicrogliaMorphologyR/reference/samplesize.md)
+  : Sample size
+- [`skeleton_tidying()`](https://ciernialab.github.io/MicrogliaMorphologyR/reference/skeleton_tidying.md)
+  : Concatenate your individual AnalyzeSkeleton output files into one
+  dataframe
+- [`stats_cluster.animal()`](https://ciernialab.github.io/MicrogliaMorphologyR/reference/stats_cluster.animal.md)
+  : Stats analysis: cluster-level changes
+- [`stats_morphologymeasures.animal()`](https://ciernialab.github.io/MicrogliaMorphologyR/reference/stats_morphologymeasures.animal.md)
+  : Stats analysis: individual morphology measures
+- [`transform_log()`](https://ciernialab.github.io/MicrogliaMorphologyR/reference/transform_log.md)
+  : Transform data: Log scale
+- [`transform_minmax()`](https://ciernialab.github.io/MicrogliaMorphologyR/reference/transform_minmax.md)
+  : Transform data: Min-max scaling
+- [`transform_scale()`](https://ciernialab.github.io/MicrogliaMorphologyR/reference/transform_scale.md)
+  : Transform data: Scaling
+
+# Articles
+
+### All vignettes
+
+- [MicrogliaMorphology Pipeline
+  2](https://ciernialab.github.io/MicrogliaMorphologyR/articles/MicrogliaMorphologyPipeline2.md):
+- [How to use
+  MicrogliaMorphologyR](https://ciernialab.github.io/MicrogliaMorphologyR/articles/MicrogliaMorphologyR.md):

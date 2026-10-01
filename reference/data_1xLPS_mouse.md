@@ -1,0 +1,57 @@
+# 1xLPS mouse dataset
+
+Mouse microglia cells from regions of interest encompassing hippocampus,
+white matter tracks, and overlaying cortex. Mice were given a single 1
+mg/kg LPS intraperitoneal injection or PBS vehicle and brains were
+collected 24 hours later.
+
+## Usage
+
+``` r
+data_1xLPS_mouse
+```
+
+## Format
+
+### `data_1xLPS_mouse`
+
+A data frame with 15,293 rows and 33 columns:
+
+- Antibody:
+
+  Iba1
+
+- MouseID:
+
+  1_F, 1_M, 2_F, 2_M, 3_F, 4_F, 4_M, 5_M
+
+- Sex:
+
+  F, M
+
+- Treatment:
+
+  PBS, LPS
+
+- ID:
+
+  Individual Cell ID
+
+- UniqueID:
+
+  Unique descriptor for each cell in dataset
+
+- 27 morphology features: Columns 7-33:
+
+  Foreground pixels, Density of foreground pixels in hull area, Span
+  ratio of hull: major/minor axis, Maximum span across hull, Area,
+  Perimeter, Circularity, Width of bounding rectangle, Height of
+  bounding rectangle, Maximum radius from hull's center of mass, Max/min
+  radii from hull's center of mass, Relative variation in radii from
+  hull's center of mass, Mean radius, Diameter of bounding circle,
+  Maximum radius from circle's center of mass, Max/min radii from
+  circle's center of mass, Relative variation in radii from circle's
+  center of mass, Mean radius from circle's center of mass, \# of
+  branches, \# of junctions, \# of end point voxels, \# of junction
+  voxels, \# of slab voxels, Average branch length \# of triple points,
+  \# of quadruple points, Maximum branch length
