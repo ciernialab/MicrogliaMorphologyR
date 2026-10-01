@@ -17,7 +17,7 @@ flexible ways including at the single-cell level, animal-level, and
 experimental condition-level, and perform statistical analysis of your
 data.
 
-For the MicrogliaMorphology Pipeline 2 workflow, see the [Pipeline 2 tutorial](https://ciernialab.github.io/MicrogliaMorphologyR/articles/MicrogliaMorphologyPipeline2.html).
+### For the MicrogliaMorphology Pipeline 2 workflow, see the [Pipeline 2 tutorial](https://ciernialab.github.io/MicrogliaMorphologyR/articles/MicrogliaMorphologyPipeline2.html).
 
 ### If you are using this tool, please cite the following publication:
 
