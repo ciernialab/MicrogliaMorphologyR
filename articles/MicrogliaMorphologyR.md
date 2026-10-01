@@ -825,8 +825,8 @@ stats.testing <- stats_cluster.animal(data = stats.input %>% filter(Antibody=="I
     #> Random-effects (co)variances:
     #> 
     #> Conditional model:
-    #>  Groups  Name        Std.Dev. 
-    #>  MouseID (Intercept) 2.484e-06
+    #>  Groups  Name        Std.Dev.
+    #>  MouseID (Intercept) 2.49e-06
     #> 
     #> Number of obs: 68 / Conditional model: MouseID, 6
     #> 
@@ -848,7 +848,7 @@ stats.testing <- stats_cluster.animal(data = stats.input %>% filter(Antibody=="I
     #>            Cluster1:BrainRegion1             Cluster2:BrainRegion1  
     #>                        -0.093337                          0.081718  
     #>            Cluster3:BrainRegion1             Cluster1:BrainRegion2  
-    #>                         0.038133                         -0.213648  
+    #>                         0.038134                         -0.213648  
     #>            Cluster2:BrainRegion2             Cluster3:BrainRegion2  
     #>                        -0.044236                         -0.070106  
     #>          Treatment1:BrainRegion1           Treatment1:BrainRegion2  
@@ -865,29 +865,29 @@ stats.testing <- stats_cluster.animal(data = stats.input %>% filter(Antibody=="I
     #> 
     #> Response: percentage
     #>                                  Chisq Df Pr(>Chisq)    
-    #> Cluster                       632.4490  3  < 2.2e-16 ***
+    #> Cluster                       632.4501  3  < 2.2e-16 ***
     #> Treatment                       1.2604  1     0.2616    
     #> BrainRegion                     0.2084  2     0.9010    
     #> Cluster:Treatment             271.0011  3  < 2.2e-16 ***
     #> Cluster:BrainRegion           120.9205  6  < 2.2e-16 ***
     #> Treatment:BrainRegion           2.0685  2     0.3555    
-    #> Cluster:Treatment:BrainRegion  38.4143  6  9.322e-07 ***
+    #> Cluster:Treatment:BrainRegion  38.4143  6  9.321e-07 ***
     #> ---
     #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     stats.testing[[2]] # posthoc 1
     #>  contrast    Cluster      BrainRegion   estimate         SE  df z.ratio p.value
-    #>  PBS - 2xLPS Ameboid      FC           0.4187647 0.09890620 Inf   4.234  0.0003
-    #>  PBS - 2xLPS Hypertrophic FC           0.0933101 0.10739881 Inf   0.869  1.0000
-    #>  PBS - 2xLPS Ramified     FC           0.4761813 0.12097418 Inf   3.936  0.0010
-    #>  PBS - 2xLPS Rod-like     FC          -1.4735268 0.14575415 Inf -10.110 <0.0001
-    #>  PBS - 2xLPS Ameboid      HC           0.3271782 0.11116897 Inf   2.943  0.0390
-    #>  PBS - 2xLPS Hypertrophic HC           0.4612292 0.12234617 Inf   3.770  0.0020
-    #>  PBS - 2xLPS Ramified     HC           0.3975892 0.13631857 Inf   2.917  0.0425
-    #>  PBS - 2xLPS Rod-like     HC          -1.3269888 0.14559095 Inf  -9.114 <0.0001
-    #>  PBS - 2xLPS Ameboid      STR         -0.2121162 0.09521813 Inf  -2.228  0.3108
-    #>  PBS - 2xLPS Hypertrophic STR          0.3758412 0.11203992 Inf   3.355  0.0095
-    #>  PBS - 2xLPS Ramified     STR          0.4707882 0.12231262 Inf   3.849  0.0014
-    #>  PBS - 2xLPS Rod-like     STR         -0.8314495 0.15327898 Inf  -5.424 <0.0001
+    #>  PBS - 2xLPS Ameboid      FC           0.4187647 0.09890615 Inf   4.234  0.0003
+    #>  PBS - 2xLPS Hypertrophic FC           0.0933101 0.10739877 Inf   0.869  1.0000
+    #>  PBS - 2xLPS Ramified     FC           0.4761803 0.12097412 Inf   3.936  0.0010
+    #>  PBS - 2xLPS Rod-like     FC          -1.4735260 0.14575407 Inf -10.110 <0.0001
+    #>  PBS - 2xLPS Ameboid      HC           0.3271788 0.11116892 Inf   2.943  0.0390
+    #>  PBS - 2xLPS Hypertrophic HC           0.4612279 0.12234611 Inf   3.770  0.0020
+    #>  PBS - 2xLPS Ramified     HC           0.3975909 0.13631855 Inf   2.917  0.0425
+    #>  PBS - 2xLPS Rod-like     HC          -1.3269885 0.14559088 Inf  -9.115 <0.0001
+    #>  PBS - 2xLPS Ameboid      STR         -0.2121163 0.09521809 Inf  -2.228  0.3108
+    #>  PBS - 2xLPS Hypertrophic STR          0.3758416 0.11203987 Inf   3.355  0.0095
+    #>  PBS - 2xLPS Ramified     STR          0.4707885 0.12231262 Inf   3.849  0.0014
+    #>  PBS - 2xLPS Rod-like     STR         -0.8314478 0.15327882 Inf  -5.424 <0.0001
     #>  Significant
     #>  significant
     #>  ns         
@@ -906,10 +906,10 @@ stats.testing <- stats_cluster.animal(data = stats.input %>% filter(Antibody=="I
     #> P value adjustment: bonferroni method for 12 tests
     stats.testing[[3]] # posthoc 2
     #>  contrast    Cluster        estimate         SE  df z.ratio p.value Significant
-    #>  PBS - 2xLPS Ameboid       0.1779422 0.05888545 Inf   3.022  0.0100 significant
-    #>  PBS - 2xLPS Hypertrophic  0.3101269 0.06587575 Inf   4.708 <0.0001 significant
-    #>  PBS - 2xLPS Ramified      0.4481862 0.07316649 Inf   6.126 <0.0001 significant
-    #>  PBS - 2xLPS Rod-like     -1.2106550 0.08561028 Inf -14.141 <0.0001 significant
+    #>  PBS - 2xLPS Ameboid       0.1779424 0.05888543 Inf   3.022  0.0100 significant
+    #>  PBS - 2xLPS Hypertrophic  0.3101265 0.06587572 Inf   4.708 <0.0001 significant
+    #>  PBS - 2xLPS Ramified      0.4481866 0.07316647 Inf   6.126 <0.0001 significant
+    #>  PBS - 2xLPS Rod-like     -1.2106541 0.08561022 Inf -14.141 <0.0001 significant
     #> 
     #> Results are averaged over the levels of: BrainRegion 
     #> Results are given on the log odds ratio (not the response) scale. 
@@ -929,8 +929,8 @@ stats.testing[[5]] # summary of model
 #> Random-effects (co)variances:
 #> 
 #> Conditional model:
-#>  Groups  Name        Std.Dev. 
-#>  MouseID (Intercept) 2.484e-06
+#>  Groups  Name        Std.Dev.
+#>  MouseID (Intercept) 2.49e-06
 #> 
 #> Number of obs: 68 / Conditional model: MouseID, 6
 #> 
@@ -952,7 +952,7 @@ stats.testing[[5]] # summary of model
 #>            Cluster1:BrainRegion1             Cluster2:BrainRegion1  
 #>                        -0.093337                          0.081718  
 #>            Cluster3:BrainRegion1             Cluster1:BrainRegion2  
-#>                         0.038133                         -0.213648  
+#>                         0.038134                         -0.213648  
 #>            Cluster2:BrainRegion2             Cluster3:BrainRegion2  
 #>                        -0.044236                         -0.070106  
 #>          Treatment1:BrainRegion1           Treatment1:BrainRegion2  
