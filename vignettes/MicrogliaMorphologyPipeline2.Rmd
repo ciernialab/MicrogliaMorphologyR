@@ -1,5 +1,5 @@
 ---
-title: "MicrogliaMorphology Pipeline 2"
+title: "MicrogliaMorphologyR Pipeline 2 for ImageJ Macro MicrogliaMorphology2"
 output: rmarkdown::html_document
 vignette: >
   %\VignetteIndexEntry{MicrogliaMorphology Pipeline 2}
