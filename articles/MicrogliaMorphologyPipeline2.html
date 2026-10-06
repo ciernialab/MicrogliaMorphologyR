@@ -5,12 +5,12 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>MicrogliaMorphology Pipeline 2 • MicrogliaMorphologyR</title>
+<title>MicrogliaMorphologyR Pipeline 2 for ImageJ Macro MicrogliaMorphology2 • MicrogliaMorphologyR</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="MicrogliaMorphology Pipeline 2">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="MicrogliaMorphologyR Pipeline 2 for ImageJ Macro MicrogliaMorphology2">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -34,7 +34,7 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/MicrogliaMorphologyPipeline2.html">MicrogliaMorphology Pipeline 2</a></li>
+<li><a class="dropdown-item" href="../articles/MicrogliaMorphologyPipeline2.html">MicrogliaMorphologyR Pipeline 2 for ImageJ Macro MicrogliaMorphology2</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -56,7 +56,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
-      <h1>MicrogliaMorphology Pipeline 2</h1>
+      <h1>MicrogliaMorphologyR Pipeline 2 for ImageJ Macro MicrogliaMorphology2</h1>
             
       
 
@@ -69,13 +69,30 @@
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
 <p>This tutorial shows how to analyze output from the
-<strong>MicrogliaMorphology ImageJ macro (Pipeline 2)</strong> with
-MicrogliaMorphologyR. The example dataset is from Cx3cr1-GFP male and
-female mice collected 24 hrs after repeated 0.5 mg/kg LPS injections
-(separated by 24 hrs) or PBS (vehicle). Three brain regions were imaged:
-hippocampus (HC), striatum (STR) and frontal cortex (FC), with several
-subregions analyzed per region (CA1, CA2, CA3, DG, IL, PL, ACC, NAc,
-CP).</p>
+<strong>MicrogliaMorphology2 ImageJ macro </strong> with
+MicrogliaMorphologyR. The overall workflow is similar to the original
+MicrogliaMorphology Pipeline that pairs with the original
+MicrogliaMorphology ImageJ macro version 1. The main differences are as
+follows: 1. MicrogliaMorphology2 ImageJ macro outputs 40 measures
+instead of the original 27 so heatmaps of features look slightly
+different. 2. The functions for reading in fraclac and skeleton files
+separately and combining them are no longer used. MicrogliaMorphology2
+ImageJ macro generates one single CSV per region (1 row per cell instead
+of 1 csv per cell) for all 40 measures. Files are read in using a simple
+function for reading in csv files. 3. Metadata can be extracted from
+file names using the dyplyr function separate to allow for more
+flexibility in file naming. Alternatively metadata can be read in
+separately and mearged with the input dataset if file names do not
+contain all relevant variables for analysis. 4. The MicrogliaMorphology2
+ImageJ macro Color by Cluster generates a single image for all mapped
+ROIs (rather than one image per ROI) and so an additional column with
+‘Region’ is included in the csv file generated for Color by Cluster in
+MicrogliaMorphology2 ImageJ macro.</p>
+<p>The example dataset is from Cx3cr1-GFP male and female mice collected
+24 hrs after repeated 0.5 mg/kg LPS injections (separated by 24 hrs) or
+PBS (vehicle). Three brain regions were imaged: hippocampus (HC),
+striatum (STR) and frontal cortex (FC), with several subregions analyzed
+per region (CA1, CA2, CA3, DG, IL, PL, ACC, NAc, CP).</p>
 <blockquote>
 <p><strong>Note:</strong> If you have multiple brain regions in an
 experiment, we recommend running the clustering on all regions together
@@ -415,12 +432,13 @@ it.</p>
 <h2 id="verify-clusters-with-colorbycluster">Verify clusters with ColorByCluster<a class="anchor" aria-label="anchor" href="#verify-clusters-with-colorbycluster"></a>
 </h2>
 <p>Using the cluster classes from MicrogliaMorphologyR, we can color
-each cell in the original image by cluster with the MicrogliaMorphology
+each cell in the original image by cluster with the MicrogliaMorphology2
 ImageJ macro <strong>ColorByCluster</strong>. This lets you visually
 assess and verify your suspected cluster identities before deeming them
 ramified, hyper-ramified, rod-like, ameboid or any other morphological
 form for downstream analysis.</p>
-<p>ColorByCluster needs one .csv file per image:</p>
+<p>ColorByCluster for the MicrogliaMorphology2 ImageJ macro needs one
+.csv file per image:</p>
 <ul>
 <li>named with the name of the original image as a starting string (the
 .tif extension is not needed), and all files must share this starting
