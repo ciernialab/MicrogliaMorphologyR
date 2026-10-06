@@ -338,9 +338,9 @@ Cluster numbers are arbitrary and change with each dataset and random seed, so a
 
 # Verify clusters with ColorByCluster
 
-Using the cluster classes from MicrogliaMorphologyR, we can color each cell in the original image by cluster with the MicrogliaMorphology ImageJ macro **ColorByCluster**. This lets you visually assess and verify your suspected cluster identities before deeming them ramified, hyper-ramified, rod-like, ameboid or any other morphological form for downstream analysis.
+Using the cluster classes from MicrogliaMorphologyR, we can color each cell in the original image by cluster with the MicrogliaMorphology2 ImageJ macro **ColorByCluster**. This lets you visually assess and verify your suspected cluster identities before deeming them ramified, hyper-ramified, rod-like, ameboid or any other morphological form for downstream analysis.
 
-ColorByCluster needs one .csv file per image:
+ColorByCluster for the MicrogliaMorphology2 ImageJ macro needs one .csv file per image:
 
 - named with the name of the original image as a starting string (the .tif extension is not needed), and all files must share this starting string;
 - a first column with an empty header and ascending numbers;
