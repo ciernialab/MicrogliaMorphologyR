@@ -2,7 +2,7 @@
 title: "MicrogliaMorphologyR Pipeline 2 for ImageJ Macro MicrogliaMorphology2"
 output: rmarkdown::html_document
 vignette: >
-  %\VignetteIndexEntry{MicrogliaMorphology Pipeline 2}
+  %\VignetteIndexEntry{MicrogliaMorphologyR Pipeline 2 for ImageJ Macro MicrogliaMorphology2}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
