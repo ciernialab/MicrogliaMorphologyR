@@ -73,21 +73,27 @@
 MicrogliaMorphologyR. The overall workflow is similar to the original
 MicrogliaMorphology Pipeline that pairs with the original
 MicrogliaMorphology ImageJ macro version 1. The main differences are as
-follows: 1. MicrogliaMorphology2 ImageJ macro outputs 40 measures
-instead of the original 27 so heatmaps of features look slightly
-different. 2. The functions for reading in fraclac and skeleton files
+follows:</p>
+<ol style="list-style-type: decimal">
+<li><p>MicrogliaMorphology2 ImageJ macro outputs 40 measures instead of
+the original 27 so heatmaps of features look slightly
+different.</p></li>
+<li><p>The functions for reading in fraclac and skeleton files
 separately and combining them are no longer used. MicrogliaMorphology2
 ImageJ macro generates one single CSV per region (1 row per cell instead
 of 1 csv per cell) for all 40 measures. Files are read in using a simple
-function for reading in csv files. 3. Metadata can be extracted from
-file names using the dyplyr function separate to allow for more
-flexibility in file naming. Alternatively metadata can be read in
-separately and mearged with the input dataset if file names do not
-contain all relevant variables for analysis. 4. The MicrogliaMorphology2
-ImageJ macro Color by Cluster generates a single image for all mapped
-ROIs (rather than one image per ROI) and so an additional column with
-‘Region’ is included in the csv file generated for Color by Cluster in
-MicrogliaMorphology2 ImageJ macro.</p>
+function for reading in csv files.</p></li>
+<li><p>Metadata can be extracted from file names using the dyplyr
+function separate to allow for more flexibility in file naming.
+Alternatively metadata can be read in separately and mearged with the
+input dataset if file names do not contain all relevant variables for
+analysis.</p></li>
+<li><p>The MicrogliaMorphology2 ImageJ macro Color by Cluster generates
+a single image for all mapped ROIs (rather than one image per ROI) and
+so an additional column with ‘Region’ is included in the csv file
+generated for Color by Cluster in MicrogliaMorphology2 ImageJ
+macro.</p></li>
+</ol>
 <p>The example dataset is from Cx3cr1-GFP male and female mice collected
 24 hrs after repeated 0.5 mg/kg LPS injections (separated by 24 hrs) or
 PBS (vehicle). Three brain regions were imaged: hippocampus (HC),
