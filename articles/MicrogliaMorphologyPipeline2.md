@@ -1,4 +1,4 @@
-# MicrogliaMorphology Pipeline 2
+# MicrogliaMorphologyR Pipeline 2 for ImageJ Macro MicrogliaMorphology2
 
 ## Overview
 
@@ -16,11 +16,9 @@ region (CA1, CA2, CA3, DG, IL, PL, ACC, NAc, CP).
 > microglia in one region is comparable to a ramified microglia in
 > another.
 
-The code below is shown for reference and is not executed when this site
-is built. Paths, column positions and cluster labels are specific to
-this example dataset, so adjust them for your own data. For a tutorial
-that runs on the example dataset included with the package, see the
-[first
+Paths, column positions and cluster labels are specific to this example
+dataset, so adjust them for your own data. For a tutorial that runs on
+the example dataset included with the package, see the [first
 tutorial](https://ciernialab.github.io/MicrogliaMorphologyR/articles/MicrogliaMorphologyR.md).
 
 ## Load libraries
@@ -373,8 +371,12 @@ clusterfeatures(pca_kmeans, featurestart = 15, featureend = 44)
 
 ![](pipeline2/figures/clusterheatmap_numbers.png)
 
-After comparing the individual features across clusters, we characterize
-the clusters in this dataset as:
+This is the main output that differs bewteen the original Microglia
+Morphology v1 ImageJ macro and the v2 ImageJ macro. The version 2
+pipline has 40 measures instead of the original 27 and hence the heatmap
+looks slightly different. Cluster identities are assigned using the same
+type of logic where we compare the individual features across clusters
+to assigne identities. We characterize the clusters in this dataset as:
 
 - Cluster 1: hypertrophic (circular, high average branch length)
 - Cluster 2: rod-like (greatest hull span ratio, lowest circularity)

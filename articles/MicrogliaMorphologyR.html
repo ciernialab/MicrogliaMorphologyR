@@ -34,7 +34,7 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/MicrogliaMorphologyPipeline2.html">MicrogliaMorphology Pipeline 2</a></li>
+<li><a class="dropdown-item" href="../articles/MicrogliaMorphologyPipeline2.html">MicrogliaMorphologyR Pipeline 2 for ImageJ Macro MicrogliaMorphology2</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -819,8 +819,8 @@ clusters, we should be correcting across 4 tests.</p>
 <span><span class="co">#&gt; Random-effects (co)variances:</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Conditional model:</span></span>
-<span><span class="co">#&gt;  Groups  Name        Std.Dev. </span></span>
-<span><span class="co">#&gt;  MouseID (Intercept) 2.484e-06</span></span>
+<span><span class="co">#&gt;  Groups  Name        Std.Dev.</span></span>
+<span><span class="co">#&gt;  MouseID (Intercept) 2.49e-06</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Number of obs: 68 / Conditional model: MouseID, 6</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -842,7 +842,7 @@ clusters, we should be correcting across 4 tests.</p>
 <span><span class="co">#&gt;            Cluster1:BrainRegion1             Cluster2:BrainRegion1  </span></span>
 <span><span class="co">#&gt;                        -0.093337                          0.081718  </span></span>
 <span><span class="co">#&gt;            Cluster3:BrainRegion1             Cluster1:BrainRegion2  </span></span>
-<span><span class="co">#&gt;                         0.038133                         -0.213648  </span></span>
+<span><span class="co">#&gt;                         0.038134                         -0.213648  </span></span>
 <span><span class="co">#&gt;            Cluster2:BrainRegion2             Cluster3:BrainRegion2  </span></span>
 <span><span class="co">#&gt;                        -0.044236                         -0.070106  </span></span>
 <span><span class="co">#&gt;          Treatment1:BrainRegion1           Treatment1:BrainRegion2  </span></span>
@@ -859,29 +859,29 @@ clusters, we should be correcting across 4 tests.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Response: percentage</span></span>
 <span><span class="co">#&gt;                                  Chisq Df Pr(&gt;Chisq)    </span></span>
-<span><span class="co">#&gt; Cluster                       632.4490  3  &lt; 2.2e-16 ***</span></span>
+<span><span class="co">#&gt; Cluster                       632.4501  3  &lt; 2.2e-16 ***</span></span>
 <span><span class="co">#&gt; Treatment                       1.2604  1     0.2616    </span></span>
 <span><span class="co">#&gt; BrainRegion                     0.2084  2     0.9010    </span></span>
 <span><span class="co">#&gt; Cluster:Treatment             271.0011  3  &lt; 2.2e-16 ***</span></span>
 <span><span class="co">#&gt; Cluster:BrainRegion           120.9205  6  &lt; 2.2e-16 ***</span></span>
 <span><span class="co">#&gt; Treatment:BrainRegion           2.0685  2     0.3555    </span></span>
-<span><span class="co">#&gt; Cluster:Treatment:BrainRegion  38.4143  6  9.322e-07 ***</span></span>
+<span><span class="co">#&gt; Cluster:Treatment:BrainRegion  38.4143  6  9.321e-07 ***</span></span>
 <span><span class="co">#&gt; ---</span></span>
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
 <span><span class="va">stats.testing</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span> <span class="co"># posthoc 1</span></span>
 <span><span class="co">#&gt;  contrast    Cluster      BrainRegion   estimate         SE  df z.ratio p.value</span></span>
-<span><span class="co">#&gt;  PBS - 2xLPS Ameboid      FC           0.4187647 0.09890620 Inf   4.234  0.0003</span></span>
-<span><span class="co">#&gt;  PBS - 2xLPS Hypertrophic FC           0.0933101 0.10739881 Inf   0.869  1.0000</span></span>
-<span><span class="co">#&gt;  PBS - 2xLPS Ramified     FC           0.4761813 0.12097418 Inf   3.936  0.0010</span></span>
-<span><span class="co">#&gt;  PBS - 2xLPS Rod-like     FC          -1.4735268 0.14575415 Inf -10.110 &lt;0.0001</span></span>
-<span><span class="co">#&gt;  PBS - 2xLPS Ameboid      HC           0.3271782 0.11116897 Inf   2.943  0.0390</span></span>
-<span><span class="co">#&gt;  PBS - 2xLPS Hypertrophic HC           0.4612292 0.12234617 Inf   3.770  0.0020</span></span>
-<span><span class="co">#&gt;  PBS - 2xLPS Ramified     HC           0.3975892 0.13631857 Inf   2.917  0.0425</span></span>
-<span><span class="co">#&gt;  PBS - 2xLPS Rod-like     HC          -1.3269888 0.14559095 Inf  -9.114 &lt;0.0001</span></span>
-<span><span class="co">#&gt;  PBS - 2xLPS Ameboid      STR         -0.2121162 0.09521813 Inf  -2.228  0.3108</span></span>
-<span><span class="co">#&gt;  PBS - 2xLPS Hypertrophic STR          0.3758412 0.11203992 Inf   3.355  0.0095</span></span>
-<span><span class="co">#&gt;  PBS - 2xLPS Ramified     STR          0.4707882 0.12231262 Inf   3.849  0.0014</span></span>
-<span><span class="co">#&gt;  PBS - 2xLPS Rod-like     STR         -0.8314495 0.15327898 Inf  -5.424 &lt;0.0001</span></span>
+<span><span class="co">#&gt;  PBS - 2xLPS Ameboid      FC           0.4187647 0.09890615 Inf   4.234  0.0003</span></span>
+<span><span class="co">#&gt;  PBS - 2xLPS Hypertrophic FC           0.0933101 0.10739877 Inf   0.869  1.0000</span></span>
+<span><span class="co">#&gt;  PBS - 2xLPS Ramified     FC           0.4761803 0.12097412 Inf   3.936  0.0010</span></span>
+<span><span class="co">#&gt;  PBS - 2xLPS Rod-like     FC          -1.4735260 0.14575407 Inf -10.110 &lt;0.0001</span></span>
+<span><span class="co">#&gt;  PBS - 2xLPS Ameboid      HC           0.3271788 0.11116892 Inf   2.943  0.0390</span></span>
+<span><span class="co">#&gt;  PBS - 2xLPS Hypertrophic HC           0.4612279 0.12234611 Inf   3.770  0.0020</span></span>
+<span><span class="co">#&gt;  PBS - 2xLPS Ramified     HC           0.3975909 0.13631855 Inf   2.917  0.0425</span></span>
+<span><span class="co">#&gt;  PBS - 2xLPS Rod-like     HC          -1.3269885 0.14559088 Inf  -9.115 &lt;0.0001</span></span>
+<span><span class="co">#&gt;  PBS - 2xLPS Ameboid      STR         -0.2121163 0.09521809 Inf  -2.228  0.3108</span></span>
+<span><span class="co">#&gt;  PBS - 2xLPS Hypertrophic STR          0.3758416 0.11203987 Inf   3.355  0.0095</span></span>
+<span><span class="co">#&gt;  PBS - 2xLPS Ramified     STR          0.4707885 0.12231262 Inf   3.849  0.0014</span></span>
+<span><span class="co">#&gt;  PBS - 2xLPS Rod-like     STR         -0.8314478 0.15327882 Inf  -5.424 &lt;0.0001</span></span>
 <span><span class="co">#&gt;  Significant</span></span>
 <span><span class="co">#&gt;  significant</span></span>
 <span><span class="co">#&gt;  ns         </span></span>
@@ -900,10 +900,10 @@ clusters, we should be correcting across 4 tests.</p>
 <span><span class="co">#&gt; P value adjustment: bonferroni method for 12 tests</span></span>
 <span><span class="va">stats.testing</span><span class="op">[[</span><span class="fl">3</span><span class="op">]</span><span class="op">]</span> <span class="co"># posthoc 2</span></span>
 <span><span class="co">#&gt;  contrast    Cluster        estimate         SE  df z.ratio p.value Significant</span></span>
-<span><span class="co">#&gt;  PBS - 2xLPS Ameboid       0.1779422 0.05888545 Inf   3.022  0.0100 significant</span></span>
-<span><span class="co">#&gt;  PBS - 2xLPS Hypertrophic  0.3101269 0.06587575 Inf   4.708 &lt;0.0001 significant</span></span>
-<span><span class="co">#&gt;  PBS - 2xLPS Ramified      0.4481862 0.07316649 Inf   6.126 &lt;0.0001 significant</span></span>
-<span><span class="co">#&gt;  PBS - 2xLPS Rod-like     -1.2106550 0.08561028 Inf -14.141 &lt;0.0001 significant</span></span>
+<span><span class="co">#&gt;  PBS - 2xLPS Ameboid       0.1779424 0.05888543 Inf   3.022  0.0100 significant</span></span>
+<span><span class="co">#&gt;  PBS - 2xLPS Hypertrophic  0.3101265 0.06587572 Inf   4.708 &lt;0.0001 significant</span></span>
+<span><span class="co">#&gt;  PBS - 2xLPS Ramified      0.4481866 0.07316647 Inf   6.126 &lt;0.0001 significant</span></span>
+<span><span class="co">#&gt;  PBS - 2xLPS Rod-like     -1.2106541 0.08561022 Inf -14.141 &lt;0.0001 significant</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Results are averaged over the levels of: BrainRegion </span></span>
 <span><span class="co">#&gt; Results are given on the log odds ratio (not the response) scale. </span></span>
@@ -920,8 +920,8 @@ clusters, we should be correcting across 4 tests.</p>
 <span><span class="co">#&gt; Random-effects (co)variances:</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Conditional model:</span></span>
-<span><span class="co">#&gt;  Groups  Name        Std.Dev. </span></span>
-<span><span class="co">#&gt;  MouseID (Intercept) 2.484e-06</span></span>
+<span><span class="co">#&gt;  Groups  Name        Std.Dev.</span></span>
+<span><span class="co">#&gt;  MouseID (Intercept) 2.49e-06</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Number of obs: 68 / Conditional model: MouseID, 6</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -943,7 +943,7 @@ clusters, we should be correcting across 4 tests.</p>
 <span><span class="co">#&gt;            Cluster1:BrainRegion1             Cluster2:BrainRegion1  </span></span>
 <span><span class="co">#&gt;                        -0.093337                          0.081718  </span></span>
 <span><span class="co">#&gt;            Cluster3:BrainRegion1             Cluster1:BrainRegion2  </span></span>
-<span><span class="co">#&gt;                         0.038133                         -0.213648  </span></span>
+<span><span class="co">#&gt;                         0.038134                         -0.213648  </span></span>
 <span><span class="co">#&gt;            Cluster2:BrainRegion2             Cluster3:BrainRegion2  </span></span>
 <span><span class="co">#&gt;                        -0.044236                         -0.070106  </span></span>
 <span><span class="co">#&gt;          Treatment1:BrainRegion1           Treatment1:BrainRegion2  </span></span>

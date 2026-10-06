@@ -5,12 +5,12 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>MicrogliaMorphology Pipeline 2 • MicrogliaMorphologyR</title>
+<title>MicrogliaMorphologyR Pipeline 2 for ImageJ Macro MicrogliaMorphology2 • MicrogliaMorphologyR</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="MicrogliaMorphology Pipeline 2">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="MicrogliaMorphologyR Pipeline 2 for ImageJ Macro MicrogliaMorphology2">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -34,7 +34,7 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/MicrogliaMorphologyPipeline2.html">MicrogliaMorphology Pipeline 2</a></li>
+<li><a class="dropdown-item" href="../articles/MicrogliaMorphologyPipeline2.html">MicrogliaMorphologyR Pipeline 2 for ImageJ Macro MicrogliaMorphology2</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -56,7 +56,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
-      <h1>MicrogliaMorphology Pipeline 2</h1>
+      <h1>MicrogliaMorphologyR Pipeline 2 for ImageJ Macro MicrogliaMorphology2</h1>
             
       
 
@@ -83,11 +83,9 @@ and then splitting by region for statistical analysis. That way, a
 ramified microglia in one region is comparable to a ramified microglia
 in another.</p>
 </blockquote>
-<p>The code below is shown for reference and is not executed when this
-site is built. Paths, column positions and cluster labels are specific
-to this example dataset, so adjust them for your own data. For a
-tutorial that runs on the example dataset included with the package, see
-the <a href="MicrogliaMorphologyR.html">first tutorial</a>.</p>
+<p>Paths, column positions and cluster labels are specific to this
+example dataset, so adjust them for your own data. For a tutorial that
+runs on the example dataset included with the package, see the <a href="MicrogliaMorphologyR.html">first tutorial</a>.</p>
 </div>
 <div class="section level2">
 <h2 id="load-libraries">Load libraries<a class="anchor" aria-label="anchor" href="#load-libraries"></a>
@@ -394,8 +392,13 @@ relative to the other clusters:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/clusterfeatures.html">clusterfeatures</a></span><span class="op">(</span><span class="va">pca_kmeans</span>, featurestart <span class="op">=</span> <span class="fl">15</span>, featureend <span class="op">=</span> <span class="fl">44</span><span class="op">)</span></span></code></pre></div>
 <p><img src="pipeline2/figures/clusterheatmap_numbers.png" class="r-plt" alt="" width="100%"></p>
-<p>After comparing the individual features across clusters, we
-characterize the clusters in this dataset as:</p>
+<p>This is the main output that differs bewteen the original Microglia
+Morphology v1 ImageJ macro and the v2 ImageJ macro. The version 2
+pipline has 40 measures instead of the original 27 and hence the heatmap
+looks slightly different. Cluster identities are assigned using the same
+type of logic where we compare the individual features across clusters
+to assigne identities. We characterize the clusters in this dataset
+as:</p>
 <ul>
 <li>Cluster 1: hypertrophic (circular, high average branch length)</li>
 <li>Cluster 2: rod-like (greatest hull span ratio, lowest
