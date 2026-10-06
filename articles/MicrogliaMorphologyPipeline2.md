@@ -2,21 +2,21 @@
 
 ## Overview
 
-This tutorial shows how to analyze output from the **MicrogliaMorphology
-ImageJ macro (Pipeline 2)** with MicrogliaMorphologyR. The overall
-workflow is similar to the original MicrogliaMorphology Pipeline that
-pairs with the original MicrogliaMorphology ImageJ macro version 1. The
-main differences are as follows: 1. MicrogliaMorphology2 ImageJ macro
-outputs 40 measures instead of the original 27 so heatmaps of features
-look slightly different. 2. The functions for reading in fraclac and
-skeleton files separately and combining them are no longer used.
-MicrogliaMorphology2 ImageJ macro generates one single CSV per region (1
-row per cell instead of 1 csv per cell) for all 40 measures. Files are
-read in using a simple function for reading in csv files. 3. Metadata
-can be extracted from file names using the dyplyr function separate to
-allow for more flexibility in file naming. Alternatively metadata can be
-read in separately and mearged with the input dataset if file names do
-not contain all relevant variables for analysis. 4. The
+This tutorial shows how to analyze output from the
+**MicrogliaMorphology2 ImageJ macro** with MicrogliaMorphologyR. The
+overall workflow is similar to the original MicrogliaMorphology Pipeline
+that pairs with the original MicrogliaMorphology ImageJ macro version 1.
+The main differences are as follows: 1. MicrogliaMorphology2 ImageJ
+macro outputs 40 measures instead of the original 27 so heatmaps of
+features look slightly different. 2. The functions for reading in
+fraclac and skeleton files separately and combining them are no longer
+used. MicrogliaMorphology2 ImageJ macro generates one single CSV per
+region (1 row per cell instead of 1 csv per cell) for all 40 measures.
+Files are read in using a simple function for reading in csv files. 3.
+Metadata can be extracted from file names using the dyplyr function
+separate to allow for more flexibility in file naming. Alternatively
+metadata can be read in separately and mearged with the input dataset if
+file names do not contain all relevant variables for analysis. 4. The
 MicrogliaMorphology2 ImageJ macro Color by Cluster generates a single
 image for all mapped ROIs (rather than one image per ROI) and so an
 additional column with ‘Region’ is included in the csv file generated
@@ -408,13 +408,14 @@ it.
 ## Verify clusters with ColorByCluster
 
 Using the cluster classes from MicrogliaMorphologyR, we can color each
-cell in the original image by cluster with the MicrogliaMorphology
+cell in the original image by cluster with the MicrogliaMorphology2
 ImageJ macro **ColorByCluster**. This lets you visually assess and
 verify your suspected cluster identities before deeming them ramified,
 hyper-ramified, rod-like, ameboid or any other morphological form for
 downstream analysis.
 
-ColorByCluster needs one .csv file per image:
+ColorByCluster for the MicrogliaMorphology2 ImageJ macro needs one .csv
+file per image:
 
 - named with the name of the original image as a starting string (the
   .tif extension is not needed), and all files must share this starting
