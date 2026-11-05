@@ -8,14 +8,15 @@ overall workflow is similar to the original MicrogliaMorphology Pipeline
 that pairs with the original MicrogliaMorphology ImageJ macro version 1.
 The main differences are as follows:
 
-1.  MicrogliaMorphology2 ImageJ macro outputs 40 measures instead of the
-    original 27 so heatmaps of features look slightly different.
+1.  MicrogliaMorphology2 ImageJ macro outputs 27 measures direclty from
+    ImageJ rather than of the original 27 (ImageJ skeleton + FracLac) so
+    heatmaps of features look slightly different.
 
 2.  The functions for reading in fraclac and skeleton files separately
     and combining them are no longer used. MicrogliaMorphology2 ImageJ
     macro generates one single CSV per region (1 row per cell instead of
-    1 csv per cell) for all 40 measures. Files are read in using a
-    simple function for reading in csv files.
+    1 csv per cell) for all measures. Files are read in using a simple
+    function for reading in csv files.
 
 3.  Metadata can be extracted from file names using the dyplyr function
     separate to allow for more flexibility in file naming. Alternatively
@@ -27,6 +28,11 @@ The main differences are as follows:
     single image for all mapped ROIs (rather than one image per ROI) and
     so an additional column with ‘Region’ is included in the csv file
     generated for Color by Cluster in MicrogliaMorphology2 ImageJ macro.
+
+5.  If you run the quantification of another channel within microglia
+    (new feature of MicrogliaMorphology2 ImageJ macro) then you will
+    need to filter those columns out of the columns for clustering and
+    add them back in post clustering for further analysis.
 
 The example dataset is from Cx3cr1-GFP male and female mice collected 24
 hrs after repeated 0.5 mg/kg LPS injections (separated by 24 hrs) or PBS
